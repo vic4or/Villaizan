@@ -1,8 +1,8 @@
 "use client"; 
 
 import React from "react";
-import Menu from '../components/menu/menu.js';
-import NuevaMultimedia from "../components/multimedia/nuevaMultimedia.js";
+import Menu from '../../menu/menu.js';
+import ListaMultimedia from "../listadoMultimedia.js";
 
 export default function PaginaNuevaMultimedia() {
   return (
@@ -11,7 +11,7 @@ export default function PaginaNuevaMultimedia() {
         <Menu />
       </div>
       <div style={{ marginLeft: "80px", padding: "20px", width: "100%", overflowY: "auto" }}>
-        <NuevaMultimedia />
+        <ListaMultimedia />
       </div>
     </div>
   );
