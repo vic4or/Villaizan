@@ -1,0 +1,79 @@
+/* NuevaMultimedia.css */
+
+.breadcrumb-container {
+  margin-bottom: 15px; /* Agregar espacio entre el breadcrumb y el contenedor principal */
+  padding-left: 30px;  /* Ajustar el padding para alinearlo con el contenedor */
+}
+
+.nueva-multimedia {
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-select-custom, .form-control-custom {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.custom-file-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background: #f8f8f8;
+  text-align: center;
+  cursor: pointer;
+}
+
+.file-input {
+  display: none;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 250px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn-change-image {
+  margin-top: 10px;
+  padding: 5px 15px;
+  border: 1px solid #e63946;
+  background: #fff;
+  color: #e63946;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-change-image:hover {
+  background: #e63946;
+  color: #fff;
+}
+
+.button-group .btn-custom {
+  background-color: #e63946;
+  color: white;
+  border: none;
+}
+
+.button-group .btn-cancel {
+  background-color: #e0e0e0;
+  color: black;
+  border: none;
+}
+
+.button-group .btn-custom:hover {
+  background-color: #d62839;
+}
+
+.button-group .btn-cancel:hover {
+  background-color: #d3d3d3;
+}
