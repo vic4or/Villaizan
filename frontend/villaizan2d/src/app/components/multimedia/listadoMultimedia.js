@@ -40,7 +40,7 @@ export default function ListadoMultimedia() {
       };      
 
     const handleAddNew = () => {
-        router.push("/multimedia/nuevo");
+        router.push("/pages/multimedia/nuevo");
     };
 
     return (
