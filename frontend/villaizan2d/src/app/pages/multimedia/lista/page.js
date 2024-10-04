@@ -1,10 +1,10 @@
 "use client"; 
 
 import React from "react";
-import Menu from '../../menu/menu.js';
-import ListaMultimedia from "../listadoMultimedia.js";
+import Menu from '../../../components/menu/menu.js';
+import ListaMultimedia from "../../../components/multimedia/listadoMultimedia.js";
 
-export default function PaginaNuevaMultimedia() {
+export default function PaginaListaMultimedia() {
   return (
     <div style={{ display: "flex", flexDirection: "row", height: "100vh", overflow: "hidden" }}>
       <div style={{ width: "80px", backgroundColor: "#b71c1c", height: "100vh", position: "fixed", top: 0, left: 0 }}>
