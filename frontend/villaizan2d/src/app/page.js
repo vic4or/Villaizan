@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Menu from "./components/menu/menu.js"; // Importar el componente de menú
 
 export default function Home() {
   const handleClick = (message) => {
     alert(message);
   };
-
+  
   return (
     <div style={{ display: "flex", flexDirection: "row", height: "100vh", overflow: "hidden" }}>
       {/* Menú lateral */}
@@ -89,6 +90,6 @@ export default function Home() {
           }
         `}</style>
       </div>
-    </div>
   );
 }
+
