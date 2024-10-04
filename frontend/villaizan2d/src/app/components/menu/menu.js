@@ -3,7 +3,7 @@ import { FaHome, FaGift, FaTags, FaBell, FaSignOutAlt, FaClipboardList, FaCredit
 import { BsImage } from 'react-icons/bs';
 import { BiSolidDiscount } from "react-icons/bi";
 import { TbLetterV } from "react-icons/tb";
-
+import Link from 'next/link'; // Importar Link de Next.js
 
 export default function Menu() {
   return (
@@ -38,14 +38,18 @@ export default function Menu() {
         alignItems: "center",
       }}>
         {/* Home */}
-        <div style={menuItemStyle} title="Inicio">
-          <FaHome size="20px" style={{ color: "#000" }} />
-        </div>
+        <Link href="/">
+          <div style={menuItemStyle} title="Inicio">
+            <FaHome size="20px" style={{ color: "#000" }} />
+          </div>
+        </Link>
 
         {/* Multimedia */}
-        <div style={menuItemStyle} title="Multimedia">
-          <BsImage size="20px" style={{ color: "#000" }} />
-        </div>
+        <Link href="/pages/multimedia/lista">
+          <div style={menuItemStyle} title="Multimedia">
+            <BsImage size="20px" style={{ color: "#000" }} />
+          </div>
+        </Link>
 
         {/* Notificaciones */}
         <div style={menuItemStyle} title="Notificaciones">

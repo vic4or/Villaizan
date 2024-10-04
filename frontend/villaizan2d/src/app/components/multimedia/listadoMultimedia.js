@@ -2,15 +2,13 @@
 
 import React, { useState } from "react";
 import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination , ButtonGroup} from "react-bootstrap";
-import { FaEdit, FaTrashAlt } from "react-icons/fa"; // Importar íconos para Editar y Eliminar
-import { useRouter } from "next/navigation"; // Usar el router de Next.js
-import Link from "next/link"; // Importar el componente Link de Next.js
-
-
+import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
+import { useRouter } from "next/navigation"; 
+import Link from "next/link";
+import * as XLSX from "xlsx";
 
 export default function ListadoMultimedia() {
     const router = useRouter();
-    // Estado inicial con datos de multimedia
     const [multimedia, setMultimedia] = useState([
         { id: 1, fruit: "Manzana", description: "Introducción a la manzana y sus beneficios", type: "Video", url: "https://vid.com/manzana", status: "Activo" },
         { id: 2, fruit: "Plátano", description: "Información nutricional del plátano", type: "Información", url: "El plátano es una fruta tropical que destaca por su alto contenido de potasio.", status: "Inactivo" },
@@ -36,13 +34,34 @@ export default function ListadoMultimedia() {
     const totalPages = Math.ceil(filteredMultimedia.length / itemsPerPage);
 
     const handleEdit = (id) => {
-        router.push(`/multimedia/editar/?id=${id}`);
+        router.push(`/pages/multimedia/editar/?id=${id}`);
       };      
 
     const handleAddNew = () => {
         router.push("/pages/multimedia/nuevo");
     };
 
+    // Función para exportar datos a CSV
+    const handleExport = () => {
+        // Crear una nueva hoja de trabajo con los datos
+        const worksheetData = filteredMultimedia.map((item) => ({
+          ID: item.id,
+          Fruta: item.fruit,
+          Descripción: item.description,
+          Tipo: item.type,
+          URL_o_Información: item.url,
+          Estado: item.status,
+        }));
+      
+        // Crear un libro de trabajo (workbook) y agregar la hoja
+        const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Multimedia");
+      
+        // Generar el archivo Excel
+        XLSX.writeFile(workbook, "multimedia_export.xlsx");
+      };      
+  
     return (
         <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
         {/* Breadcrumb y Filtro de Activos/Inactivos */}
@@ -102,7 +121,7 @@ export default function ListadoMultimedia() {
             <Col md={4} className="d-flex justify-content-end align-items-start">
             <Button variant="outline-secondary" className="me-2">Filtrar</Button>
             <Button variant="danger" className="me-2" onClick={handleAddNew}>+ Agregar</Button>
-            <Button variant="outline-danger">Exportar</Button>
+            <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
             </Col>
         </Row>
 
@@ -134,14 +153,11 @@ export default function ListadoMultimedia() {
                 </td>
                 <td className="text-center">
                     {/* Botones de Edición y Eliminación */}
-                    <Button
-                    variant="outline-primary"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => handleEdit(item.id)}
-                    >
-                    <FaEdit /> Editar
-                    </Button>
+                    <Link href={`/pages/multimedia/editar/?id=${item.id}`} key={item.id}>
+                        <Button variant="outline-primary" size="sm" className="me-2">
+                            <FaEdit /> Editar
+                        </Button>
+                    </Link>
                     <Button
                     variant="outline-danger"
                     size="sm"
