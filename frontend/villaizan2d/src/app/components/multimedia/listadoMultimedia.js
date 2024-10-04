@@ -5,8 +5,7 @@ import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
 import { useRouter } from "next/navigation"; 
 import Link from "next/link";
-
-
+import * as XLSX from "xlsx";
 
 export default function ListadoMultimedia() {
     const router = useRouter();
@@ -42,6 +41,27 @@ export default function ListadoMultimedia() {
         router.push("/pages/multimedia/nuevo");
     };
 
+    // Función para exportar datos a CSV
+    const handleExport = () => {
+        // Crear una nueva hoja de trabajo con los datos
+        const worksheetData = filteredMultimedia.map((item) => ({
+          ID: item.id,
+          Fruta: item.fruit,
+          Descripción: item.description,
+          Tipo: item.type,
+          URL_o_Información: item.url,
+          Estado: item.status,
+        }));
+      
+        // Crear un libro de trabajo (workbook) y agregar la hoja
+        const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Multimedia");
+      
+        // Generar el archivo Excel
+        XLSX.writeFile(workbook, "multimedia_export.xlsx");
+      };      
+  
     return (
         <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
         {/* Breadcrumb y Filtro de Activos/Inactivos */}
@@ -101,7 +121,7 @@ export default function ListadoMultimedia() {
             <Col md={4} className="d-flex justify-content-end align-items-start">
             <Button variant="outline-secondary" className="me-2">Filtrar</Button>
             <Button variant="danger" className="me-2" onClick={handleAddNew}>+ Agregar</Button>
-            <Button variant="outline-danger">Exportar</Button>
+            <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
             </Col>
         </Row>
 
