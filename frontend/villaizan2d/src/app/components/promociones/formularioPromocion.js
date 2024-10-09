@@ -7,7 +7,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function FormularioPromocion() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isEditMode = searchParams.get("editar") === "true";
+  const id = searchParams.get("id");
+  const isEditMode = Boolean(id); // Si hay un ID, estamos en modo edición
+
   const [initialValues, setInitialValues] = useState({
     nombre: "",
     tipo: "",
@@ -23,6 +25,7 @@ export default function FormularioPromocion() {
   const [searchProduct, setSearchProduct] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formError, setFormError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const availableProducts = [
     "Paleta - Fresa",
@@ -34,55 +37,64 @@ export default function FormularioPromocion() {
     "Helado - Chocolate"
   ];
 
+  // Simular la búsqueda de la promoción por ID
+  const fetchPromotionById = (id) => {
+    const promociones = [
+      { id: 1, nombre: "Helado gratis", tipo: "Oferta Especial", descripcion: "Obtén un 100% de descuento en un helado por día de fundación de helados Villizan", fechaInicio: "2024-09-27", fechaFin: "2024-10-27", descuento: "100", productos: ["Paleta - Fresa", "Mafeleta - Coco"] },
+      { id: 2, nombre: "50% de Descuento", tipo: "Paquete", descripcion: "Obtén un 30% de descuento en total por llevarte este paquete", fechaInicio: "2024-09-28", fechaFin: "2024-10-28", descuento: "30", productos: ["Paleta - Aguaje", "Helado - Vainilla"] }
+      // Agregar más promociones si es necesario
+    ];
+    return promociones.find((promo) => promo.id === parseInt(id));
+  };
+
   useEffect(() => {
     if (isEditMode) {
-      const id = searchParams.get("id");
-      // Aquí deberías hacer la lógica para obtener los datos de la promoción a editar por ID
-      // y luego actualizar el estado con los valores obtenidos.
-      // Ejemplo:
-      // fetchPromotionById(id).then(data => setInitialValues(data));
-      setInitialValues({
-        nombre: "Helado Natural",
-        tipo: "Oferta Especial",
-        descuento: "50",
-        limiteStock: "100",
-        fechaInicio: "2024-09-29",
-        fechaFin: "2024-10-29",
-        descripcion: "Obtén un 50% de descuento por un helado por día de las frutas",
-        productos: ["Paleta - Fresa", "Paleta - Aguaje", "Mafeleta - Ron", "Mafeleta - Coco", "Mafeleta - Lúcuma"],
-      });
+      const promotion = fetchPromotionById(id);
+      if (promotion) {
+        setInitialValues({
+          nombre: promotion.nombre,
+          tipo: promotion.tipo,
+          descuento: promotion.descuento,
+          limiteStock: promotion.limiteStock || "",
+          fechaInicio: promotion.fechaInicio,
+          fechaFin: promotion.fechaFin,
+          descripcion: promotion.descripcion,
+          productos: promotion.productos,
+        });
+        setSelectedProducts(promotion.productos);
+      }
     }
-  }, [isEditMode, searchParams]);
+  }, [isEditMode, id]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
     let valid = true;
+    let message = "";
 
     if (!initialValues.nombre || !initialValues.tipo || !initialValues.descuento || !initialValues.fechaInicio || !initialValues.fechaFin || !initialValues.descripcion) {
-      setFormError(true);
       valid = false;
+      message = "Todos los campos obligatorios deben ser completados.";
     }
 
     if (initialValues.tipo === "Paquete" && selectedProducts.length < 2) {
-      setFormError(true);
       valid = false;
+      message = "Para el tipo \"Paquete\", debe seleccionar al menos dos productos.";
     }
 
     if (new Date(initialValues.fechaFin) < new Date(initialValues.fechaInicio)) {
-        setFormError(true);
-        valid = false;
-        message = "La fecha de fin no puede ser menor a la fecha de inicio.";
-      }
+      valid = false;
+      message = "La fecha de fin no puede ser menor a la fecha de inicio.";
+    }
 
-      if (valid) {
-        setShowConfirmation(true);
-        setFormError(false);
-        setErrorMessage("");
-      } else {
-        setFormError(true);
-        setErrorMessage(message);
-      }
+    if (valid) {
+      setShowConfirmation(true);
+      setFormError(false);
+      setErrorMessage("");
+    } else {
+      setFormError(true);
+      setErrorMessage(message);
+    }
   };
 
   const handleProductSearch = (event) => {
@@ -100,7 +112,10 @@ export default function FormularioPromocion() {
     setSelectedProducts(selectedProducts.filter((item) => item !== product));
   };
 
-  const handleClose = () => setShowConfirmation(false);
+  const handleClose = () => {
+    setShowConfirmation(false);
+    router.push("/pages/promociones/lista");
+  };
 
   return (
     <>
@@ -275,9 +290,7 @@ export default function FormularioPromocion() {
 
             {formError && (
               <Alert variant="danger" className="mb-3">
-                Todos los campos obligatorios deben ser completados.
-                {initialValues.tipo === "Paquete" && selectedProducts.length < 2 && <div>Para el tipo "Paquete", debe seleccionar al menos dos productos.</div>}
-                {(new Date(initialValues.fechaFin) < new Date(initialValues.fechaInicio) )&& <div>La fecha de fin no puede ser menor a la fecha de inicio.</div>}
+                {errorMessage}
               </Alert>
             )}
 

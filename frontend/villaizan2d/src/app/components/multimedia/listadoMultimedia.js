@@ -153,7 +153,7 @@ export default function ListadoMultimedia() {
                 </td>
                 <td className="text-center">
                     {/* Botones de Edición y Eliminación */}
-                    <Link href={`/pages/multimedia/editar/?id=${item.id}`} key={item.id}>
+                    <Link href={`/pages/multimedia/editar?id=${item.id}`} key={item.id}>
                         <Button variant="outline-primary" size="sm" className="me-2">
                             <FaEdit /> Editar
                         </Button>

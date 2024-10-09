@@ -47,7 +47,7 @@ export default function Home() {
               <h3>Gestión de Recompensas</h3>
               <p>Administra los puntos de recompensa de los clientes</p>
             </div>
-            <div className="card" onClick={() => handleClick("Gestión de Puntos")}>  
+            <div className="card" onClick={() => window.location.href='/pages/puntos/lista'}>  
               <div className="icon-container">
                 <Icon name="card" />
               </div>
@@ -75,7 +75,7 @@ export default function Home() {
               <h3>Gestión de Multimedia</h3>
               <p>Crea, modifica y gestiona contenido multimedia como imágenes y videos de frutas y helados</p>
             </div>
-            <div className="card" onClick={() => handleClick("Gestión de Promociones")}>  
+            <div className="card" onClick={() => window.location.href='/pages/promociones/lista'}>  
               <div className="icon-container">
                 <Icon name="tag" />
               </div>

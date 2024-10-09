@@ -9,12 +9,19 @@ import * as XLSX from "xlsx";
 
 export default function ListadoPuntos() {
     const router = useRouter();
-    const [puntos, setPuntos] = useState([
+    /* const [puntos, setPuntos] = useState([
         { id: 1, product: "Helado de Fresa", description: "Información de los puntos del Helado de Fresa", point: 25, status: "Activo" },
         { id: 2, product: "Helado de Coco", description: "Información de los puntos del Helado de Coco", point: 50, status: "Inactivo" },
         { id: 3, product: "Helado de Maracumango", description: "Información de los puntos del Helado de Maracumango", point: 60, status: "Activo" },
         { id: 4, product: "Helado de Aguaje", description: "Información de los puntos del Helado de Aguaje", point: 75, status: "Activo" },
         { id: 5, product: "Helado de Uva", description: "Información de los puntos del Helado de Uva", point: 30, status: "Inactivo" },
+    ]); */
+    const [puntos, setPuntos] = useState([
+        { id: 1, name: "Helado de Fresa",product: "Helado de Fresa", point: 25, status: "Activo" },
+        { id: 2, name: "Helado de Coco",product: "Helado de Coco", point: 50, status: "Inactivo" },
+        { id: 3, name: "Helado de Maracumango",product: "Helado de Maracumango", point: 60, status: "Activo" },
+        { id: 4, name: "Helado de Aguaje",product: "Helado de Aguaje", point: 75, status: "Activo" },
+        { id: 5, name: "Helado de Uva",product: "Helado de Uva", point: 30, status: "Inactivo" },
     ]);
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,8 +62,8 @@ export default function ListadoPuntos() {
     const handleExport = () => {
         const worksheetData = filteredPuntos.map((item) => ({
           ID: item.id,
+          Nombre: item.name,
           Producto: item.fruit,
-          Descripción: item.description,
           Puntos: item.puntos,
           Estado: item.status,
         }));
@@ -128,8 +135,8 @@ export default function ListadoPuntos() {
         <Table hover>
             <thead>
             <tr>
+                <th>Nombre</th>
                 <th>Producto</th>
-                <th>Descripción</th>
                 <th>Puntos</th>
                 <th className="text-center">Opciones</th>
             </tr>
@@ -137,8 +144,8 @@ export default function ListadoPuntos() {
             <tbody>
             {currentItems.map((item) => (
                 <tr key={item.id}>
+                <td>{item.name}</td>
                 <td>{item.product}</td>
-                <td>{item.description}</td>
                 <td>{item.point}</td>
                 <td className="text-center">
                     <Button variant="outline-primary" size="sm" className="me-2" onClick={() => handleEdit(item)}>

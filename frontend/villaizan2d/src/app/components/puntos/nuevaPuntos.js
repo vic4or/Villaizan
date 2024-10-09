@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Form, Button, Row, Col, Container, Modal, Alert } from "react-bootstrap";
 import "./nuevaPuntos.css";
 
-export default function NuevaMultimedia({ isEditMode = false, initialValues = {} }) {
+export default function NuevaPuntos({ isEditMode = false, initialValues = {} }) {
   const [selectedFile, setSelectedFile] = useState(initialValues.image || null);
   const [multimediaType, setMultimediaType] = useState(initialValues.type || "");
   const [description, setDescription] = useState(initialValues.description || "");
@@ -59,7 +59,7 @@ export default function NuevaMultimedia({ isEditMode = false, initialValues = {}
         </Modal>
 
         <div className="breadcrumb-container">
-          <p className="text-muted">Gestión del sistema &gt; Multimedia &gt; {isEditMode ? "Editar Multimedia" : "Nueva Multimedia"}</p>
+          <p className="text-muted">Gestión del sistema &gt; Puntos &gt; {isEditMode ? "Editar Multimedia" : "Nuevo Puntos"}</p>
         </div>
 
         <Container
@@ -73,7 +73,7 @@ export default function NuevaMultimedia({ isEditMode = false, initialValues = {}
             maxWidth: "95%",
           }}
         >
-          <h2 className="mb-4">{isEditMode ? "Editar Multimedia" : "Nueva Multimedia"}</h2>
+          <h2 className="mb-4">{isEditMode ? "Editar Puntos" : "Nuevo Puntos"}</h2>
           <Form onSubmit={handleSubmit}>
             <Row className="mb-4">
               <Col md={6}>
