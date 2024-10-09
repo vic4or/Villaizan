@@ -1,26 +1,92 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Container, Modal, Alert } from "react-bootstrap";
 import "./nuevaMultimedia.css";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function NuevaMultimedia({ isEditMode = false, initialValues = {} }) {
-  const [selectedFile, setSelectedFile] = useState(initialValues.image || null);
-  const [multimediaType, setMultimediaType] = useState(initialValues.type || "");
-  const [description, setDescription] = useState(initialValues.description || "");
-  const [educationalMessage, setEducationalMessage] = useState(initialValues.message || "");
+
+export default function NuevaMultimedia() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const isEditMode = Boolean(id); // Si hay un ID, estamos en modo edición
+
+  const [formData, setFormData] = useState({
+    imagen: "",
+    tipo: "",
+    descripcion: "",
+    mensaje: "",
+    videofile: "",
+    videourl: "",
+    fruta: "",
+  });
+
+  // Estados para almacenar la información de multimedia
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [multimediaType, setMultimediaType] = useState("");
+  const [description, setDescription] = useState("");
+  const [educationalMessage, setEducationalMessage] = useState("");
   const [videoOption, setVideoOption] = useState(""); 
-  const [videoFile, setVideoFile] = useState(initialValues.videoFile || null);
-  const [videoURL, setVideoURL] = useState(initialValues.videoURL || "");
-  const [fruit, setFruit] = useState(initialValues.fruit || ""); // Estado para controlar la fruta seleccionada
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoURL, setVideoURL] = useState("");
+  const [fruit, setFruit] = useState(""); 
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [fruitOptions, setFruitOptions] = useState([]);
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    setImageError(false); 
-  };
+  // Efecto para cargar datos en el modo de edición
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchMultimediaById = async (id) => {
+        try {
+          // Aquí deberías hacer una llamada a tu API para obtener los datos
+          // Por ahora, usaremos los datos de ejemplo
+          const multimedia = [
+            { id: 1, fruit: "Manzana", description: "Introducción a la manzana y sus beneficios", type: "Video", url: "https://vid.com/manzana", status: "Activo" },
+            { id: 2, fruit: "Plátano", description: "Información nutricional del plátano", type: "Información", message: "El plátano es una fruta tropical que destaca por su alto contenido de potasio.", status: "Inactivo" },
+            { id: 3, fruit: "Naranja", description: "Video educativo sobre las naranjas", type: "Video", url: "https://vid.com/naranja", status: "Activo" },
+            { id: 4, fruit: "Manzana verde", description: "La manzana verde en la cocina", type: "Información", message: "Las manzanas son una de las frutas más populares y saludables del mundo.", status: "Activo" },
+            { id: 5, fruit: "Fresa", description: "Historia de la fresa: de la granja a tu mesa", type: "Video", url: "https://vid.com/fresa", status: "Inactivo" },
+          ];
+          const item = multimedia.find((multi) => multi.id === parseInt(id));
+
+          const uniqueFruits = [...new Set(multimedia.map(item => item.fruit))];
+          setFruitOptions(uniqueFruits);
+          
+          if (item) {
+            setFormData({
+              imagen: item.imagen || "",
+              tipo: item.type || "",
+              descripcion: item.description || "",
+              mensaje: item.message || "",
+              videofile: item.videoFile || "",
+              videourl: item.url || "",
+              fruta: item.fruit || "",
+            });
+            setMultimediaType(item.type === "Video" ? "video" : "informacion");
+            setVideoOption(item.url.includes("http") ? "url" : "upload");
+          }
+        } catch (error) {
+          console.error("Error al cargar los datos de multimedia:", error);
+        }
+      };
+
+      fetchMultimediaById(id);
+    }
+    }, [isEditMode, id]);
+
+
+    const handleFileChange = (event) => {
+      const file = event.target.files[0];
+      setFormData(prevData => ({
+        ...prevData,
+        imagen: file
+      }));
+      setSelectedFile(file);
+      setImageError(false);
+    };
 
   const handleVideoChange = (event) => {
     setVideoFile(event.target.files[0]);
@@ -87,7 +153,18 @@ export default function NuevaMultimedia({ isEditMode = false, initialValues = {}
     }
   };
 
-  const handleClose = () => setShowConfirmation(false);
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleClose = () => {
+    setShowConfirmation(false);
+    router.push("/pages/multimedia/lista");
+  };
 
   return (
     <>
@@ -132,14 +209,14 @@ export default function NuevaMultimedia({ isEditMode = false, initialValues = {}
                     aria-label="Selecciona una fruta"
                     className="form-select-custom"
                     required
-                    value={fruit} // Enlazar el valor con el estado 'fruit'
-                    onChange={(e) => setFruit(e.target.value)} // Actualizar el estado al cambiar
-                  >
+                    value={formData.fruta}
+                    onChange={handleInputChange}
+                    >
                     <option value="">--Selecciona una fruta--</option>
-                    <option value="manzana">Manzana</option>
-                    <option value="pera">Pera</option>
-                    <option value="platano">Plátano</option>
-                  </Form.Select>
+                    {fruitOptions.map((fruit, index) => (
+                      <option key={index} value={fruit}>{fruit}</option>
+                    ))}
+                    </Form.Select>
                 </Form.Group>
 
                 {/* Tipo de Multimedia */}
@@ -164,8 +241,8 @@ export default function NuevaMultimedia({ isEditMode = false, initialValues = {}
                     type="text"
                     placeholder="Descripción"
                     className="form-control-custom"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    value={formData.descripcion}
+                    onChange={handleInputChange}
                     required
                   />
                 </Form.Group>
@@ -178,8 +255,8 @@ export default function NuevaMultimedia({ isEditMode = false, initialValues = {}
                       as="textarea"
                       rows={4}
                       placeholder="Ingresa el mensaje educativo..."
-                      value={educationalMessage}
-                      onChange={(e) => setEducationalMessage(e.target.value)}
+                      value={formData.mensaje}
+                      onChange={handleInputChange}
                       className="form-control-custom"
                       maxLength={400}
                       required
@@ -252,8 +329,8 @@ export default function NuevaMultimedia({ isEditMode = false, initialValues = {}
                           <Form.Control
                             type="url"
                             placeholder="https://vid.com/mi-video"
-                            value={videoURL}
-                            onChange={(e) => setVideoURL(e.target.value)}
+                            value={formData.videourl}
+                            onChange={handleInputChange}
                             className="form-control-custom"
                             required
                           />
