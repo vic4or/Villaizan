@@ -62,9 +62,11 @@ export default function Menu() {
         </div>
 
         {/* Puntos */}
-        <div style={menuItemStyle} title="Puntos">
-          <FaCreditCard size="20px" style={{ color: "#000" }} />
-        </div>
+        <Link href="/pages/puntos/lista">
+          <div style={menuItemStyle} title="Puntos">
+            <FaCreditCard size="20px" style={{ color: "#000" }} />
+          </div>
+        </Link>
 
         {/* Recompensas */}
         <div style={menuItemStyle} title="Recompensas">
