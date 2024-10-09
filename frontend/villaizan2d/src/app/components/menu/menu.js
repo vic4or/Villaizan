@@ -57,9 +57,11 @@ export default function Menu() {
         </div>
 
         {/* Promociones */}
-        <div style={menuItemStyle} title="Promociones">
-          <BiSolidDiscount size="20px" style={{ color: "#000" }} />
-        </div>
+        <Link href="/pages/promociones/lista">
+          <div style={menuItemStyle} title="Promociones">
+            <BiSolidDiscount size="20px" style={{ color: "#000" }} />
+          </div>
+        </Link>
 
         {/* Puntos */}
         <div style={menuItemStyle} title="Puntos">
