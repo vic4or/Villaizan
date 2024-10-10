@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination , ButtonGroup} from "react-bootstrap";
-import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
-import { useRouter } from "next/navigation"; 
+import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Form } from "react-bootstrap";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import * as XLSX from "xlsx";
 
@@ -19,13 +19,15 @@ export default function ListadoMultimedia() {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [viewType, setViewType] = useState("Activo");
+    const [filterType, setFilterType] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const itemsPerPage = 5;
 
-    // Filtrado de multimedia según el estado seleccionado (Activo/Inactivo)
+    // Filtrado de multimedia según el estado, tipo, y palabras clave
     const filteredMultimedia = multimedia
         .filter((item) => item.status === viewType)
-        .filter((item) => item.fruit.toLowerCase().includes(searchTerm.toLowerCase())); // Búsqueda por nombre de fruta
+        .filter((item) => (filterType ? item.type === filterType : true))
+        .filter((item) => item.fruit.toLowerCase().includes(searchTerm.toLowerCase()));
 
     // Paginación
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -35,7 +37,7 @@ export default function ListadoMultimedia() {
 
     const handleEdit = (id) => {
         router.push(`/pages/multimedia/editar/?id=${id}`);
-      };      
+    };
 
     const handleAddNew = () => {
         router.push("/pages/multimedia/nuevo");
@@ -43,159 +45,163 @@ export default function ListadoMultimedia() {
 
     // Función para exportar datos a CSV
     const handleExport = () => {
-        // Crear una nueva hoja de trabajo con los datos
         const worksheetData = filteredMultimedia.map((item) => ({
-          ID: item.id,
-          Fruta: item.fruit,
-          Descripción: item.description,
-          Tipo: item.type,
-          URL_o_Información: item.url,
-          Estado: item.status,
+            ID: item.id,
+            Fruta: item.fruit,
+            Descripción: item.description,
+            Tipo: item.type,
+            URL_o_Información: item.url,
+            Estado: item.status,
         }));
-      
-        // Crear un libro de trabajo (workbook) y agregar la hoja
+
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Multimedia");
-      
-        // Generar el archivo Excel
         XLSX.writeFile(workbook, "multimedia_export.xlsx");
-      };      
-  
+    };
+
     return (
         <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
-        {/* Breadcrumb y Filtro de Activos/Inactivos */}
-        <Row className="mb-4">
-            <Col>
-            <h4>Multimedia</h4>
-            <p className="text-muted">Administra la multimedia conformado por la fruta, descripción, tipo, imagen e información/URL.</p>
-            </Col>
-        </Row>
+            {/* Breadcrumb y Filtro de Activos/Inactivos */}
+            <Row className="mb-4">
+                <Col>
+                    <h4>Multimedia</h4>
+                    <p className="text-muted">Administra la multimedia conformado por la fruta, descripción, tipo, imagen e información/URL.</p>
+                </Col>
+            </Row>
 
-        {/* Filtro de Activos e Inactivos */}
-        <Row className="mb-3">
-            <Col>
-            <ButtonGroup>
-                <Button
-                variant={viewType === "Activo" ? "danger" : "outline-danger"}
-                style={{
-                    backgroundColor: viewType === "Activo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                    borderColor: "rgba(230, 57, 70, 0.6)",
-                    color: viewType === "Activo" ? "#fff" : "rgba(230, 57, 70, 0.8)",
-                }}
-                onClick={() => setViewType("Activo")}
-                >
-                Activos
-                </Button>
-                <Button
-                variant={viewType === "Inactivo" ? "danger" : "outline-danger"}
-                style={{
-                    backgroundColor: viewType === "Inactivo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                    borderColor: "rgba(230, 57, 70, 0.6)",
-                    color: viewType === "Inactivo" ? "#fff" : "rgba(230, 57, 70, 0.8)",
-                }}
-                onClick={() => setViewType("Inactivo")}
-                >
-                Inactivos
-                </Button>
-            </ButtonGroup>
-            </Col>
-        </Row>
-
-        {/* Barra de Búsqueda */}
-        <Row className="mb-3">
-            <Col>
-            <InputGroup>
-                <FormControl
-                placeholder="Buscar por nombre..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </InputGroup>
-            </Col>
-        </Row>
-
-        {/* Barra de Acciones */}
-        <Row className="mb-4">
-            <Col md={8}></Col>
-            <Col md={4} className="d-flex justify-content-end align-items-start">
-            <Button variant="outline-secondary" className="me-2">Filtrar</Button>
-            <Button variant="danger" className="me-2" onClick={handleAddNew}>+ Agregar</Button>
-            <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
-            </Col>
-        </Row>
-
-        {/* Tabla de Multimedia */}
-        <Table hover>
-            <thead>
-            <tr>
-                <th>Fruta</th>
-                <th>Descripción</th>
-                <th>Tipo</th>
-                <th>Información/URL</th>
-                <th className="text-center">Opciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            {currentItems.map((item) => (
-                <tr key={item.id}>
-                <td>{item.fruit}</td>
-                <td>{item.description}</td>
-                <td>{item.type}</td>
-                <td>
-                    {item.url.includes("http") ? (
-                    <a href={item.url} target="_blank" rel="noopener noreferrer">
-                        {item.url}
-                    </a>
-                    ) : (
-                    item.url
-                    )}
-                </td>
-                <td className="text-center">
-                    {/* Botones de Edición y Eliminación */}
-                    <Link href={`/pages/multimedia/editar?id=${item.id}`} key={item.id}>
-                        <Button variant="outline-primary" size="sm" className="me-2">
-                            <FaEdit /> Editar
+            {/* Filtro de Activos e Inactivos */}
+            <Row className="mb-3">
+                <Col>
+                    <ButtonGroup>
+                        <Button
+                            variant={viewType === "Activo" ? "danger" : "outline-danger"}
+                            style={{
+                                backgroundColor: viewType === "Activo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
+                                borderColor: "rgba(230, 57, 70, 0.6)",
+                                color: viewType === "Activo" ? "#fff" : "rgba(230, 57, 70, 0.8)",
+                            }}
+                            onClick={() => setViewType("Activo")}
+                        >
+                            Activos
                         </Button>
-                    </Link>
-                    <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => alert(`Eliminando ${item.fruit}`)}
-                    >
-                    <FaTrashAlt /> Eliminar
-                    </Button>
-                </td>
-                </tr>
-            ))}
-            </tbody>
-        </Table>
+                        <Button
+                            variant={viewType === "Inactivo" ? "danger" : "outline-danger"}
+                            style={{
+                                backgroundColor: viewType === "Inactivo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
+                                borderColor: "rgba(230, 57, 70, 0.6)",
+                                color: viewType === "Inactivo" ? "#fff" : "rgba(230, 57, 70, 0.8)",
+                            }}
+                            onClick={() => setViewType("Inactivo")}
+                        >
+                            Inactivos
+                        </Button>
+                    </ButtonGroup>
+                </Col>
+            </Row>
 
-        {/* Paginador */}
-        <Row>
-            <Col className="d-flex justify-content-between">
-            <span>Mostrando {indexOfFirstItem + 1} a {indexOfLastItem} de {filteredMultimedia.length} producto(s)</span>
-            <Pagination>
-                <Pagination.Prev
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                />
-                {[...Array(totalPages)].map((_, index) => (
-                <Pagination.Item
-                    key={index}
-                    active={index + 1 === currentPage}
-                    onClick={() => setCurrentPage(index + 1)}
-                >
-                    {index + 1}
-                </Pagination.Item>
-                ))}
-                <Pagination.Next
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                />
-            </Pagination>
-            </Col>
-        </Row>
+            {/* Barra de Búsqueda y Filtro por Tipo de Multimedia */}
+            <Row className="mb-3">
+                <Col md={8}>
+                    <InputGroup>
+                        <FormControl
+                            placeholder="Buscar por nombre..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </InputGroup>
+                </Col>
+                <Col md={4}>
+                    <Form.Select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                    >
+                        <option value="">Todos los Tipos</option>
+                        <option value="Video">Video</option>
+                        <option value="Información">Información</option>
+                    </Form.Select>
+                </Col>
+            </Row>
+
+            {/* Barra de Acciones */}
+            <Row className="mb-4">
+                <Col md={8}></Col>
+                <Col md={4} className="d-flex justify-content-end align-items-start">
+                    <Button variant="danger" className="me-2" onClick={handleAddNew}>+ Agregar</Button>
+                    <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
+                </Col>
+            </Row>
+
+            {/* Tabla de Multimedia */}
+            <Table hover>
+                <thead>
+                    <tr>
+                        <th>Fruta</th>
+                        <th>Descripción</th>
+                        <th>Tipo</th>
+                        <th>Información/URL</th>
+                        <th className="text-center">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {currentItems.map((item) => (
+                        <tr key={item.id}>
+                            <td>{item.fruit}</td>
+                            <td>{item.description}</td>
+                            <td>{item.type}</td>
+                            <td>
+                                {item.url.includes("http") ? (
+                                    <a href={item.url} target="_blank" rel="noopener noreferrer">
+                                        {item.url}
+                                    </a>
+                                ) : (
+                                    item.url
+                                )}
+                            </td>
+                            <td className="text-center">
+                                <Link href={`/pages/multimedia/editar?id=${item.id}`} key={item.id}>
+                                    <Button variant="outline-primary" size="sm" className="me-2">
+                                        <FaEdit /> Editar
+                                    </Button>
+                                </Link>
+                                <Button
+                                    variant="outline-danger"
+                                    size="sm"
+                                    onClick={() => alert(`Eliminando ${item.fruit}`)}
+                                >
+                                    <FaTrashAlt /> Eliminar
+                                </Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
+
+            {/* Paginador */}
+            <Row>
+                <Col className="d-flex justify-content-between">
+                    <span>Mostrando {indexOfFirstItem + 1} a {indexOfLastItem} de {filteredMultimedia.length} producto(s)</span>
+                    <Pagination>
+                        <Pagination.Prev
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        />
+                        {[...Array(totalPages)].map((_, index) => (
+                            <Pagination.Item
+                                key={index}
+                                active={index + 1 === currentPage}
+                                onClick={() => setCurrentPage(index + 1)}
+                            >
+                                {index + 1}
+                            </Pagination.Item>
+                        ))}
+                        <Pagination.Next
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        />
+                    </Pagination>
+                </Col>
+            </Row>
         </Container>
-  );
+    );
 }

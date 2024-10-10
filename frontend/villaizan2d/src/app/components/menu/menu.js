@@ -19,6 +19,7 @@ export default function Menu() {
     }}>
       {/* Logo */}
       <div style={{ marginBottom: "20px" }}>
+      <Link href="/">
         <div style={{
           backgroundColor: "#ffffff",
           borderRadius: "50%",
@@ -28,6 +29,7 @@ export default function Menu() {
         }}>
           <TbLetterV size="24px" style={{ color: "#e63946" }} /> 
         </div>
+      </Link>
       </div>
 
       {/* Menú de iconos */}
