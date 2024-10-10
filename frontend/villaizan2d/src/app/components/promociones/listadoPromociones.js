@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup } from "react-bootstrap";
+import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Form } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -20,12 +20,14 @@ export default function ListadoPromociones() {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewType, setViewType] = useState("Activo");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTipo, setSelectedTipo] = useState("Todos");
   const itemsPerPage = 5;
 
-  // Filtrado de promociones según el estado seleccionado (Activo/Inactivo)
+  // Filtrado de promociones según el estado seleccionado (Activo/Inactivo) y tipo de promoción
   const filteredPromociones = promociones
     .filter((item) => item.estado === viewType)
-    .filter((item) => item.nombre.toLowerCase().includes(searchTerm.toLowerCase())); // Búsqueda por nombre de promoción
+    .filter((item) => item.nombre.toLowerCase().includes(searchTerm.toLowerCase())) // Búsqueda por nombre de promoción
+    .filter((item) => selectedTipo === "Todos" || item.tipo === selectedTipo); // Filtrado por tipo de promoción
 
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -104,9 +106,9 @@ export default function ListadoPromociones() {
         </Col>
       </Row>
 
-      {/* Barra de Búsqueda */}
+      {/* Barra de Búsqueda y Filtro de Tipo de Promoción */}
       <Row className="mb-3">
-        <Col>
+        <Col md={8}>
           <InputGroup>
             <FormControl
               placeholder="Buscar por nombre..."
@@ -114,6 +116,14 @@ export default function ListadoPromociones() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </InputGroup>
+        </Col>
+        <Col md={4}>
+          <Form.Select value={selectedTipo} onChange={(e) => setSelectedTipo(e.target.value)}>
+            <option value="Todos">Todos los tipos</option>
+            <option value="Oferta Especial">Oferta Especial</option>
+            <option value="Paquete">Paquete</option>
+            <option value="Descuento">Descuento</option>
+          </Form.Select>
         </Col>
       </Row>
 

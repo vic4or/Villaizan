@@ -126,7 +126,6 @@ export default function ListadoPuntos() {
         <Row className="mb-4">
             <Col md={8}></Col>
             <Col md={4} className="d-flex justify-content-end align-items-start">
-            <Button variant="outline-secondary" className="me-2">Filtrar</Button>
             <Button variant="danger" className="me-2" onClick={() => router.push("/pages/puntos/nuevo")}>+ Agregar</Button>
             <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
             </Col>
