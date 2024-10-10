@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Puntos_Producto {
+  id               String  @id @default(uuid())     
+  cantidadPuntos   Int
+  descripcion      String?
+  estado           String
+  fechaActivo      DateTime
+  fechaInactivo    DateTime?
+  idProducto       String @unique
+
+  // Relación con la tabla vi_producto
+  producto         Producto @relation(fields: [idProducto], references: [id])
+
+  @@map("vi_puntos_producto")
+}
+
+model Producto {
+  id String @id @map("id")  // id en vi_producto es varchar(50)
+
+  puntoProducto Puntos_Producto? 
+
+  @@map("vi_producto")  // Mapea este modelo a la tabla "vi_producto"
+}
