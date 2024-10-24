@@ -19,18 +19,45 @@ export class Puntos_ProductoService {
         });
     }
     
-    async createPuntos_Producto(data: vi_puntos_producto): Promise<vi_puntos_producto> {
+    async createPuntos_Producto(idProducto: string, cantidadPuntos: number): Promise<vi_puntos_producto> {
         return this.prisma.vi_puntos_producto.create({
-            data
+            data: {
+                id_producto: idProducto,
+                cantidadpuntos: cantidadPuntos 
+            }
         });
     }
 
-    async updatePuntos_Producto(id: number, data: vi_puntos_producto): Promise<vi_puntos_producto> {
-        return this.prisma.vi_puntos_producto.update({
+    async updatePuntos_Producto(idPuntosProducto: number, idProducto:string, nuevaCantidad:number): Promise<vi_puntos_producto> {
+        
+        await this.prisma.vi_puntos_producto.update({
             where: {
-                id_puntosproducto: id
+              id_puntosproducto: idPuntosProducto,
             },
-            data
+            data: {
+              estado: false,
+              fechainactivo: new Date(),  
+            },
+        }); 
+
+        return this.prisma.vi_puntos_producto.create({
+            data:{
+                id_producto: idProducto,
+                cantidadpuntos: nuevaCantidad,
+            },
         });
     }
+
+    async inactivatePuntos_Producto(idPuntosProducto: number): Promise<vi_puntos_producto> {
+        return this.prisma.vi_puntos_producto.update({
+          where: {
+            id_puntosproducto: idPuntosProducto, 
+          },
+          data: {
+            estado: false,
+            fechainactivo: new Date(),
+          },
+        });
+    }
+      
 }
