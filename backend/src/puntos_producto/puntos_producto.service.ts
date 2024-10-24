@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Puntos_Producto } from '@prisma/client';
+import { vi_puntos_producto } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable() 
@@ -7,28 +7,28 @@ export class Puntos_ProductoService {
 
     constructor(private prisma: PrismaService) {}
 
-    async getAllPuntos_Producto(): Promise<Puntos_Producto[]> {
-        return this.prisma.puntos_Producto.findMany();
+    async getAllPuntos_Producto(): Promise<vi_puntos_producto[]> {
+        return this.prisma.vi_puntos_producto.findMany();
     }
 
-    async getPuntos_ProductoById(id: string): Promise<Puntos_Producto> {
-        return this.prisma.puntos_Producto.findUnique({
+    async getPuntos_ProductoById(id: number): Promise<vi_puntos_producto> {
+        return this.prisma.vi_puntos_producto.findUnique({
             where: {
-                id: id
+                id_puntosproducto: id
             }
         });
     }
     
-    async createPuntos_Producto(data: Puntos_Producto): Promise<Puntos_Producto> {
-        return this.prisma.puntos_Producto.create({
+    async createPuntos_Producto(data: vi_puntos_producto): Promise<vi_puntos_producto> {
+        return this.prisma.vi_puntos_producto.create({
             data
         });
     }
 
-    async updatePuntos_Producto(id: string, data: Puntos_Producto): Promise<Puntos_Producto> {
-        return this.prisma.puntos_Producto.update({
+    async updatePuntos_Producto(id: number, data: vi_puntos_producto): Promise<vi_puntos_producto> {
+        return this.prisma.vi_puntos_producto.update({
             where: {
-                id
+                id_puntosproducto: id
             },
             data
         });
