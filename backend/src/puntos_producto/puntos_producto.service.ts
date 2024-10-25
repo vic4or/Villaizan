@@ -8,11 +8,11 @@ export class Puntos_ProductoService {
     constructor(private prisma: PrismaService) {}
 
     async getAllPuntos_Producto(): Promise<vi_puntos_producto[]> {
-        return this.prisma.vi_puntos_producto.findMany();
+        return await this.prisma.vi_puntos_producto.findMany();
     }
 
     async getPuntos_ProductoById(id: number): Promise<vi_puntos_producto> {
-        return this.prisma.vi_puntos_producto.findUnique({
+        return await this.prisma.vi_puntos_producto.findUnique({
             where: {
                 id_puntosproducto: id
             }
@@ -20,7 +20,7 @@ export class Puntos_ProductoService {
     }
     
     async createPuntos_Producto(idProducto: string, cantidadPuntos: number): Promise<vi_puntos_producto> {
-        return this.prisma.vi_puntos_producto.create({
+        return await this.prisma.vi_puntos_producto.create({
             data: {
                 id_producto: idProducto,
                 cantidadpuntos: cantidadPuntos 
@@ -40,7 +40,7 @@ export class Puntos_ProductoService {
             },
         }); 
 
-        return this.prisma.vi_puntos_producto.create({
+        return await this.prisma.vi_puntos_producto.create({
             data:{
                 id_producto: idProducto,
                 cantidadpuntos: nuevaCantidad,
@@ -49,7 +49,7 @@ export class Puntos_ProductoService {
     }
 
     async inactivatePuntos_Producto(idPuntosProducto: number): Promise<vi_puntos_producto> {
-        return this.prisma.vi_puntos_producto.update({
+        return await this.prisma.vi_puntos_producto.update({
           where: {
             id_puntosproducto: idPuntosProducto, 
           },

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { Puntos_ProductoService } from './puntos_producto.service';
 
 @Controller('puntos_producto') 
@@ -8,12 +8,12 @@ export class Puntos_ProductoController {
 
     @Get('/listarTodos')
     async getAllPuntos_Producto() {
-        return this.puntos_productoService.getAllPuntos_Producto();
+        return await this.puntos_productoService.getAllPuntos_Producto();
     }
 
     @Get('/listarUno/:idPuntosProducto')
-    async getPuntos_ProductoById(@Param('idPuntosProducto') idPuntosProducto: number) {
-        return this.puntos_productoService.getPuntos_ProductoById(idPuntosProducto);
+    async getPuntos_ProductoById(@Param('idPuntosProducto', ParseIntPipe) idPuntosProducto: number) {
+        return await this.puntos_productoService.getPuntos_ProductoById(idPuntosProducto);
     }
 
     @Post('/registrar')
@@ -21,7 +21,7 @@ export class Puntos_ProductoController {
         @Body('idProducto') idProducto: string,
         @Body('cantidadPuntos') cantidadPuntos: number,
     ) {
-      return this.puntos_productoService.createPuntos_Producto(idProducto, cantidadPuntos);
+      return await this.puntos_productoService.createPuntos_Producto(idProducto, cantidadPuntos);
     }
 
     @Put('/editar')
@@ -30,11 +30,11 @@ export class Puntos_ProductoController {
         @Body('idProducto') idProducto: string,
         @Body('nuevaCantidad') nuevaCantidad: number,
     ) {
-    return this.puntos_productoService.updatePuntos_Producto(idPuntosProducto,idProducto, nuevaCantidad);
+    return await this.puntos_productoService.updatePuntos_Producto(idPuntosProducto,idProducto, nuevaCantidad);
     }
 
     @Put('/inactivar/:idPuntosProducto')
-    async inactivarPuntosProducto(@Param('idPuntosProducto') idPuntosProducto: number) {
-        return this.puntos_productoService.inactivatePuntos_Producto(idPuntosProducto);
+    async inactivarPuntosProducto(@Param('idPuntosProducto', ParseIntPipe) idPuntosProducto: number) {
+        return await this.puntos_productoService.inactivatePuntos_Producto(idPuntosProducto);
     }
 }
