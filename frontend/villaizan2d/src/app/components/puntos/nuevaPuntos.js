@@ -1,148 +1,121 @@
-"use client";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Form, Button, Alert } from 'react-bootstrap';
 
-import React, { useState } from "react";
-import { Form, Button, Row, Col, Container, Modal, Alert } from "react-bootstrap";
-import "./nuevaPuntos.css";
+const NuevaPuntos = () => {
+  const [productos, setProductos] = useState([]);
+  const [idProducto, setIdProducto] = useState('');
+  const [nombreProducto, setNombreProducto] = useState('');
+  const [cantidadPuntos, setCantidadPuntos] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-export default function NuevaPuntos({ isEditMode = false, initialValues = {} }) {
-  const [selectedFile, setSelectedFile] = useState(initialValues.image || null);
-  const [multimediaType, setMultimediaType] = useState(initialValues.type || "");
-  const [description, setDescription] = useState(initialValues.description || "");
-  const [nombre, setNombre] = useState(initialValues.nombre || "");
-  const [puntos, setPuntos] = useState(initialValues.puntos || "");    
-  const [educationalMessage, setEducationalMessage] = useState(initialValues.message || "");
-  const [videoOption, setVideoOption] = useState(""); 
-  const [videoFile, setVideoFile] = useState(initialValues.videoFile || null);
-  const [videoURL, setVideoURL] = useState(initialValues.videoURL || "");
-  const [fruit, setFruit] = useState(initialValues.fruit || ""); // Estado para controlar la fruta seleccionada
-  const [producto, setProducto] = useState(initialValues.producto || "");
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [videoError, setVideoError] = useState(false);
+  // Obtener productos al cargar el componente
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/productos/listarTodos');
+        setProductos(response.data);
+      } catch (err) {
+        console.error('Error al obtener los productos:', err);
+        setError('Hubo un error al cargar los productos.');
+      }
+    };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+    fetchProductos();
+  }, []);
 
-    let valid = true;
+  // Manejar el submit del formulario
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    if (!nombre) {
-      alert("El nombre es obligatorio.");
-      valid = false;
+    if (!idProducto || !cantidadPuntos) {
+      setError('Por favor, complete todos los campos.');
+      return;
     }
 
-    if (!puntos) {
-      alert("Los puntos son obligatorios.");
-      valid = false;
-    }
+    const data = {
+      idProducto: idProducto,
+      cantidadPuntos: parseInt(cantidadPuntos)
+    };
 
-    if (valid) {
-      setShowConfirmation(true); 
+    try {
+      console.log('Enviando datos a la API:', data); // Verificación antes del envío
+      const response = await axios.post('http://localhost:3000/puntos_producto/registrar', data);
+      
+      console.log('Respuesta de la API:', response); // Verificar la respuesta de la API
+
+      if (response.status === 200) {
+        setSuccess(`Se han asignado ${cantidadPuntos} puntos al producto ${nombreProducto} correctamente.`);
+        setError('');
+        setCantidadPuntos(''); // Limpiar cantidad de puntos
+      }
+    } catch (err) {
+      console.error('Error al registrar puntos:', err);
+      setError('Hubo un error al registrar los puntos.');
+      setSuccess('');
     }
   };
 
-  const handleClose = () => setShowConfirmation(false);
+  // Manejar cambio de producto
+  const handleProductoChange = (e) => {
+    const selectedProductId = e.target.value;
+    const selectedProduct = productos.find(producto => producto.id === selectedProductId);
+
+    setIdProducto(selectedProductId);
+    setNombreProducto(selectedProduct?.nombre || ''); // Actualizar nombre de producto
+  };
 
   return (
-    <>
-      <div>
-        {/* Popup de confirmación */}
-        <Modal show={showConfirmation} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Confirmación</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>Los puntos se han guardado exitosamente.</Modal.Body>
-          <Modal.Footer>
-            <Button variant="success" onClick={handleClose}>
-              Cerrar
-            </Button>
-          </Modal.Footer>
-        </Modal>
+    <div>
+      <h4>Registrar Puntos para Producto</h4>
+      {/* Mensaje de error */}
+      {error && <Alert variant="danger">{error}</Alert>}
+      {/* Mensaje de éxito */}
+      {success && <Alert variant="success">{success}</Alert>}
+      
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3">
+          <Form.Label>Producto</Form.Label>
+          <Form.Select
+            aria-label="Selecciona un producto"
+            value={idProducto} 
+            onChange={handleProductoChange}
+            required
+          >
+            <option value="">--Selecciona un producto--</option>
+            {productos.map((producto) => (
+              <option key={producto.id} value={producto.id}>
+                {producto.nombre}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
 
-        <div className="breadcrumb-container">
-          <p className="text-muted">Gestión del sistema &gt; Puntos &gt; {isEditMode ? "Editar Multimedia" : "Nuevo Puntos"}</p>
-        </div>
+        <Form.Group className="mb-3">
+          <Form.Label>Cantidad de Puntos</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="Cantidad de Puntos"
+            value={cantidadPuntos}
+            onChange={(e) => setCantidadPuntos(e.target.value)}
+            required
+          />
+        </Form.Group>
 
-        <Container
-          style={{
-            background: "#ffffff",
-            border: "1px solid #eaeaea",
-            borderRadius: "8px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            padding: "30px",
-            marginLeft: "30px",
-            maxWidth: "95%",
-          }}
-        >
-          <h2 className="mb-4">{isEditMode ? "Editar Puntos" : "Nuevo Puntos"}</h2>
-          <Form onSubmit={handleSubmit}>
-            <Row className="mb-4">
-              <Col md={6}>
-                <h4>Información general</h4>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Nombre</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Nombre"
-                    className="form-control-custom"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    required
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Cantidad puntos</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Puntos"
-                    className="form-control-custom"
-                    value={puntos}
-                    onChange={(e) => setPuntos(e.target.value)}
-                    required
-                  />
-                </Form.Group>
-              </Col>
-
-              {/* Sección de Imagen */}
-              <Col md={6}>
-                <h4>Seleccionar producto</h4>
-                {/* Control del Selector de Fruta */}
-                <Form.Group className="mb-3">
-                  <Form.Label>Producto</Form.Label>
-                  <Form.Select
-                    aria-label="Selecciona un producto"
-                    className="form-select-custom"
-                    required
-                    value={fruit} // Enlazar el valor con el estado 'producto'
-                    onChange={(e) => setFruit(e.target.value)} // Actualizar el estado al cambiar
-                  >
-                    <option value="">--Selecciona un producto--</option>
-                    <option value="PaletaFresa">Paleta de fresa</option>
-                    <option value="Mafeleta2Sabores">Mafeleta de 2 sabores</option>
-                    <option value="Mafeleta3Sabores">Mafeleta de 3 sabores</option>
-                    <option value="PaletaEspecialSandia">Paleta especial sabor de sandía</option>
-                    <option value="PaletaGlaseadaFresa">Paleta glaseada de fresa</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            </Row>
-
-            {/* Botones para guardar y cancelar */}
-            <div className="d-flex justify-content-end button-group">
-              <Button variant="danger" type="submit" className="btn-custom me-2">
-                {isEditMode ? "ACTUALIZAR" : "GUARDAR"}
-              </Button>
-              <Button variant="light" type="button" className="btn-cancel" onClick={() => alert("Acción cancelada")}>
-                CANCELAR
-              </Button>
-            </div>
-          </Form>
-        </Container>
-      </div>
-    </>
+        <Button variant="primary" type="submit">
+          Registrar Puntos
+        </Button>
+      </Form>
+    </div>
   );
-}
+};
+
+export default NuevaPuntos;
+
+
+
+
 
 
 
