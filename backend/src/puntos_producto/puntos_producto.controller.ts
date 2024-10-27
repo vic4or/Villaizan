@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { Puntos_ProductoService } from './puntos_producto.service';
 
 @Controller('puntos_producto') 

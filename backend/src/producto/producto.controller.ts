@@ -8,7 +8,7 @@ export class ProductoController {
 
     @Get('/listarTodos')
     async getAllPuntos_Producto() {
-        return this.productoService.getAllProductos();
+        return await this.productoService.getAllProductos();
     }
 
 }
