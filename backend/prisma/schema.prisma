@@ -1892,19 +1892,17 @@ model store_currencies {
 model surveys_answer {
   id               BigInt           @id @default(autoincrement())
   answer           String
-  question_id      String           @db.VarChar(50)
-  response_id      String           @db.VarChar(50)
-  surveys_question surveys_question @relation(fields: [question_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_answer_question_id_c0166f3c_fk_surveys_question_id")
-  surveys_response surveys_response @relation(fields: [response_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_answer_response_id_5416c873_fk_surveys_response_id")
+  question_id      BigInt
+  response_id      BigInt
+  surveys_question surveys_question @relation(fields: [question_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_answer_question_id_c0166f3c_fk")
+  surveys_response surveys_response @relation(fields: [response_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_answer_response_id_5416c873_fk")
 
   @@index([question_id], map: "surveys_answer_question_id_c0166f3c")
-  @@index([question_id], map: "surveys_answer_question_id_c0166f3c_like")
   @@index([response_id], map: "surveys_answer_response_id_5416c873")
-  @@index([response_id], map: "surveys_answer_response_id_5416c873_like")
 }
 
 model surveys_encuesta {
-  id               String             @id @db.VarChar(50)
+  id               BigInt             @id @default(autoincrement())
   title            String             @db.VarChar(255)
   description      String?
   status           String             @db.VarChar(50)
@@ -1912,37 +1910,31 @@ model surveys_encuesta {
   end_date         DateTime           @db.Date
   surveys_question surveys_question[]
   surveys_response surveys_response[]
-
-  @@index([id], map: "surveys_encuesta_id_e9de6082_like")
 }
 
 /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
 model surveys_question {
-  id               String           @id @db.VarChar(50)
+  id               BigInt           @id @default(autoincrement())
   title            String           @db.VarChar(255)
   type             String           @db.VarChar(50)
   required         Boolean
   options          Json?
-  encuesta_id      String           @db.VarChar(50)
+  encuesta_id      BigInt
   surveys_answer   surveys_answer[]
-  surveys_encuesta surveys_encuesta @relation(fields: [encuesta_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_question_encuesta_id_85d80c32_fk_surveys_encuesta_id")
+  surveys_encuesta surveys_encuesta @relation(fields: [encuesta_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_question_encuesta_id_85d80c32_fk")
 
   @@index([encuesta_id], map: "surveys_question_encuesta_id_85d80c32")
-  @@index([encuesta_id], map: "surveys_question_encuesta_id_85d80c32_like")
-  @@index([id], map: "surveys_question_id_5f49d6f0_like")
 }
 
 /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
 model surveys_response {
-  id               String           @id @db.VarChar(50)
+  id               BigInt           @id @default(autoincrement())
   date             DateTime         @db.Timestamptz(6)
-  encuesta_id      String           @db.VarChar(50)
+  encuesta_id      BigInt
   surveys_answer   surveys_answer[]
-  surveys_encuesta surveys_encuesta @relation(fields: [encuesta_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_response_encuesta_id_da639ff0_fk_surveys_encuesta_id")
+  surveys_encuesta surveys_encuesta @relation(fields: [encuesta_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_response_encuesta_id_da639ff0_fk")
 
   @@index([encuesta_id], map: "surveys_response_encuesta_id_da639ff0")
-  @@index([encuesta_id], map: "surveys_response_encuesta_id_da639ff0_like")
-  @@index([id], map: "surveys_response_id_df77f8d4_like")
 }
 
 model swap {
@@ -2089,6 +2081,32 @@ model vi_ciudad {
   vi_motorizado        vi_motorizado[]
 }
 
+model vi_combo {
+  id                   String                @id @db.VarChar(50)
+  titulo               String                @db.VarChar(50)
+  descripcion          String?               @db.VarChar(255)
+  fechainicio          DateTime              @db.Timestamp(6)
+  fechafin             DateTime              @db.Timestamp(6)
+  limitestock          Int
+  precio               Decimal?              @db.Decimal(5, 2)
+  estado               Boolean               @default(true)
+  eliminadoen          DateTime?             @db.Timestamp(6)
+  creadoen             DateTime?             @default(now()) @db.Timestamp(6)
+  actualizadoen        DateTime?             @default(now()) @db.Timestamp(6)
+  usuariocreacion      String                @db.VarChar(50)
+  usuarioactualizacion String?               @db.VarChar(50)
+  vi_combo_x_producto  vi_combo_x_producto[]
+}
+
+model vi_combo_x_producto {
+  combo_id    String      @db.VarChar(50)
+  producto_id String      @db.VarChar(50)
+  vi_combo    vi_combo    @relation(fields: [combo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  vi_producto vi_producto @relation(fields: [producto_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([combo_id, producto_id])
+}
+
 model vi_comentario {
   id               Int             @id @default(autoincrement())
   comentario       String
@@ -2106,9 +2124,9 @@ model vi_contenidoeducativo {
   id                   String    @id @db.VarChar(50)
   id_fruta             String?   @db.VarChar(50)
   titulo               String    @db.VarChar(200)
-  descripcion          String?
+  contenidoinformacion String?
   tipocontenido        String    @db.VarChar(100)
-  urlcontenido         String    @db.VarChar(255)
+  urlcontenido         String?   @db.VarChar(255)
   fechapublicacion     DateTime  @db.Timestamp(6)
   estaactivo           Boolean   @default(true)
   desactivadoen        DateTime? @db.Timestamp(6)
@@ -2119,9 +2137,9 @@ model vi_contenidoeducativo {
   vi_fruta             vi_fruta? @relation(fields: [id_fruta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fruta")
 }
 
-/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
 model vi_cuentaredsocial {
   id                         BigInt            @id @default(autoincrement())
+  red_social                 String            @db.VarChar(50)
   usuario                    String            @db.VarChar(100)
   open_id                    String?           @db.VarChar(255)
   page_id                    String?           @db.VarChar(255)
@@ -2132,14 +2150,10 @@ model vi_cuentaredsocial {
   fecha_expiracion_token     DateTime          @db.Timestamptz(6)
   fecha_expiracion_refresh   DateTime?         @db.Timestamptz(6)
   linked                     Boolean
-  red_social_id              BigInt
-  vi_redsocial               vi_redsocial      @relation(fields: [red_social_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "vi_cuentaredsocial_red_social_id_1c5ff95c_fk_vi_redsocial_id")
   vi_interaccion             vi_interaccion[]
   vi_post                    vi_post[]
   vi_reporteredes            vi_reporteredes[]
   vi_segmento                vi_segmento[]
-
-  @@index([red_social_id], map: "vi_cuentaredsocial_red_social_id_1c5ff95c")
 }
 
 model vi_detallepedido {
@@ -2177,8 +2191,12 @@ model vi_direccion {
   actualizadoen        DateTime      @default(now()) @db.Timestamp(6)
   usuariocreacion      String        @db.VarChar(50)
   usuarioactualizacion String?       @db.VarChar(50)
+  id_usuario           String?       @db.VarChar(50)
+  guardada             Boolean?
+  nombre               String?       @db.VarChar(250)
   vi_ciudad            vi_ciudad?    @relation(fields: [id_ciudad], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ciudad")
   vi_ubicacion         vi_ubicacion? @relation(fields: [id_ubicacion], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ubicacion")
+  vi_usuario           vi_usuario?   @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario")
   vi_pedido            vi_pedido[]
 }
 
@@ -2374,18 +2392,19 @@ model vi_motorizado {
 }
 
 model vi_notificacion {
-  idnotificacion       String      @id @db.VarChar(50)
+  id                   String      @id @db.VarChar(50)
   asunto               String      @db.VarChar(255)
   descripcion          String?
   tiponotificacion     String?     @db.VarChar(100)
   leido                Boolean     @default(false)
   estaactivo           Boolean     @default(true)
-  eliminadoen          DateTime?   @db.Timestamp(6)
+  desactivadoen        DateTime?   @db.Timestamp(6)
   creadoen             DateTime    @default(now()) @db.Timestamp(6)
   actualizadoen        DateTime    @default(now()) @db.Timestamp(6)
   usuariocreacion      String      @db.VarChar(50)
   usuarioactualizacion String?     @db.VarChar(50)
   idusuario            String?     @db.VarChar(50)
+  sistema              String?     @db.VarChar(50)
   vi_usuario           vi_usuario? @relation(fields: [idusuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario")
 }
 
@@ -2469,7 +2488,7 @@ model vi_permiso {
   id                   String           @id @db.VarChar(50)
   nombre               String           @db.VarChar(255)
   estaactivo           Boolean          @default(true)
-  eliminadoen          DateTime?        @db.Timestamp(6)
+  desactivadoen        DateTime?        @db.Timestamp(6)
   creadoen             DateTime         @default(now()) @db.Timestamp(6)
   actualizadoen        DateTime         @default(now()) @db.Timestamp(6)
   usuariocreacion      String           @db.VarChar(50)
@@ -2551,6 +2570,7 @@ model vi_producto {
   desactivadoen            DateTime?                  @db.Timestamp(6)
   id_tipoproducto          String?                    @db.VarChar(50)
   id_igv                   String?                    @db.VarChar(50)
+  vi_combo_x_producto      vi_combo_x_producto[]
   vi_detallepedido         vi_detallepedido[]
   vi_inventarioalmacen     vi_inventarioalmacen[]
   vi_inventariomotorizado  vi_inventariomotorizado[]
@@ -2590,6 +2610,23 @@ model vi_producto_subcategoria {
   vi_subcategoria      vi_subcategoria @relation(fields: [id_subcategoria], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_subcategoria")
 
   @@id([id_producto, id_subcategoria])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model vi_promocion {
+  id                   String    @id @db.VarChar(50)
+  titulo               String    @db.VarChar(50)
+  descripcion          String?   @db.VarChar(255)
+  fechainicio          DateTime  @db.Timestamp(6)
+  fechafin             DateTime  @db.Timestamp(6)
+  limitestock          Int
+  porcentajedescuento  Decimal?  @default(0) @db.Decimal(5, 2)
+  estado               Boolean   @default(true)
+  eliminadoen          DateTime? @db.Timestamp(6)
+  creadoen             DateTime? @default(now()) @db.Timestamp(6)
+  actualizadoen        DateTime? @default(now()) @db.Timestamp(6)
+  usuariocreacion      String    @db.VarChar(50)
+  usuarioactualizacion String?   @db.VarChar(50)
 }
 
 model vi_publicacion {
@@ -2648,15 +2685,6 @@ model vi_recompensa_puntos {
   vi_producto          vi_producto @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_producto_recompensa")
 }
 
-model vi_redsocial {
-  id                 BigInt               @id @default(autoincrement())
-  nombre             String               @db.VarChar(100)
-  limite_caracteres  Int
-  api_url            String               @db.VarChar(200)
-  api_version        String?              @db.VarChar(10)
-  vi_cuentaredsocial vi_cuentaredsocial[]
-}
-
 /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
 model vi_reporteredes {
   id                   BigInt             @id @default(autoincrement())
@@ -2675,7 +2703,7 @@ model vi_rol {
   id                   String           @id @db.VarChar(50)
   nombre               String           @db.VarChar(255)
   estaactivo           Boolean          @default(true)
-  eliminadoen          DateTime?        @db.Timestamp(6)
+  desactivadoen        DateTime?        @db.Timestamp(6)
   creadoen             DateTime         @default(now()) @db.Timestamp(6)
   actualizadoen        DateTime         @default(now()) @db.Timestamp(6)
   usuariocreacion      String           @db.VarChar(50)
@@ -2779,7 +2807,7 @@ model vi_usuario {
   apellido                           String                               @db.VarChar(100)
   concuenta                          Boolean
   numerotelefono                     String?                              @db.VarChar(15)
-  correo                             String?                              @unique @db.VarChar(150)
+  correo                             String                               @unique @db.VarChar(150)
   contrasena                         String                               @db.VarChar(255)
   fechaultimologin                   DateTime?                            @db.Timestamp(6)
   id_persona                         String?                              @db.VarChar(50)
@@ -2789,18 +2817,19 @@ model vi_usuario {
   actualizadoen                      DateTime                             @default(now()) @db.Timestamp(6)
   usuariocreacion                    String                               @db.VarChar(50)
   usuarioactualizacion               String?                              @db.VarChar(50)
-  id_rol                             String?                              @db.VarChar(50)
+  id_rol                             String                               @db.VarChar(50)
   resettoken                         String?                              @db.VarChar(255)
   resettokenexpiracion               DateTime?                            @db.Timestamp(6)
   marketing_campaigns_campanausuario marketing_campaigns_campanausuario[]
   vi_comentario                      vi_comentario[]
+  vi_direccion                       vi_direccion[]
   vi_historialrepartidor             vi_historialrepartidor[]
   vi_motorizado                      vi_motorizado[]
   vi_notificacion                    vi_notificacion[]
   vi_pedido                          vi_pedido[]
   vi_publicacion                     vi_publicacion[]
   vi_persona                         vi_persona?                          @relation(fields: [id_persona], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_persona")
-  vi_rol                             vi_rol?                              @relation(fields: [id_rol], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rol")
+  vi_rol                             vi_rol                               @relation(fields: [id_rol], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rol")
 }
 
 model vi_venta {
@@ -2837,6 +2866,7 @@ model vi_version_publicacion {
   fechacreacion           DateTime          @default(now()) @db.Timestamp(6)
   fechaultimamodificacion DateTime          @default(now()) @db.Timestamp(6)
   estaactivo              Boolean?          @default(true)
+  richtext                String?
   vi_estado_version       vi_estado_version @relation(fields: [id_estado], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_estado_version")
   vi_publicacion          vi_publicacion    @relation(fields: [id_publicacion], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_publicacion")
 }
