@@ -27,8 +27,6 @@ export default function NuevaMultimedia() {
   const [multimediaType, setMultimediaType] = useState("");
   const [description, setDescription] = useState("");
   const [educationalMessage, setEducationalMessage] = useState("");
-  const [videoOption, setVideoOption] = useState(""); 
-  const [videoFile, setVideoFile] = useState(null);
   const [videoURL, setVideoURL] = useState("");
   const [fruit, setFruit] = useState(""); 
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -41,8 +39,6 @@ export default function NuevaMultimedia() {
     if (isEditMode) {
       const fetchMultimediaById = async (id) => {
         try {
-          // Aquí deberías hacer una llamada a tu API para obtener los datos
-          // Por ahora, usaremos los datos de ejemplo
           const multimedia = [
             { id: 1, fruit: "Manzana", description: "Introducción a la manzana y sus beneficios", type: "Video", url: "https://vid.com/manzana", status: "Activo" },
             { id: 2, fruit: "Plátano", description: "Información nutricional del plátano", type: "Información", message: "El plátano es una fruta tropical que destaca por su alto contenido de potasio.", status: "Inactivo" },
@@ -66,7 +62,6 @@ export default function NuevaMultimedia() {
               fruta: item.fruit || "",
             });
             setMultimediaType(item.type === "Video" ? "video" : "informacion");
-            setVideoOption(item.url.includes("http") ? "url" : "upload");
           }
         } catch (error) {
           console.error("Error al cargar los datos de multimedia:", error);
@@ -75,42 +70,24 @@ export default function NuevaMultimedia() {
 
       fetchMultimediaById(id);
     }
-    }, [isEditMode, id]);
+  }, [isEditMode, id]);
 
 
-    const handleFileChange = (event) => {
-      const file = event.target.files[0];
-      setFormData(prevData => ({
-        ...prevData,
-        imagen: file
-      }));
-      setSelectedFile(file);
-      setImageError(false);
-    };
-
-  const handleVideoChange = (event) => {
-    setVideoFile(event.target.files[0]);
-    setVideoURL("");
-    setVideoError(false); 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setFormData(prevData => ({
+      ...prevData,
+      imagen: file
+    }));
+    setSelectedFile(file);
+    setImageError(false);
   };
 
   const handleTypeChange = (event) => {
     setMultimediaType(event.target.value);
-    setVideoOption("");
-    setVideoFile(null);
-    setSelectedFile(null);
     setVideoURL("");
+    setSelectedFile(null);
     setImageError(false);
-    setVideoError(false);
-  };
-
-  const handleVideoOptionChange = (option) => {
-    setVideoOption(option);
-    if (option === "upload") {
-      setVideoURL(""); 
-    } else if (option === "url") {
-      setVideoFile(null); 
-    }
     setVideoError(false);
   };
 
@@ -129,18 +106,9 @@ export default function NuevaMultimedia() {
       valid = false;
     }
 
-    if (multimediaType === "video") {
-      if (videoOption === "upload" && !videoFile) {
-        setVideoError(true);
-        valid = false;
-      } else if (videoOption === "url" && !videoURL) {
-        setVideoError(true);
-        valid = false;
-      }
-      if (!videoOption) {
-        setVideoError(true);
-        valid = false;
-      }
+    if (multimediaType === "video" && !videoURL) {
+      setVideoError(true);
+      valid = false;
     }
 
     if (!selectedFile) {
@@ -211,12 +179,12 @@ export default function NuevaMultimedia() {
                     required
                     value={formData.fruta}
                     onChange={handleInputChange}
-                    >
+                  >
                     <option value="">--Selecciona una fruta--</option>
                     {fruitOptions.map((fruit, index) => (
                       <option key={index} value={fruit}>{fruit}</option>
                     ))}
-                    </Form.Select>
+                  </Form.Select>
                 </Form.Group>
 
                 {/* Tipo de Multimedia */}
@@ -266,87 +234,22 @@ export default function NuevaMultimedia() {
                 )}
 
                 {multimediaType === "video" && (
-                  <div>
-                    <h4>Video</h4>
-                    <p>Sube un archivo de video o añade uno con una URL.</p>
-
-                    <div className="d-flex justify-content-start mb-3">
-                      <Button
-                        variant={videoOption === "upload" ? "danger" : "outline-danger"}
-                        className="btn-option me-2"
-                        onClick={() => handleVideoOptionChange("upload")}
-                      >
-                        Subir archivo
-                      </Button>
-                      <Button
-                        variant={videoOption === "url" ? "danger" : "outline-danger"}
-                        className="btn-option"
-                        onClick={() => handleVideoOptionChange("url")}
-                      >
-                        Insertar desde URL
-                      </Button>
-                    </div>
-
+                  <Form.Group className="mb-3">
+                    <Form.Label>URL del Video</Form.Label>
+                    <Form.Control
+                      type="url"
+                      placeholder="https://vid.com/mi-video"
+                      value={formData.videourl}
+                      onChange={handleInputChange}
+                      className="form-control-custom"
+                      required
+                    />
                     {videoError && (
-                      <Alert variant="danger" className="mb-3">
-                        Debes proporcionar un video o URL válido.
+                      <Alert variant="danger" className="mt-3">
+                        Debes proporcionar una URL de video válida.
                       </Alert>
                     )}
-                    {videoOption === "upload" && (
-                      <div className="file-upload-box">
-                        <label htmlFor="file-upload-video" className="custom-file-upload">
-                          {videoFile ? (
-                            <>
-                              <span>{videoFile.name}</span>
-                              <Button
-                                variant="light"
-                                className="ms-3"
-                                onClick={() => setVideoFile(null)}
-                              >
-                                ✕
-                              </Button>
-                            </>
-                          ) : (
-                            <>
-                              <span>Selecciona tu archivo</span>
-                              <span>o suelta tu archivo aquí</span>
-                            </>
-                          )}
-                          <input
-                            id="file-upload-video"
-                            type="file"
-                            accept=".mp4"
-                            onChange={handleVideoChange}
-                            className="file-input"
-                          />
-                        </label>
-                      </div>
-                    )}
-
-                    {videoOption === "url" && (
-                      <Form.Group className="mb-3">
-                        <div className="d-flex align-items-center">
-                          <Form.Control
-                            type="url"
-                            placeholder="https://vid.com/mi-video"
-                            value={formData.videourl}
-                            onChange={handleInputChange}
-                            className="form-control-custom"
-                            required
-                          />
-                          {videoURL && (
-                            <Button
-                              variant="light"
-                              className="ms-3"
-                              onClick={() => setVideoURL("")}
-                            >
-                              ✕
-                            </Button>
-                          )}
-                        </div>
-                      </Form.Group>
-                    )}
-                  </div>
+                  </Form.Group>
                 )}
               </Col>
 
