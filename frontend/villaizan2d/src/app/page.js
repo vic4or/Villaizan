@@ -3,7 +3,6 @@
 import React from "react";
 import Menu from "./components/menu/menu.js"; // Importar el componente de menú
 
-
 const Icon = ({ name }) => {
   const icons = {
     gift: "🎁",
@@ -12,6 +11,7 @@ const Icon = ({ name }) => {
     bell: "🔔",
     image: "🖼️",
     tag: "🏷️",
+    apple: "🍎", // Nuevo icono para "Gestión de Frutas"
   };
   return (
     <span className="icon" style={{ fontSize: '3rem', lineHeight: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
@@ -81,6 +81,14 @@ export default function Home() {
               </div>
               <h3>Gestión de Promociones</h3>
               <p>Administra ofertas y promociones para los clientes</p>
+            </div>
+            {/* Nueva tarjeta para "Gestión de Frutas" */}
+            <div className="card" onClick={() => window.location.href='/pages/frutas/lista'}>
+              <div className="icon-container">
+                <Icon name="apple" />
+              </div>
+              <h3>Gestión de Frutas</h3>
+              <p>Administra la información sobre las frutas y los productos que las contienen</p>
             </div>
           </div>
         </div>
