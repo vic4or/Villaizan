@@ -6,6 +6,7 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation"; 
 import axios from "axios"; 
 import * as XLSX from "xlsx"; // Asegúrate de importar XLSX
+import NuevaPuntos from './nuevaPuntos.js';
 
 export default function ListadoPuntos() {
     const router = useRouter();
@@ -13,12 +14,13 @@ export default function ListadoPuntos() {
     const [puntos, setPuntos] = useState([]);
     const [productos, setProductos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [viewType, setViewType] = useState(true); // true para Activo, false para Inactivo
+    const [viewType, setViewType] = useState("todos"); // "activos", "inactivos", "todos"
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [newPoints, setNewPoints] = useState("");
     const [showModal, setShowModal] = useState(false);
-    const itemsPerPage = 5;
+    const [showNuevoModal, setShowNuevoModal] = useState(false); // Estado para mostrar el modal de nueva puntos
+    const itemsPerPage = 10;
 
     // Llamada a la API para listar todos los puntos
     useEffect(() => {
@@ -39,7 +41,11 @@ export default function ListadoPuntos() {
 
     // Filtrar puntos según el estado seleccionado (Activo/Inactivo) y búsqueda por nombre de producto
     const filteredPuntos = puntos
-        .filter((item) => item.estado === viewType) // Filtrar por estado (true = activo, false = inactivo)
+        .filter((item) => {
+            if (viewType === "activos") return item.estado === true;
+            if (viewType === "inactivos") return item.estado === false;
+            return true; // "todos" muestra todos los registros
+        }) // Filtrar por estado (true = activo, false = inactivo)
         .filter((item) => {
             const producto = productos.find(p => p.id === item.id_producto);
             return producto?.nombre?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -70,6 +76,11 @@ export default function ListadoPuntos() {
         setShowModal(false); // Cerrar el modal
         setNewPoints(""); // Limpiar el valor de los puntos nuevos
     };
+
+
+    // Función para abrir y cerrar el modal de Nueva puntos
+    const handleShowNuevoModal = () => setShowNuevoModal(true);
+    const handleCloseNuevoModal = () => setShowNuevoModal(false);
 
     const handleSave = async () => {
         try {
@@ -152,26 +163,22 @@ export default function ListadoPuntos() {
                 <Col>
                     <ButtonGroup>
                         <Button
-                            variant={viewType ? "danger" : "outline-danger"}
-                            style={{
-                                backgroundColor: viewType ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                                borderColor: "rgba(230, 57, 70, 0.6)",
-                                color: viewType ? "#fff" : "rgba(230, 57, 70, 0.8)",
-                            }}
-                            onClick={() => setViewType(true)}
+                            variant={viewType === "activos" ? "danger" : "outline-danger"}
+                            onClick={() => setViewType("activos")}
                         >
                             Activos
                         </Button>
                         <Button
-                            variant={!viewType ? "danger" : "outline-danger"}
-                            style={{
-                                backgroundColor: !viewType ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                                borderColor: "rgba(230, 57, 70, 0.6)",
-                                color: !viewType ? "#fff" : "rgba(230, 57, 70, 0.8)",
-                            }}
-                            onClick={() => setViewType(false)}
+                            variant={viewType === "inactivos" ? "danger" : "outline-danger"}
+                            onClick={() => setViewType("inactivos")}
                         >
                             Inactivos
+                        </Button>
+                        <Button
+                            variant={viewType === "todos" ? "danger" : "outline-danger"}
+                            onClick={() => setViewType("todos")}
+                        >
+                            Todos
                         </Button>
                     </ButtonGroup>
                 </Col>
@@ -192,7 +199,7 @@ export default function ListadoPuntos() {
             <Row className="mb-4">
                 <Col md={8}></Col>
                 <Col md={4} className="d-flex justify-content-end align-items-start">
-                    <Button variant="danger" className="me-2" onClick={() => router.push("/pages/puntos/nuevo")}>+ Agregar</Button>
+                    <Button variant="danger" className="me-2" onClick={handleShowNuevoModal}>+ Agregar</Button>
                     <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
                 </Col>
             </Row>
@@ -262,6 +269,8 @@ export default function ListadoPuntos() {
                     <Button variant="danger" onClick={handleSave}>Guardar</Button>
                 </Modal.Footer>
             </Modal>
+
+            <NuevaPuntos show={showNuevoModal} handleClose={handleCloseNuevoModal} />
         </Container>
     );
 }

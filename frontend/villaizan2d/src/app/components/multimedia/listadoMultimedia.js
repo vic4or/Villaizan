@@ -11,7 +11,7 @@ export default function ListadoMultimedia() {
     const [multimedia, setMultimedia] = useState([]);
     const [frutas, setFrutas] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [viewType, setViewType] = useState("Activo");
+    const [viewType, setViewType] = useState("todos"); // "activos", "inactivos", "todos"
     const [filterType, setFilterType] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const itemsPerPage = 5;
@@ -44,7 +44,11 @@ export default function ListadoMultimedia() {
 
     // Filtrado de multimedia según el estado, tipo, y palabras clave
     const filteredMultimedia = multimedia
-        .filter((item) => item.estaactivo === (viewType === "Activo"))
+        .filter((item) => {
+            if (viewType === "activos") return item.estado === true;
+            if (viewType === "inactivos") return item.estado === false;
+            return true; // "todos" muestra todos los registros
+        })
         .filter((item) => (filterType ? item.tipocontenido === filterType : true))
         .filter((item) => item.titulo.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -113,35 +117,20 @@ export default function ListadoMultimedia() {
                 <Col>
                     <ButtonGroup>
                         <Button
-                            variant={viewType === "Activo" ? "danger" : "outline-danger"}
-                            style={{
-                                backgroundColor: viewType === "Activo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                                borderColor: "rgba(230, 57, 70, 0.6)",
-                                color: viewType === "Activo" ? "#fff" : "rgba(230, 57, 70, 0.8)",
-                            }}
-                            onClick={() => setViewType("Activo")}
+                            variant={viewType === "activos" ? "danger" : "outline-danger"}
+                            onClick={() => setViewType("activos")}
                         >
                             Activos
                         </Button>
                         <Button
-                            variant={viewType === "Inactivo" ? "danger" : "outline-danger"}
-                            style={{
-                                backgroundColor: viewType === "Inactivo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                                borderColor: "rgba(230, 57, 70, 0.6)",
-                                color: viewType === "Inactivo" ? "#fff" : "rgba(230, 57, 70, 0.8)",
-                            }}
-                            onClick={() => setViewType("Inactivo")}
+                            variant={viewType === "inactivos" ? "danger" : "outline-danger"}
+                            onClick={() => setViewType("inactivos")}
                         >
                             Inactivos
                         </Button>
                         <Button
-                            variant={viewType === "Todos" ? "danger" : "outline-danger"}
-                            style={{
-                                backgroundColor: viewType === "Inactivo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                                borderColor: "rgba(230, 57, 70, 0.6)",
-                                color: viewType === "Todos" ? "#fff" : "rgba(230, 57, 70, 0.8)",
-                            }}
-                            onClick={() => setViewType("Todos")}
+                            variant={viewType === "todos" ? "danger" : "outline-danger"}
+                            onClick={() => setViewType("todos")}
                         >
                             Todos
                         </Button>
