@@ -42,3 +42,4 @@ export class FrutaController {
         return this.frutaService.inactivateFruta(id);
     }*/
 }
+//prueba
