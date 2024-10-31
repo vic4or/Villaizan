@@ -109,6 +109,17 @@ export default function ListadoNotificaciones() {
             >
               Inactivos
             </Button>
+            <Button
+              variant={viewType === "Todos" ? "danger" : "outline-danger"}
+              style={{
+                  backgroundColor: viewType === "Inactivo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
+                  borderColor: "rgba(230, 57, 70, 0.6)",
+                  color: viewType === "Todos" ? "#fff" : "rgba(230, 57, 70, 0.8)",
+              }}
+              onClick={() => setViewType("Todos")}
+          >
+              Todos
+          </Button>
           </ButtonGroup>
         </Col>
       </Row>
@@ -169,7 +180,7 @@ export default function ListadoNotificaciones() {
                   {/* Botones de Edición y Eliminación */}
                   <Link href={`/pages/notificaciones/editar/?id=${item.id}`} key={item.id}>
                     <Button variant="outline-primary" size="sm" className="me-2">
-                      <FaEdit /> Editar
+                      <FaEdit /> 
                     </Button>
                   </Link>
                   <Button
@@ -177,7 +188,7 @@ export default function ListadoNotificaciones() {
                     size="sm"
                     onClick={() => alert(`Eliminando ${item.asunto}`)}
                   >
-                    <FaTrashAlt /> Eliminar
+                    <FaTrashAlt /> 
                   </Button>
                 </td>
               </tr>
