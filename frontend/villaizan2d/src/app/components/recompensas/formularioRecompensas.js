@@ -7,6 +7,7 @@ const NuevaRecompensa = ({ show, handleClose }) => {
   const [idProducto, setIdProducto] = useState('');
   const [nombreProducto, setNombreProducto] = useState('');
   const [cantidadRecompensa, setCantidadRecompensa] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -32,6 +33,7 @@ const NuevaRecompensa = ({ show, handleClose }) => {
     setCantidadRecompensa('');
     setError('');
     setSuccess('');
+    setSearchTerm('');
   };
 
   // Cerrar el modal y resetear el formulario
@@ -69,14 +71,22 @@ const NuevaRecompensa = ({ show, handleClose }) => {
     }
   };
 
-  // Manejar cambio de producto
-  const handleProductoChange = (e) => {
-    const selectedProductId = e.target.value;
-    const selectedProduct = productos.find(producto => producto.id === selectedProductId);
-
-    setIdProducto(selectedProductId);
-    setNombreProducto(selectedProduct?.nombre || ''); // Actualizar nombre de producto
+  // Manejar cambio de búsqueda
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
+
+  // Manejar la selección de un producto
+  const handleProductoSelect = (producto) => {
+    setIdProducto(producto.id);
+    setNombreProducto(producto.nombre);
+    setSearchTerm(producto.nombre);
+  };
+
+  // Filtrar los productos según el término de búsqueda
+  const filteredProductos = productos.filter(producto =>
+    producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Modal show={show} onHide={handleModalClose} centered>
@@ -92,19 +102,30 @@ const NuevaRecompensa = ({ show, handleClose }) => {
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Producto</Form.Label>
-            <Form.Select
-              aria-label="Selecciona un producto"
-              value={idProducto}
-              onChange={handleProductoChange}
-              required
-            >
-              <option value="">--Selecciona un producto--</option>
-              {productos.map((producto) => (
-                <option key={producto.id} value={producto.id}>
-                  {producto.nombre}
-                </option>
-              ))}
-            </Form.Select>
+            <Form.Control
+              type="text"
+              placeholder="Buscar producto..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              autoComplete="off"
+            />
+            {searchTerm && (
+              <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #ddd', marginTop: '5px', borderRadius: '4px' }}>
+                {filteredProductos.map((producto) => (
+                  <div
+                    key={producto.id}
+                    onClick={() => handleProductoSelect(producto)}
+                    style={{
+                      padding: '8px',
+                      cursor: 'pointer',
+                      backgroundColor: idProducto === producto.id ? '#f0f0f0' : 'white'
+                    }}
+                  >
+                    {producto.nombre}
+                  </div>
+                ))}
+              </div>
+            )}
           </Form.Group>
 
           <Form.Group className="mb-3">

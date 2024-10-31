@@ -18,21 +18,27 @@ export default function FormularioFruta() {
     productos: [],
   });
 
+  const [productos, setProductos] = useState([]); // Estado para los productos cargados de la API
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [searchProduct, setSearchProduct] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formError, setFormError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const availableProducts = [
-    "Paleta - Fresa",
-    "Paleta - Aguaje",
-    "Mafeleta - Ron",
-    "Mafeleta - Coco",
-    "Mafeleta - Lúcuma",
-    "Helado - Vainilla",
-    "Helado - Chocolate"
-  ];
+  // Obtener productos al cargar el componente
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/productos/listarTodos");
+        setProductos(response.data);
+      } catch (err) {
+        console.error("Error al obtener los productos:", err);
+        setErrorMessage("Hubo un error al cargar los productos.");
+      }
+    };
+
+    fetchProductos();
+  }, []);
 
   useEffect(() => {
     // Cargar datos de la fruta si estamos en modo edición
@@ -97,9 +103,9 @@ export default function FormularioFruta() {
     setSearchProduct(event.target.value);
   };
 
-  const handleAddProduct = () => {
-    if (searchProduct && availableProducts.includes(searchProduct) && !selectedProducts.includes(searchProduct)) {
-      setSelectedProducts([...selectedProducts, searchProduct]);
+  const handleAddProduct = (product) => {
+    if (product && !selectedProducts.includes(product)) {
+      setSelectedProducts([...selectedProducts, product]);
       setSearchProduct("");
     }
   };
@@ -112,6 +118,11 @@ export default function FormularioFruta() {
     setShowConfirmation(false);
     router.push("/pages/frutas/lista");
   };
+
+  // Filtrar productos según el término de búsqueda
+  const filteredProductos = productos.filter((producto) =>
+    producto.nombre.toLowerCase().includes(searchProduct.toLowerCase())
+  );
 
   return (
     <>
@@ -185,15 +196,28 @@ export default function FormularioFruta() {
                     placeholder="Buscar producto"
                     value={searchProduct}
                     onChange={handleProductSearch}
-                    list="productOptions"
                   />
-                  <datalist id="productOptions">
-                    {availableProducts.map((product, index) => (
-                      <option key={index} value={product} />
-                    ))}
-                  </datalist>
-                  <Button variant="outline-secondary" onClick={handleAddProduct}>Agregar</Button>
+                  <Button variant="outline-secondary" onClick={() => handleAddProduct(searchProduct)}>Agregar</Button>
                 </InputGroup>
+
+                {/* Lista de productos filtrados */}
+                {searchProduct && (
+                  <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    {filteredProductos.map((product) => (
+                      <div
+                        key={product.id}
+                        onClick={() => handleAddProduct(product.nombre)}
+                        style={{
+                          padding: '8px',
+                          cursor: 'pointer',
+                          backgroundColor: selectedProducts.includes(product.nombre) ? '#f0f0f0' : 'white'
+                        }}
+                      >
+                        {product.nombre}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <h5>Listado final</h5>
                 <Table bordered>
@@ -209,7 +233,7 @@ export default function FormularioFruta() {
                         <td>{product}</td>
                         <td>
                           <Button variant="outline-danger" size="sm" onClick={() => handleRemoveProduct(product)}>
-                            <FaTrashAlt /> 
+                            <FaTrashAlt />
                           </Button>
                         </td>
                       </tr>
