@@ -91,14 +91,38 @@ export class DescuentoService {
             data: promocionData
         });
     
-        // Paso 2: Actualizar los productos asociados con el ID de la promoción
+        //PARA SOLO TENER COMO PROMOCION LOS PRODUCTOS QUE SE ENVIAN EN
+        // vi_productoIds
+        // Paso 2: Obtener los IDs de productos asociados a la promoción antes de la actualización
+        const currentProductos = await this.prisma.vi_producto.findMany({
+            where: { id_promocion: updatedPromocion.id },
+            select: { id: true }
+        });
+        
+        const currentProductoIds = currentProductos.map(producto => producto.id);
+
+        // Paso 3: Actualizar los productos asociados con el ID de la promoción
         if (updatePromocionDto.vi_productoIds) {
+            // Actualizar solo los productos que están en vi_productoIds
             await this.prisma.vi_producto.updateMany({
                 where: {
                     id: { in: updatePromocionDto.vi_productoIds }
                 },
                 data: {
                     id_promocion: updatedPromocion.id // Asigna el ID de la promoción actualizada
+                }
+            });
+        }
+
+        // Paso 4: Eliminar la asociación de productos que no están en vi_productoIds
+        const productosToRemove = currentProductoIds.filter(id => !updatePromocionDto.vi_productoIds.includes(id));
+        if (productosToRemove.length > 0) {
+            await this.prisma.vi_producto.updateMany({
+                where: {
+                    id: { in: productosToRemove }
+                },
+                data: {
+                    id_promocion: null // Elimina la asociación de la promoción
                 }
             });
         }
