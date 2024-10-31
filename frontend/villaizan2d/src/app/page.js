@@ -40,7 +40,7 @@ export default function Home() {
           </div>
           <div className="grid">
             {/* Cada tarjeta tiene un evento onClick que llama a la función handleClick */}
-            <div className="card" onClick={() => handleClick("Gestión de Recompensas")}>  
+            <div className="card" onClick={() => window.location.href='/pages/recompensas/lista'}>  
               <div className="icon-container">
                 <Icon name="gift" />
               </div>
@@ -58,7 +58,7 @@ export default function Home() {
               <div className="icon-container">
                 <Icon name="percent" />
               </div>
-              <h3>Gestión de Códigos</h3>
+              <h3>Gestión de Csnjes</h3>
               <p>Administra los códigos generados por los clientes para canjear recompensas</p>
             </div>
             <div className="card" onClick={() => window.location.href='/pages/notificaciones/lista'}>  

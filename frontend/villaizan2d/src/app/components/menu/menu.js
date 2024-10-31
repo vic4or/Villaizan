@@ -33,6 +33,7 @@ export default function Menu() {
       ref={menuRef}
       onClick={toggleMenu}
       style={{
+        position: "fixed",
         height: "100vh",
         width: isExpanded ? "260px" : "80px",
         background: "linear-gradient(to bottom, #e63946, #b2182b)",
@@ -43,7 +44,8 @@ export default function Menu() {
         padding: "20px 0",
         cursor: "pointer",
         transition: "width 0.3s ease", // Animación suave al expandir/contraer
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)"
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+        zIndex: "10000"
       }}
     >
       {/* Logo */}
@@ -68,7 +70,8 @@ export default function Menu() {
         gap: "20px",
         alignItems: isExpanded ? "flex-start" : "center",
         width: "100%",
-        paddingLeft: isExpanded ? "20px" : "0"
+        paddingLeft: isExpanded ? "20px" : "0",
+        zIndex: "10000"
       }}>
         {/*         
         <Link href="/">
@@ -157,6 +160,7 @@ const menuItemStyle = {
   gap: "15px",
   width: "100%",
   transition: "background 0.3s ease, padding 0.3s ease",
+  zIndex: "999999"
 };
 
 const textStyle = {
