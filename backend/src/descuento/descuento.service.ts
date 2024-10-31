@@ -48,7 +48,8 @@ export class DescuentoService {
             fechafin: new Date(createPromocionDto.fechaFin),
             limitestock: createPromocionDto.limiteStock,
             porcentajedescuento: createPromocionDto.porcentajeDescuento ?? 0,
-            usuariocreacion: "admin"
+            usuariocreacion: "admin",
+            usuarioactualizacion: "admin"
         };
     
         // Paso 2: Crear la nueva promoción
@@ -76,6 +77,8 @@ export class DescuentoService {
     }
 
     async update(id: string, updatePromocionDto: UpdateDescuentoDto) {
+        
+        const actual = new Date();
         // Paso 1: Actualizar la promoción
         const promocionData: Prisma.vi_promocionUpdateInput = {
             titulo: updatePromocionDto.titulo,
@@ -84,6 +87,7 @@ export class DescuentoService {
             fechafin: new Date(updatePromocionDto.fechaFin),
             limitestock: updatePromocionDto.limiteStock,
             porcentajedescuento: updatePromocionDto.porcentajeDescuento,
+            actualizadoen: actual.toISOString()
             //usuariocreacion: updatePromocionDto.usuariocreacion
         };
         const updatedPromocion = await this.prisma.vi_promocion.update({
@@ -139,9 +143,14 @@ export class DescuentoService {
 
     async delete(id: string) {
         // Paso 1: Actualizar la promoción a estado: false
+        const actual = new Date();
+        
         await this.prisma.vi_promocion.update({
             where: { id },
-            data: { estado: false }
+            data: { 
+                estado: false,
+                eliminadoen: actual.toISOString()
+            }
         });
     
         // Paso 2: Actualizar los productos asociados, estableciendo id_promocion a null

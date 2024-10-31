@@ -54,7 +54,8 @@ export class ComboService {
             fechafin: new Date(createComboDto.fechaFin),
             limitestock: createComboDto.limiteStock,
             precio: createComboDto.precio,
-            usuariocreacion: "admin"
+            usuariocreacion: "admin",
+            usuarioactualizacion: "admin"
         };
     
         // Paso 2: Crear la nueva promoción
@@ -93,6 +94,8 @@ export class ComboService {
 
     //PROBAR EL METODO
     async update(id: string, updateComboDto: UpdateComboDto) {
+        
+        const actual = new Date();
         // Actualizar el combo
         const comboData: Prisma.vi_comboUpdateInput = {
             titulo: updateComboDto.titulo,
@@ -101,6 +104,7 @@ export class ComboService {
             fechafin: new Date(updateComboDto.fechaFin),
             limitestock: updateComboDto.limiteStock,
             precio: updateComboDto.precio,
+            actualizadoen: actual.toISOString()
         };
         
         const updatedCombo = await this.prisma.vi_combo.update({
@@ -158,11 +162,13 @@ export class ComboService {
     }
 
     async delete(id: string) {
+        const actual = new Date();
         // Paso 1: Actualizar el combo a estado: false
         await this.prisma.vi_combo.update({
             where: { id },
             data: {
-                estado: false
+                estado: false,
+                eliminadoen: actual.toISOString()
             }
         });
 
