@@ -9,7 +9,8 @@ export class PromocionService {
 
     async findAll(estado?: boolean) {
         // Por defecto, el estado es true si no se especifica
-        const filter = estado === false ? { estado: false } : { estado: true };
+        const filter = { estado: true}
+        if(estado) filter.estado = false; 
       
         // Obtiene los combos con el filtro de estado
         const combos = await this.prisma.vi_combo.findMany({
