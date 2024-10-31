@@ -1,321 +1,203 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Form, Button, Row, Col, Container, Modal, Alert } from "react-bootstrap";
-import "./nuevaMultimedia.css";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import axios from "axios";
 
 export default function NuevaMultimedia() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
-  const isEditMode = Boolean(id); // Si hay un ID, estamos en modo edición
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id"); // Obtenemos el ID de los parámetros de la URL
 
-  const [formData, setFormData] = useState({
-    imagen: "",
-    tipo: "",
-    descripcion: "",
-    mensaje: "",
-    videofile: "",
-    videourl: "",
-    fruta: "",
-  });
+    const [frutas, setFrutas] = useState([]);
+    const [titulo, setTitulo] = useState("");
+    const [tipoContenido, setTipoContenido] = useState("Información");
+    const [contenidoInformacion, setContenidoInformacion] = useState("");
+    const [urlContenido, setUrlContenido] = useState("");
+    const [selectedFruta, setSelectedFruta] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
 
-  // Estados para almacenar la información de multimedia
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [multimediaType, setMultimediaType] = useState("");
-  const [description, setDescription] = useState("");
-  const [educationalMessage, setEducationalMessage] = useState("");
-  const [videoURL, setVideoURL] = useState("");
-  const [fruit, setFruit] = useState(""); 
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [videoError, setVideoError] = useState(false);
-  const [fruitOptions, setFruitOptions] = useState([]);
-
-  // Efecto para cargar datos en el modo de edición
-  useEffect(() => {
-    if (isEditMode) {
-      const fetchMultimediaById = async (id) => {
-        try {
-          const multimedia = [
-            { id: 1, fruit: "Manzana", description: "Introducción a la manzana y sus beneficios", type: "Video", url: "https://vid.com/manzana", status: "Activo" },
-            { id: 2, fruit: "Plátano", description: "Información nutricional del plátano", type: "Información", message: "El plátano es una fruta tropical que destaca por su alto contenido de potasio.", status: "Inactivo" },
-            { id: 3, fruit: "Naranja", description: "Video educativo sobre las naranjas", type: "Video", url: "https://vid.com/naranja", status: "Activo" },
-            { id: 4, fruit: "Manzana verde", description: "La manzana verde en la cocina", type: "Información", message: "Las manzanas son una de las frutas más populares y saludables del mundo.", status: "Activo" },
-            { id: 5, fruit: "Fresa", description: "Historia de la fresa: de la granja a tu mesa", type: "Video", url: "https://vid.com/fresa", status: "Inactivo" },
-          ];
-          const item = multimedia.find((multi) => multi.id === parseInt(id));
-
-          const uniqueFruits = [...new Set(multimedia.map(item => item.fruit))];
-          setFruitOptions(uniqueFruits);
-          
-          if (item) {
-            setFormData({
-              imagen: item.imagen || "",
-              tipo: item.type || "",
-              descripcion: item.description || "",
-              mensaje: item.message || "",
-              videofile: item.videoFile || "",
-              videourl: item.url || "",
-              fruta: item.fruit || "",
+    useEffect(() => {
+        // Cargar lista de frutas desde la API
+        axios.get("http://localhost:3000/fruta/listarTodos")
+            .then((response) => {
+                setFrutas(response.data);
+            })
+            .catch((error) => {
+                console.error("Error al cargar los datos de frutas:", error);
             });
-            setMultimediaType(item.type === "Video" ? "video" : "informacion");
-          }
-        } catch (error) {
-          console.error("Error al cargar los datos de multimedia:", error);
+
+        // Si estamos en modo de edición, cargar los datos del multimedia existente
+        if (id) {
+            setIsEditing(true);
+            axios.get(`http://localhost:3000/contenidoeducativo/listarTodos`)
+                .then((response) => {
+                    const multimediaData = response.data.find((item) => item.id === id);
+                    if (multimediaData) {
+                        setTitulo(multimediaData.titulo);
+                        setTipoContenido(multimediaData.tipocontenido);
+                        setContenidoInformacion(multimediaData.contenidoinformacion || "");
+                        setUrlContenido(multimediaData.urlcontenido || "");
+                        setSelectedFruta(multimediaData.id_fruta);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error al cargar los datos del multimedia:", error);
+                });
         }
-      };
+    }, [id]);
 
-      fetchMultimediaById(id);
-    }
-  }, [isEditMode, id]);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
+        // Crear el payload dependiendo del tipo de contenido
+        const payload = {
+            titulo,
+            contenidoinformacion: tipoContenido === "Información" ? contenidoInformacion : null,
+            tipocontenido: tipoContenido,
+            urlcontenido: tipoContenido === "Video" ? urlContenido : null,
+            id_fruta: selectedFruta
+        };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setFormData(prevData => ({
-      ...prevData,
-      imagen: file
-    }));
-    setSelectedFile(file);
-    setImageError(false);
-  };
+        try {
+            if (isEditing) {
+                // Agregar console.log para depurar el ID
+                console.log("ID para actualizar:", id); // Log del ID
 
-  const handleTypeChange = (event) => {
-    setMultimediaType(event.target.value);
-    setVideoURL("");
-    setSelectedFile(null);
-    setImageError(false);
-    setVideoError(false);
-  };
+                // Actualizar el multimedia existente
+                const response = await axios.put(
+                    `http://localhost:3000/contenidoeducativo/editar/${id}`, // URL de actualización con ID
+                    payload
+                );
+                console.log("Multimedia actualizada con éxito:", response.data);
+                alert("Multimedia actualizada exitosamente");
+            } else {
+                // Crear un nuevo multimedia
+                const response = await axios.post(
+                    "http://localhost:3000/contenidoeducativo/registrar",
+                    payload
+                );
+                console.log("Multimedia creada con éxito:", response.data);
+                alert("Multimedia creada exitosamente");
+            }
+            router.push("/pages/multimedia/lista"); // Redirigir a la lista de multimedia después de guardar
+        } catch (error) {
+            console.error("Error al guardar el multimedia:", error);
+            alert("Hubo un error al guardar el multimedia");
+        }
+    };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    let valid = true;
-
-    if (!description) {
-      alert("La descripción es obligatoria.");
-      valid = false;
-    }
-
-    if (multimediaType === "informacion" && !educationalMessage) {
-      alert("El mensaje educativo es obligatorio.");
-      valid = false;
-    }
-
-    if (multimediaType === "video" && !videoURL) {
-      setVideoError(true);
-      valid = false;
-    }
-
-    if (!selectedFile) {
-      setImageError(true);
-      valid = false;
-    }
-
-    if (valid) {
-      setShowConfirmation(true); 
-    }
-  };
-
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
-  const handleClose = () => {
-    setShowConfirmation(false);
-    router.push("/pages/multimedia/lista");
-  };
-
-  return (
-    <>
-      <div>
-        {/* Popup de confirmación */}
-        <Modal show={showConfirmation} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Confirmación</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>La multimedia se ha guardado exitosamente.</Modal.Body>
-          <Modal.Footer>
-            <Button variant="success" onClick={handleClose}>
-              Cerrar
-            </Button>
-          </Modal.Footer>
-        </Modal>
-
-        <div className="breadcrumb-container">
-          <p className="text-muted">Gestión del sistema &gt; Multimedia &gt; {isEditMode ? "Editar Multimedia" : "Nueva Multimedia"}</p>
-        </div>
-
-        <Container
-          style={{
-            background: "#ffffff",
-            border: "1px solid #eaeaea",
-            borderRadius: "8px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            padding: "30px",
-            marginLeft: "30px",
-            maxWidth: "95%",
-          }}
-        >
-          <h2 className="mb-4">{isEditMode ? "Editar Multimedia" : "Nueva Multimedia"}</h2>
-          <Form onSubmit={handleSubmit}>
+    return (
+        <Container>
             <Row className="mb-4">
-              <Col md={6}>
-                <h4>Información general</h4>
-                {/* Control del Selector de Fruta */}
-                <Form.Group className="mb-3">
-                  <Form.Label>Fruta</Form.Label>
-                  <Form.Select
-                    aria-label="Selecciona una fruta"
-                    className="form-select-custom"
-                    required
-                    value={formData.fruta}
-                    onChange={handleInputChange}
-                  >
-                    <option value="">--Selecciona una fruta--</option>
-                    {fruitOptions.map((fruit, index) => (
-                      <option key={index} value={fruit}>{fruit}</option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-
-                {/* Tipo de Multimedia */}
-                <Form.Group className="mb-3">
-                  <Form.Label>Tipo</Form.Label>
-                  <Form.Select
-                    aria-label="Selecciona un tipo"
-                    className="form-select-custom"
-                    onChange={handleTypeChange}
-                    required
-                    value={multimediaType}
-                  >
-                    <option value="">--Selecciona un tipo--</option>
-                    <option value="informacion">Información</option>
-                    <option value="video">Video</option>
-                  </Form.Select>
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Descripción</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Descripción"
-                    className="form-control-custom"
-                    value={formData.descripcion}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </Form.Group>
-
-                {/* Mostrar el Mensaje Educativo o la sección de Video */}
-                {multimediaType === "informacion" && (
-                  <Form.Group className="mb-3">
-                    <Form.Label>Mensaje educativo</Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={4}
-                      placeholder="Ingresa el mensaje educativo..."
-                      value={formData.mensaje}
-                      onChange={handleInputChange}
-                      className="form-control-custom"
-                      maxLength={400}
-                      required
-                    />
-                    <Form.Text className="text-muted">Máximo 400 caracteres</Form.Text>
-                  </Form.Group>
-                )}
-
-                {multimediaType === "video" && (
-                  <Form.Group className="mb-3">
-                    <Form.Label>URL del Video</Form.Label>
-                    <Form.Control
-                      type="url"
-                      placeholder="https://vid.com/mi-video"
-                      value={formData.videourl}
-                      onChange={handleInputChange}
-                      className="form-control-custom"
-                      required
-                    />
-                    {videoError && (
-                      <Alert variant="danger" className="mt-3">
-                        Debes proporcionar una URL de video válida.
-                      </Alert>
-                    )}
-                  </Form.Group>
-                )}
-              </Col>
-
-              {/* Sección de Imagen */}
-              <Col md={6}>
-                <h4>Imagen</h4>
-                <div className="file-upload-box">
-                  <label htmlFor="file-upload" className="custom-file-upload">
-                    {selectedFile ? (
-                      <>
-                        <span>{selectedFile.name}</span>
-                        <Button
-                          variant="light"
-                          className="ms-3"
-                          onClick={() => setSelectedFile(null)}
-                        >
-                          ✕
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <span>Selecciona tu archivo</span>
-                        <span>o suelta tu archivo aquí</span>
-                      </>
-                    )}
-                    <input
-                      id="file-upload"
-                      type="file"
-                      accept=".jpg, .png"
-                      onChange={handleFileChange}
-                      className="file-input"
-                    />
-                  </label>
-                </div>
-
-                {imageError && (
-                  <Alert variant="danger" className="mt-3">
-                    Debes subir una imagen obligatoriamente.
-                  </Alert>
-                )}
-
-                {selectedFile && (
-                  <div className="mt-3 preview">
-                    <h6>Vista previa:</h6>
-                    <img
-                      src={URL.createObjectURL(selectedFile)}
-                      alt="Vista previa"
-                      className="preview-image"
-                    />
-                  </div>
-                )}
-              </Col>
+                <Col>
+                    <h4>{isEditing ? "Editar Multimedia" : "Nueva Multimedia"}</h4>
+                    <p className="text-muted">Completa el formulario para {isEditing ? "editar" : "agregar"} un contenido multimedia.</p>
+                </Col>
             </Row>
 
-            {/* Botones para guardar y cancelar */}
-            <div className="d-flex justify-content-end button-group">
-              <Button variant="danger" type="submit" className="btn-custom me-2">
-                {isEditMode ? "ACTUALIZAR" : "GUARDAR"}
-              </Button>
-              <Button variant="light" type="button" className="btn-cancel" onClick={() => alert("Acción cancelada")}>
-                CANCELAR
-              </Button>
-            </div>
-          </Form>
+            <Form onSubmit={handleSubmit}>
+                <Row className="mb-3">
+                    <Col>
+                        <Form.Group controlId="titulo">
+                            <Form.Label>Título</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Ingrese el título"
+                                value={titulo}
+                                onChange={(e) => setTitulo(e.target.value)}
+                                required
+                            />
+                        </Form.Group>
+                    </Col>
+                </Row>
+
+                <Row className="mb-3">
+                    <Col md={6}>
+                        <Form.Group controlId="tipoContenido">
+                            <Form.Label>Tipo de Contenido</Form.Label>
+                            <Form.Select
+                                value={tipoContenido}
+                                onChange={(e) => setTipoContenido(e.target.value)}
+                            >
+                                <option value="Información">Información</option>
+                                <option value="Video">Video</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                        <Form.Group controlId="idFruta">
+                            <Form.Label>Fruta</Form.Label>
+                            <Form.Select
+                                value={selectedFruta}
+                                onChange={(e) => setSelectedFruta(e.target.value)}
+                                required
+                            >
+                                <option value="">Seleccione una fruta</option>
+                                {frutas.map((fruta) => (
+                                    <option key={fruta.id} value={fruta.id}>
+                                        {fruta.nombre}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
+                </Row>
+
+                <Row className="mb-3">
+                    {tipoContenido === "Información" ? (
+                        <Col>
+                            <Form.Group controlId="contenidoInformacion">
+                                <Form.Label>Mensaje Educativo</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={3}
+                                    placeholder="Ingrese el contenido informativo"
+                                    value={contenidoInformacion}
+                                    onChange={(e) => setContenidoInformacion(e.target.value)}
+                                    required={tipoContenido === "Información"}
+                                />
+                            </Form.Group>
+                        </Col>
+                    ) : (
+                        <Col>
+                            <Form.Group controlId="urlContenido">
+                                <Form.Label>URL del Video</Form.Label>
+                                <Form.Control
+                                    type="url"
+                                    placeholder="Ingrese la URL del video"
+                                    value={urlContenido}
+                                    onChange={(e) => setUrlContenido(e.target.value)}
+                                    required={tipoContenido === "Video"}
+                                />
+                            </Form.Group>
+                        </Col>
+                    )}
+                </Row>
+
+                <Button variant="primary" type="submit">
+                    {isEditing ? "Actualizar" : "Guardar"}
+                </Button>
+                <Button variant="secondary" className="ms-2" onClick={() => router.push("/pages/multimedia/lista")}>
+                    Cancelar
+                </Button>
+            </Form>
         </Container>
-      </div>
-    </>
-  );
+    );
 }
+
+
+
+
+
+                 
+
+
+
+
+
+
+
+
+

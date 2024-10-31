@@ -1,33 +1,52 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Form } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import * as XLSX from "xlsx";
+import axios from "axios";
 
 export default function ListadoMultimedia() {
     const router = useRouter();
-    const [multimedia, setMultimedia] = useState([
-        { id: 1, fruit: "Manzana", description: "Introducción a la manzana y sus beneficios", type: "Video", url: "https://vid.com/manzana", status: "Activo" },
-        { id: 2, fruit: "Plátano", description: "Información nutricional del plátano", type: "Información", url: "El plátano es una fruta tropical que destaca por su alto contenido de potasio.", status: "Inactivo" },
-        { id: 3, fruit: "Naranja", description: "Video educativo sobre las naranjas", type: "Video", url: "https://vid.com/naranja", status: "Activo" },
-        { id: 4, fruit: "Manzana verde", description: "La manzana verde en la cocina", type: "Información", url: "Las manzanas son una de las frutas más populares y saludables del mundo.", status: "Activo" },
-        { id: 5, fruit: "Fresa", description: "Historia de la fresa: de la granja a tu mesa", type: "Video", url: "https://vid.com/fresa", status: "Inactivo" },
-    ]);
-
+    const [multimedia, setMultimedia] = useState([]);
+    const [frutas, setFrutas] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [viewType, setViewType] = useState("Activo");
     const [filterType, setFilterType] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const itemsPerPage = 5;
 
+    useEffect(() => {
+        // Cargar multimedia desde la API
+        axios.get("http://localhost:3000/contenidoeducativo/listarTodos")
+            .then((response) => {
+                setMultimedia(response.data);
+            })
+            .catch((error) => {
+                console.error("Error al cargar los datos de multimedia:", error);
+            });
+
+        // Cargar frutas desde la API
+        axios.get("http://localhost:3000/fruta/listarTodos")
+            .then((response) => {
+                setFrutas(response.data);
+            })
+            .catch((error) => {
+                console.error("Error al cargar los datos de frutas:", error);
+            });
+    }, []);
+
+    // Obtener el nombre de la fruta por el ID
+    const getNombreFruta = (id_fruta) => {
+        const fruta = frutas.find((f) => f.id === id_fruta);
+        return fruta ? fruta.nombre : "Desconocido";
+    };
+
     // Filtrado de multimedia según el estado, tipo, y palabras clave
     const filteredMultimedia = multimedia
-        .filter((item) => item.status === viewType)
-        .filter((item) => (filterType ? item.type === filterType : true))
-        .filter((item) => item.fruit.toLowerCase().includes(searchTerm.toLowerCase()));
+        .filter((item) => item.estaactivo === (viewType === "Activo"))
+        .filter((item) => (filterType ? item.tipocontenido === filterType : true))
+        .filter((item) => item.titulo.toLowerCase().includes(searchTerm.toLowerCase()));
 
     // Paginación
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -43,15 +62,36 @@ export default function ListadoMultimedia() {
         router.push("/pages/multimedia/nuevo");
     };
 
+    // Función para inactivar multimedia
+    const handleDelete = (id) => {
+        const confirmDelete = window.confirm("¿Estás seguro de que deseas inactivar este contenido?");
+        if (confirmDelete) {
+            axios.put(`http://localhost:3000/contenidoeducativo/inactivar/${id}`)
+                .then((response) => {
+                    console.log("Contenido inactivado exitosamente:", response.data);
+                    // Actualizar la lista de multimedia
+                    setMultimedia(prevMultimedia => 
+                        prevMultimedia.map(item => 
+                            item.id === id ? { ...item, estaactivo: false } : item
+                        )
+                    );
+                })
+                .catch((error) => {
+                    console.error("Error al inactivar el contenido:", error);
+                    alert("Hubo un error al inactivar el contenido");
+                });
+        }
+    };
+
     // Función para exportar datos a CSV
     const handleExport = () => {
         const worksheetData = filteredMultimedia.map((item) => ({
             ID: item.id,
-            Fruta: item.fruit,
-            Descripción: item.description,
-            Tipo: item.type,
-            URL_o_Información: item.url,
-            Estado: item.status,
+            Fruta: getNombreFruta(item.id_fruta),
+            Titulo: item.titulo,
+            Tipo: item.tipocontenido,
+            URL_o_Información: item.urlcontenido || item.contenidoinformacion,
+            Estado: item.estaactivo ? "Activo" : "Inactivo",
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -62,15 +102,13 @@ export default function ListadoMultimedia() {
 
     return (
         <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
-            {/* Breadcrumb y Filtro de Activos/Inactivos */}
             <Row className="mb-4">
                 <Col>
                     <h4>Multimedia</h4>
-                    <p className="text-muted">Administra la multimedia conformado por la fruta, descripción, tipo, imagen e información/URL.</p>
+                    <p className="text-muted">Administra la multimedia conformado por la fruta, título, tipo, imagen e información/URL.</p>
                 </Col>
             </Row>
 
-            {/* Filtro de Activos e Inactivos */}
             <Row className="mb-3">
                 <Col>
                     <ButtonGroup>
@@ -100,12 +138,11 @@ export default function ListadoMultimedia() {
                 </Col>
             </Row>
 
-            {/* Barra de Búsqueda y Filtro por Tipo de Multimedia */}
             <Row className="mb-3">
                 <Col md={8}>
                     <InputGroup>
                         <FormControl
-                            placeholder="Buscar por nombre..."
+                            placeholder="Buscar por título..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -123,7 +160,6 @@ export default function ListadoMultimedia() {
                 </Col>
             </Row>
 
-            {/* Barra de Acciones */}
             <Row className="mb-4">
                 <Col md={8}></Col>
                 <Col md={4} className="d-flex justify-content-end align-items-start">
@@ -132,13 +168,12 @@ export default function ListadoMultimedia() {
                 </Col>
             </Row>
 
-            {/* Tabla de Multimedia */}
             <Table hover>
                 <thead>
                     <tr>
+                        <th>ID Fruta</th>
                         <th>Fruta</th>
-                        <th>Descripción</th>
-                        <th>Tipo</th>
+                        <th>Título</th>
                         <th>Información/URL</th>
                         <th className="text-center">Opciones</th>
                     </tr>
@@ -146,16 +181,16 @@ export default function ListadoMultimedia() {
                 <tbody>
                     {currentItems.map((item) => (
                         <tr key={item.id}>
-                            <td>{item.fruit}</td>
-                            <td>{item.description}</td>
-                            <td>{item.type}</td>
+                            <td>{item.id_fruta}</td>
+                            <td>{getNombreFruta(item.id_fruta)}</td>
+                            <td>{item.titulo}</td>
                             <td>
-                                {item.url.includes("http") ? (
-                                    <a href={item.url} target="_blank" rel="noopener noreferrer">
-                                        {item.url}
+                                {item.urlcontenido ? (
+                                    <a href={item.urlcontenido} target="_blank" rel="noopener noreferrer">
+                                        {item.urlcontenido}
                                     </a>
                                 ) : (
-                                    item.url
+                                    item.contenidoinformacion
                                 )}
                             </td>
                             <td className="text-center">
@@ -167,7 +202,7 @@ export default function ListadoMultimedia() {
                                 <Button
                                     variant="outline-danger"
                                     size="sm"
-                                    onClick={() => alert(`Eliminando ${item.fruit}`)}
+                                    onClick={() => handleDelete(item.id)} // Cambiar a handleDelete
                                 >
                                     <FaTrashAlt /> Eliminar
                                 </Button>
@@ -177,7 +212,6 @@ export default function ListadoMultimedia() {
                 </tbody>
             </Table>
 
-            {/* Paginador */}
             <Row>
                 <Col className="d-flex justify-content-between">
                     <span>Mostrando {indexOfFirstItem + 1} a {indexOfLastItem} de {filteredMultimedia.length} producto(s)</span>
@@ -205,3 +239,6 @@ export default function ListadoMultimedia() {
         </Container>
     );
 }
+
+
+

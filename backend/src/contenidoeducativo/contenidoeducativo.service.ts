@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { vi_contenidoeducativo } from '@prisma/client';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class ContenidoEducativoService {
