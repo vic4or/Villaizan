@@ -28,7 +28,7 @@ export default function ListadoRecompensas() {
     useEffect(() => {
         const fetchRecompensasYProductos = async () => {
             try {
-                const recompensasResponse = await axios.get("http://localhost:3000/recompensas/listarTodos");
+                const recompensasResponse = await axios.get("http://localhost:3000/recompensa_puntos/listarTodos");
                 const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
 
                 setRecompensas(recompensasResponse.data);
@@ -90,7 +90,7 @@ export default function ListadoRecompensas() {
                 return;
             }
 
-            await axios.put("http://localhost:3000/recompensas/editar", {
+            await axios.put("http://localhost:3000/recompensa_puntos/editar", {
                 idRecompensa: selectedRecompensa.id_recompensa,
                 idProducto: selectedRecompensa.id_producto,
                 nuevaCantidad: newAmountValue
@@ -112,7 +112,7 @@ export default function ListadoRecompensas() {
 
     const handleDelete = async (idRecompensa) => {
         try {
-            await axios.put(`http://localhost:3000/recompensas/inactivar/${idRecompensa}`);
+            await axios.put(`http://localhost:3000/recompensa_puntos/inactivar/${idRecompensa}`);
             const updatedRecompensas = recompensas.map((item) =>
                 item.id_recompensa === idRecompensa
                 ? { ...item, estado: false }
