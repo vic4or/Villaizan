@@ -6,9 +6,10 @@ import { ContenidoEducativoModule } from './contenidoeducativo/contenidoeducativ
 import { Recompensa_PuntosModule } from './recompensa_puntos/recompensa_puntos.module';
 import { DescuentoModule } from './descuento/descuento.module';
 import { ComboModule } from './combo/combo.module';
+import { PromocionModule } from './promocion/promocion.module';
 
 @Module({
-  imports: [ProductoModule, Puntos_ProductoModule, FrutaModule, ContenidoEducativoModule, Recompensa_PuntosModule, DescuentoModule, ComboModule],
+  imports: [ProductoModule, Puntos_ProductoModule, FrutaModule, ContenidoEducativoModule, Recompensa_PuntosModule, DescuentoModule, ComboModule, PromocionModule],
   controllers: [],
   providers: [],
 })
