@@ -219,10 +219,10 @@ export default function ListadoPuntos() {
                                 <td>{horaFormateada}</td>
                                 <td className="text-center">
                                     <Button variant="outline-primary" size="sm" onClick={() => handleEdit(item)}>
-                                        <FaEdit /> Editar
+                                        <FaEdit /> 
                                     </Button>
                                     <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(item.id_puntosproducto)}>
-                                        <FaTrashAlt /> Eliminar
+                                        <FaTrashAlt /> 
                                     </Button>
                                 </td>
                             </tr>
