@@ -4,12 +4,12 @@ import { Form, Button, Alert, Modal } from 'react-bootstrap';
 
 const NuevaRecompensa = ({ show, handleClose }) => {
   const [productos, setProductos] = useState([]);
-  const [idProducto, setIdProducto] = useState('');
+  const [id_producto, setid_producto] = useState('');
   const [nombreProducto, setNombreProducto] = useState('');
-  const [cantidadRecompensa, setCantidadRecompensa] = useState('');
+  const [puntosnecesarios, setpuntosnecesarios] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false); // Modal de confirmación
 
   // Obtener productos al cargar el componente
   useEffect(() => {
@@ -28,46 +28,43 @@ const NuevaRecompensa = ({ show, handleClose }) => {
 
   // Función para limpiar el formulario
   const resetForm = () => {
-    setIdProducto('');
+    setid_producto('');
     setNombreProducto('');
-    setCantidadRecompensa('');
+    setpuntosnecesarios('');
     setError('');
-    setSuccess('');
     setSearchTerm('');
   };
 
   // Cerrar el modal y resetear el formulario
   const handleModalClose = () => {
     resetForm();
-    handleClose();
+    handleClose(); // Cierra el modal principal
   };
 
   // Manejar el submit del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!idProducto || !cantidadRecompensa) {
+    if (!id_producto || !puntosnecesarios) {
       setError('Por favor, complete todos los campos.');
       return;
     }
 
     const data = {
-      idProducto: idProducto,
-      cantidadRecompensa: parseInt(cantidadRecompensa)
+      id_producto: id_producto,
+      puntosnecesarios: parseInt(puntosnecesarios)
     };
 
     try {
-      const response = await axios.post('http://localhost:3000/recompensas/registrar', data);
+      const response = await axios.post('http://localhost:3000/recompensa_puntos/registrar', data);
 
       if (response.status === 200) {
-        setSuccess(`Se han asignado ${cantidadRecompensa} recompensas al producto ${nombreProducto} correctamente.`);
+        setShowConfirmation(true); // Muestra el modal de confirmación
         setError('');
-        resetForm(); // Limpiar el formulario después de un envío exitoso
       }
     } catch (err) {
       console.error('Error al registrar recompensas:', err);
       setError('Hubo un error al registrar las recompensas.');
-      setSuccess('');
     }
   };
 
@@ -78,7 +75,7 @@ const NuevaRecompensa = ({ show, handleClose }) => {
 
   // Manejar la selección de un producto
   const handleProductoSelect = (producto) => {
-    setIdProducto(producto.id);
+    setid_producto(producto.id);
     setNombreProducto(producto.nombre);
     setSearchTerm(producto.nombre);
   };
@@ -88,68 +85,85 @@ const NuevaRecompensa = ({ show, handleClose }) => {
     producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Cerrar ambos modales al cerrar el de confirmación
+  const handleConfirmationClose = () => {
+    setShowConfirmation(false); // Cierra el modal de confirmación
+    handleModalClose(); // Cierra el modal principal y limpia el formulario
+  };
+
   return (
-    <Modal show={show} onHide={handleModalClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Registrar Recompensa para Producto</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {/* Mensaje de error */}
-        {error && <Alert variant="danger">{error}</Alert>}
-        {/* Mensaje de éxito */}
-        {success && <Alert variant="success">{success}</Alert>}
+    <>
+      {/* Modal principal para registrar recompensa */}
+      <Modal show={show} onHide={handleModalClose} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Registrar Recompensa para Producto</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Mensaje de error */}
+          {error && <Alert variant="danger">{error}</Alert>}
 
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Producto</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Buscar producto..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              autoComplete="off"
-            />
-            {searchTerm && (
-              <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #ddd', marginTop: '5px', borderRadius: '4px' }}>
-                {filteredProductos.map((producto) => (
-                  <div
-                    key={producto.id}
-                    onClick={() => handleProductoSelect(producto)}
-                    style={{
-                      padding: '8px',
-                      cursor: 'pointer',
-                      backgroundColor: idProducto === producto.id ? '#f0f0f0' : 'white'
-                    }}
-                  >
-                    {producto.nombre}
-                  </div>
-                ))}
-              </div>
-            )}
-          </Form.Group>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Producto</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Buscar producto..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                autoComplete="off"
+              />
+              {searchTerm && (
+                <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #ddd', marginTop: '5px', borderRadius: '4px' }}>
+                  {filteredProductos.map((producto) => (
+                    <div
+                      key={producto.id}
+                      onClick={() => handleProductoSelect(producto)}
+                      style={{
+                        padding: '8px',
+                        cursor: 'pointer',
+                        backgroundColor: id_producto === producto.id ? '#f0f0f0' : 'white'
+                      }}
+                    >
+                      {producto.nombre}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Cantidad de puntos necesarios</Form.Label>
-            <Form.Control
-              type="number"
-              placeholder="Puntos necesarios"
-              value={cantidadRecompensa}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value >= 0) {
-                  setCantidadRecompensa(value);
-                }
-              }}
-              required
-            />
-          </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Cantidad de puntos necesarios</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Puntos necesarios"
+                value={puntosnecesarios}
+                onChange={(e) => setpuntosnecesarios(e.target.value)}
+                required
+              />
+            </Form.Group>
 
-          <Button variant="primary" type="submit">
-            Registrar Recompensa
+            <Button variant="primary" type="submit">
+              Registrar Recompensa
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      {/* Modal de confirmación de éxito */}
+      <Modal show={showConfirmation} onHide={handleConfirmationClose} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Se han asignado {puntosnecesarios} puntos necesarios al producto {nombreProducto} correctamente.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={handleConfirmationClose}>
+            Cerrar
           </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
 
