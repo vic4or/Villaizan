@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Modal } from "react-bootstrap";
+import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
 import { useRouter } from "next/navigation"; 
 import axios from "axios"; 
 import * as XLSX from "xlsx";
 import NuevaRecompensa from './formularioRecompensas.js';
+import EditarRecompensa from './editarRecompensa.js'; 
 
 
 export default function ListadoRecompensas() {
@@ -20,24 +21,26 @@ export default function ListadoRecompensas() {
     const [selectedRecompensa, setSelectedRecompensa] = useState(null);
     const [newAmount, setNewAmount] = useState("");
     const [showModal, setShowModal] = useState(false);
-    const itemsPerPage = 5;
+    const itemsPerPage = 15;
     const [showNuevoModal, setShowNuevoModal] = useState(false); // Estado para mostrar el modal de nueva recompensa
+    const [showEditModal, setShowEditModal] = useState(false); // Controla la visibilidad del modal de edición
 
+
+    // Función para cargar recompensas y productos desde el backend
+    const fetchRecompensasYProductos = async () => {
+        try {
+            const recompensasResponse = await axios.get("http://localhost:3000/recompensa_puntos/listarTodos");
+            const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
+
+            setRecompensas(recompensasResponse.data);
+            setProductos(productosResponse.data);
+        } catch (error) {
+            console.error("Error al obtener los datos:", error);
+        }
+    };
 
     // Llamada a la API para listar todas las recompensas
     useEffect(() => {
-        const fetchRecompensasYProductos = async () => {
-            try {
-                const recompensasResponse = await axios.get("http://localhost:3000/recompensa_puntos/listarTodos");
-                const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
-
-                setRecompensas(recompensasResponse.data);
-                setProductos(productosResponse.data);
-            } catch (error) {
-                console.error("Error al obtener los datos:", error);
-            }
-        };
-
         fetchRecompensasYProductos();
     }, []);
 
@@ -52,7 +55,7 @@ export default function ListadoRecompensas() {
             const producto = productos.find(p => p.id === item.id_producto);
             return producto?.nombre?.toLowerCase().includes(searchTerm.toLowerCase());
         })
-        .sort((a, b) => new Date(b.fechaActivo) - new Date(a.fechaActivo));
+        .sort((a, b) => new Date(b.actualizadoen) - new Date(a.actualizadoen)); // Ordenar de mayor a menor fecha de actualización
 
     // Paginación
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -70,8 +73,8 @@ export default function ListadoRecompensas() {
 
     const handleEdit = (recompensa) => {
         setSelectedRecompensa(recompensa);
-        setShowModal(true);
-    };
+        setShowEditModal(true); // Abre el modal de edición
+    };    
 
     const handleClose = () => {
         setShowModal(false);
@@ -80,8 +83,19 @@ export default function ListadoRecompensas() {
 
     // Función para abrir y cerrar el modal de Nueva Recompensa
     const handleShowNuevoModal = () => setShowNuevoModal(true);
-    const handleCloseNuevoModal = () => setShowNuevoModal(false);
+    const handleCloseNuevoModal = () => {
+        setShowNuevoModal(false);
+        fetchRecompensasYProductos(); // Recarga la lista de recompensas al cerrar el modal
+    };
 
+    const handleUpdateRecompensa = (id, nuevaCantidad) => {
+        const updatedRecompensas = recompensas.map((item) =>
+            item.id_recompensa === id ? { ...item, puntosnecesarios: nuevaCantidad } : item
+        );
+        setRecompensas(updatedRecompensas);
+    };
+
+    
     const handleSave = async () => {
         try {
             const newAmountValue = parseInt(newAmount);
@@ -91,8 +105,8 @@ export default function ListadoRecompensas() {
             }
 
             await axios.put("http://localhost:3000/recompensa_puntos/editar", {
-                idRecompensa: selectedRecompensa.id_recompensa,
-                idProducto: selectedRecompensa.id_producto,
+                id_recompensa: selectedRecompensa.id_recompensa,
+                id_producto: selectedRecompensa.id_producto,
                 nuevaCantidad: newAmountValue
             });
 
@@ -110,11 +124,11 @@ export default function ListadoRecompensas() {
         }
     };
 
-    const handleDelete = async (idRecompensa) => {
+    const handleDelete = async (id_recompensa) => {
         try {
-            await axios.put(`http://localhost:3000/recompensa_puntos/inactivar/${idRecompensa}`);
+            await axios.put(`http://localhost:3000/recompensa_puntos/inactivar/${parseInt(id_recompensa)}`);
             const updatedRecompensas = recompensas.map((item) =>
-                item.id_recompensa === idRecompensa
+                item.id_recompensa === id_recompensa
                 ? { ...item, estado: false }
                 : item
             );
@@ -128,11 +142,11 @@ export default function ListadoRecompensas() {
     const handleExport = () => {
         const worksheetData = filteredRecompensas.map((item) => {
             const producto = productos.find(p => p.id === item.id_producto);
-            const { fechaFormateada, horaFormateada } = formatFechaHora(item.fechaActivo);
+            const { fechaFormateada, horaFormateada } = formatFechaHora(item.actualizadoen);
             return {
                 ID: item.id_recompensa,
                 Producto: producto ? producto.nombre : "Producto no encontrado",
-                Cantidad: item.cantidad,
+                Puntos: item.puntosnecesarios,
                 Fecha: fechaFormateada,
                 Hora: horaFormateada,
             };
@@ -142,6 +156,12 @@ export default function ListadoRecompensas() {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Recompensas");
         XLSX.writeFile(workbook, "recompensas_export.xlsx");
     };
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        fetchRecompensasYProductos(); // Recarga la lista después de editar
+    };
+    
 
     return (
         <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
@@ -192,8 +212,8 @@ export default function ListadoRecompensas() {
             <Row className="mb-4">
                 <Col md={8}></Col>
                 <Col md={4} className="d-flex justify-content-end align-items-start">
-                <Button variant="danger" className="me-2" onClick={handleShowNuevoModal}>+ Agregar</Button>
-                <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
+                    <Button variant="danger" className="me-2" onClick={handleShowNuevoModal}>+ Agregar</Button>
+                    <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
                 </Col>
             </Row>
 
@@ -210,11 +230,11 @@ export default function ListadoRecompensas() {
                 <tbody>
                     {currentItems.map((item) => {
                         const producto = productos.find(p => p.id === item.id_producto);
-                        const { fechaFormateada, horaFormateada } = formatFechaHora(item.fechaActivo);
+                        const { fechaFormateada, horaFormateada } = formatFechaHora(item.actualizadoen);
                         return (
                             <tr key={item.id_recompensa}>
                                 <td>{producto ? producto.nombre : "Producto no encontrado"}</td>
-                                <td>{item.cantidad}</td>
+                                <td>{item.puntosnecesarios}</td>
                                 <td>{fechaFormateada}</td>
                                 <td>{horaFormateada}</td>
                                 <td className="text-center">
@@ -242,6 +262,17 @@ export default function ListadoRecompensas() {
             </Pagination>
 
             <NuevaRecompensa show={showNuevoModal} handleClose={handleCloseNuevoModal} />
+
+            {selectedRecompensa && (
+                <EditarRecompensa 
+                    show={showEditModal} 
+                    handleClose={handleCloseEditModal} 
+                    recompensa={selectedRecompensa} 
+                    productos={productos} 
+                    onSave={handleUpdateRecompensa} 
+                />
+            )}
+
         </Container>
     );
 }
