@@ -57,8 +57,8 @@ const NuevaRecompensa = ({ show, handleClose }) => {
 
     try {
       const response = await axios.post('http://localhost:3000/recompensa_puntos/registrar', data);
-
-      if (response.status === 200) {
+      console.log(response); // Verifica el status de la respuesta
+      if (response.status === 20) {
         setShowConfirmation(true); // Muestra el modal de confirmación
         setError('');
       }
