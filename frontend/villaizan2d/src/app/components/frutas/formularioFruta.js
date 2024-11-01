@@ -29,7 +29,7 @@ export default function FormularioFruta() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/productos/listarTodos");
+        const response = await axios.get("http://localhost:3000/producto/listarTodos");
         setProductos(response.data);
       } catch (err) {
         console.error("Error al obtener los productos:", err);
@@ -45,7 +45,7 @@ export default function FormularioFruta() {
     if (isEditMode) {
       const fetchFrutaById = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/frutas/${id}`);
+          const response = await axios.get(`http://localhost:3000/fruta/${id}`);
           const fruta = response.data;
 
           setInitialValues({
@@ -75,14 +75,14 @@ export default function FormularioFruta() {
     try {
       if (isEditMode) {
         // Editar fruta existente
-        await axios.put(`http://localhost:3000/frutas/editar/${id}`, {
+        await axios.put(`http://localhost:3000/fruta/editar/${id}`, {
           nombre: initialValues.nombre,
           descripcion: initialValues.descripcion,
           productos: selectedProducts,
         });
       } else {
         // Crear nueva fruta
-        await axios.post("http://localhost:3000/frutas/crear", {
+        await axios.post("http://localhost:3000/fruta/registrar", {
           nombre: initialValues.nombre,
           descripcion: initialValues.descripcion,
           productos: selectedProducts,

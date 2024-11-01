@@ -23,8 +23,8 @@ export default function ListadoFrutas() {
     useEffect(() => {
         const fetchFrutasYProductos = async () => {
             try {
-                const frutasResponse = await axios.get("http://localhost:3000/frutas/listarTodas");
-                const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
+                const frutasResponse = await axios.get("http://localhost:3000/fruta/listarTodos");
+                const productosResponse = await axios.get("http://localhost:3000/producto/listarTodos");
 
                 setFrutas(frutasResponse.data);
                 setProductos(productosResponse.data);
@@ -63,7 +63,7 @@ export default function ListadoFrutas() {
 
     const handleSave = async () => {
         try {
-            await axios.put("http://localhost:3000/frutas/editar", {
+            await axios.put("http://localhost:3000/fruta/editar", {
                 idFruta: selectedFruta.id,
                 nuevaDescripcion: newDescription,
             });
@@ -82,7 +82,7 @@ export default function ListadoFrutas() {
 
     const handleDelete = async (idFruta) => {
         try {
-            await axios.put(`http://localhost:3000/frutas/inactivar/${idFruta}`);
+            await axios.put(`http://localhost:3000/fruta/inactivar/${idFruta}`);
             const updatedFrutas = frutas.map((item) =>
                 item.id === idFruta ? { ...item, estado: false } : item
             );
