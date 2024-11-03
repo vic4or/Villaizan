@@ -121,7 +121,6 @@ const NuevaPuntos = ({ show, handleClose }) => {
         </Modal.Header>
         <Modal.Body>
           <div>
-            <h4>Registrar Puntos para Producto</h4>
             {error && <Alert variant="danger">{error}</Alert>}
             
             <Form onSubmit={handleSubmit}>

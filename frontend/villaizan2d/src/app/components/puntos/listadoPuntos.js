@@ -207,6 +207,7 @@ export default function ListadoPuntos() {
             <Table hover>
                 <thead>
                     <tr>
+                        <th>IdProducto</th>
                         <th>Nombre Producto</th>
                         <th>Puntos</th>
                         <th>Fecha</th>
@@ -220,6 +221,7 @@ export default function ListadoPuntos() {
                         const { fechaFormateada, horaFormateada } = formatFechaHora(item.fechaactivo);
                         return (
                             <tr key={item.id_puntosproducto}>
+                                <td>{producto ? producto.id : "Producto no encontrado"}</td>
                                 <td>{producto ? producto.nombre : "Producto no encontrado"}</td>
                                 <td>{item.cantidadpuntos}</td>
                                 <td>{fechaFormateada}</td>

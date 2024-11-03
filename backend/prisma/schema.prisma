@@ -2906,6 +2906,16 @@ model vi_preguntas_frecuentes {
   estaactivo              Boolean? @default(true)
 }
 
+model vi_puntosventa {
+  id        Int     @id @default(autoincrement())
+  nombre    String  @db.VarChar(255)
+  direccion String  @db.VarChar(255)
+  latitud   Float
+  longitud  Float
+  nota      String?
+  esactivo  Boolean @default(true)
+}
+
 enum PAYMENT_COLLECTION_STATUS_ENUM {
   not_paid
   awaiting
