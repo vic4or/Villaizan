@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Modal } from "react-bootstrap";
+import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Modal, Alert} from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
 import { useRouter } from "next/navigation"; 
 import axios from "axios"; 
@@ -20,6 +20,7 @@ export default function ListadoRecompensas() {
     const [newAmount, setNewAmount] = useState("");
     const [showEditModal, setShowEditModal] = useState(false); // Controla la visibilidad del modal de edición
     const itemsPerPage = 15;
+    const [error, setError] = useState('');
     const [showNuevoModal, setShowNuevoModal] = useState(false); // Estado para mostrar el modal de nueva recompensa
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false); // Modal para confirmación de eliminación
     const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false); // Modal para confirmar que se eliminó correctamente
@@ -88,6 +89,12 @@ export default function ListadoRecompensas() {
                 return;
             }
 
+            const puntos = parseInt(newAmountValue);
+            if (puntos < 10 || puntos > 90) {
+            setError('El puntaje que se asignará debe de ser como mínimo 10 y como máximo 90.');
+            return;
+            }
+
             await axios.put("http://localhost:3000/recompensa_puntos/editar", {
                 id_recompensa: selectedRecompensa.id_recompensa,
                 id_producto: selectedRecompensa.id_producto,
@@ -102,6 +109,7 @@ export default function ListadoRecompensas() {
             setRecompensas(updatedRecompensas);
 
             handleCloseEditModal();
+            setError('');
             fetchRecompensasYProductos(); 
         } catch (error) {
             console.error("Error al editar la recompensa:", error);
@@ -256,6 +264,7 @@ export default function ListadoRecompensas() {
                     <Modal.Title>Editar Recompensa</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {error && <Alert variant="danger">{error}</Alert>}
                     <p>Producto: {selectedRecompensa ? productos.find(p => p.id === selectedRecompensa.id_producto)?.nombre : "Cargando..."}</p>
                     <p>Valor anterior: <strong>{selectedRecompensa?.puntosnecesarios}</strong></p>
                     <InputGroup className="mb-3">
