@@ -11,7 +11,6 @@ export default function ListadoFrutas() {
     const router = useRouter();
 
     const [frutas, setFrutas] = useState([]);
-    const [productos, setProductos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [viewType, setViewType] = useState("activos"); // "todos", "activos" o "inactivos"
     const [searchTerm, setSearchTerm] = useState("");
@@ -21,19 +20,16 @@ export default function ListadoFrutas() {
     const itemsPerPage = 5;
 
     useEffect(() => {
-        const fetchFrutasYProductos = async () => {
+        const fetchFrutas = async () => {
             try {
                 const frutasResponse = await axios.get("http://localhost:3000/fruta/listarTodos");
-                const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
-
                 setFrutas(frutasResponse.data);
-                setProductos(productosResponse.data);
             } catch (error) {
                 console.error("Error al obtener los datos:", error);
             }
         };
 
-        fetchFrutasYProductos();
+        fetchFrutas();
     }, []);
 
     // Filtrar frutas según el estado y la búsqueda
@@ -95,14 +91,13 @@ export default function ListadoFrutas() {
 
     const handleExport = () => {
         const worksheetData = filteredFrutas.map((item) => {
-            const productosRelacionados = productos
-                .filter(p => p.id_fruta === item.id)
-                .map(p => p.nombre)
-                .join(", ");
+            const productosRelacionados = item.vi_producto_fruta
+                ? item.vi_producto_fruta.map(p => p.vi_producto.nombre).join(", ")
+                : "No tiene productos";
             return {
                 Nombre: item.nombre,
                 Descripción: item.descripcion,
-                Productos: productosRelacionados || "No tiene productos",
+                Productos: productosRelacionados,
             };
         });
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -175,28 +170,31 @@ export default function ListadoFrutas() {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentItems.map((item) => {
-                        const productosRelacionados = productos
-                            .filter(p => p.id_fruta === item.id)
-                            .map(p => p.nombre)
-                            .join(", ");
-                        return (
-                            <tr key={item.id}>
-                                <td>{item.nombre}</td>
-                                <td>{item.descripcion}</td>
-                                <td>{productosRelacionados || "No tiene productos"}</td>
-                                <td className="text-center">
-                                    <Button variant="outline-primary" size="sm" onClick={() => handleEdit(item)}>
-                                        <FaEdit />
-                                    </Button>
-                                    <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(item.id)}>
-                                        <FaTrashAlt />
-                                    </Button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
+                {currentItems.map((item) => {
+                    console.log("Fruta completa:", item); // Verifica la estructura completa de item
+
+                    const productosRelacionados = item.vi_producto_fruta && Array.isArray(item.vi_producto_fruta)
+                        ? item.vi_producto_fruta.map(p => p.vi_producto ? p.vi_producto.nombre : "Producto sin nombre").join(", ")
+                        : "No tiene productos";
+
+                    return (
+                        <tr key={item.id}>
+                            <td>{item.nombre}</td>
+                            <td>{item.descripcion}</td>
+                            <td>{productosRelacionados}</td>
+                            <td className="text-center">
+                                <Button variant="outline-primary" size="sm" onClick={() => handleEdit(item)}>
+                                    <FaEdit />
+                                </Button>
+                                <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(item.id)}>
+                                    <FaTrashAlt />
+                                </Button>
+                            </td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+
             </Table>
 
             <Pagination style={{ position: 'relative', zIndex: 1 }}>

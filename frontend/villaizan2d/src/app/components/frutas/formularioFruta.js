@@ -10,7 +10,7 @@ export default function FormularioFruta() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const isEditMode = Boolean(id); // Determina si estamos en modo edición o creación
+  const isEditMode = Boolean(id);
 
   const [initialValues, setInitialValues] = useState({
     nombre: "",
@@ -18,7 +18,7 @@ export default function FormularioFruta() {
     productos: [],
   });
 
-  const [productos, setProductos] = useState([]); // Estado para los productos cargados de la API
+  const [productos, setProductos] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [searchProduct, setSearchProduct] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -30,7 +30,7 @@ export default function FormularioFruta() {
     const fetchProductos = async () => {
       try {
         const response = await axios.get("http://localhost:3000/productos/listarTodos");
-        setProductos(response.data);
+        setProductos(response.data); // Asegurarse de que los datos contienen id y nombre
       } catch (err) {
         console.error("Error al obtener los productos:", err);
         setErrorMessage("Hubo un error al cargar los productos.");
@@ -41,7 +41,6 @@ export default function FormularioFruta() {
   }, []);
 
   useEffect(() => {
-    // Cargar datos de la fruta si estamos en modo edición
     if (isEditMode) {
       const fetchFrutaById = async () => {
         try {
@@ -73,25 +72,16 @@ export default function FormularioFruta() {
     }
 
     try {
+      const payload = {
+        nombre: initialValues.nombre,
+        descripcion: initialValues.descripcion,
+        productos: selectedProducts.map((product) => product.id), 
+      };
+
       if (isEditMode) {
-        // Editar fruta existente
-        await axios.put(`http://localhost:3000/fruta/editar/${id}`, {
-          nombre: initialValues.nombre,
-          descripcion: initialValues.descripcion,
-          productos: selectedProducts,
-        });
+        await axios.put(`http://localhost:3000/fruta/editar/${id}`, payload);
       } else {
-        // Crear nueva fruta
-        console.log({
-          nombre: initialValues.nombre,
-          descripcion: initialValues.descripcion,
-          productos: selectedProducts
-        });
-        await axios.post("http://localhost:3000/fruta/registrar", {
-          nombre: initialValues.nombre,
-          descripcion: initialValues.descripcion,
-          productos: selectedProducts
-        });
+        await axios.post("http://localhost:3000/fruta/registrar", payload);
       }
 
       setShowConfirmation(true);
@@ -109,22 +99,23 @@ export default function FormularioFruta() {
   };
 
   const handleAddProduct = (product) => {
-    if (product && !selectedProducts.includes(product)) {
+    // Asegurarse de que el producto completo es el que se agrega
+    if (product && !selectedProducts.some((p) => p.id === product.id)) {
       setSelectedProducts([...selectedProducts, product]);
       setSearchProduct("");
     }
   };
 
   const handleRemoveProduct = (product) => {
-    setSelectedProducts(selectedProducts.filter((item) => item !== product));
+    setSelectedProducts(selectedProducts.filter((item) => item.id !== product.id));
   };
 
   const handleClose = () => {
     setShowConfirmation(false);
-    router.push("/pages/fruta/lista");
+    router.push("/pages/frutas/lista");
   };
 
-  // Filtrar productos según el término de búsqueda
+  // Filtrar productos y asegurarse de que cada elemento tiene un objeto con id y nombre
   const filteredProductos = productos.filter((producto) =>
     producto.nombre.toLowerCase().includes(searchProduct.toLowerCase())
   );
@@ -132,7 +123,6 @@ export default function FormularioFruta() {
   return (
     <>
       <div>
-        {/* Popup de confirmación */}
         <Modal show={showConfirmation} onHide={handleClose}>
           <Modal.Header closeButton>
             <Modal.Title>Confirmación</Modal.Title>
@@ -165,7 +155,6 @@ export default function FormularioFruta() {
             <Row className="mb-4">
               <Col md={6}>
                 <h4>Información general</h4>
-                {/* Nombre de la fruta */}
                 <Form.Group className="mb-3">
                   <Form.Label>Nombre de la Fruta</Form.Label>
                   <Form.Control
@@ -178,7 +167,6 @@ export default function FormularioFruta() {
                   />
                 </Form.Group>
 
-                {/* Descripción de la fruta */}
                 <Form.Group className="mb-3">
                   <Form.Label>Descripción</Form.Label>
                   <Form.Control
@@ -193,7 +181,6 @@ export default function FormularioFruta() {
                 </Form.Group>
               </Col>
 
-              {/* Sección de Productos */}
               <Col md={6}>
                 <h4>Agregar productos</h4>
                 <InputGroup className="mb-3">
@@ -202,20 +189,18 @@ export default function FormularioFruta() {
                     value={searchProduct}
                     onChange={handleProductSearch}
                   />
-                  <Button variant="outline-secondary" onClick={() => handleAddProduct(searchProduct)}>Agregar</Button>
                 </InputGroup>
 
-                {/* Lista de productos filtrados */}
                 {searchProduct && (
                   <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px' }}>
                     {filteredProductos.map((product) => (
                       <div
                         key={product.id}
-                        onClick={() => handleAddProduct(product.nombre)}
+                        onClick={() => handleAddProduct(product)}
                         style={{
                           padding: '8px',
                           cursor: 'pointer',
-                          backgroundColor: selectedProducts.includes(product.nombre) ? '#f0f0f0' : 'white'
+                          backgroundColor: selectedProducts.some((p) => p.id === product.id) ? '#f0f0f0' : 'white'
                         }}
                       >
                         {product.nombre}
@@ -233,9 +218,9 @@ export default function FormularioFruta() {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedProducts.map((product, index) => (
-                      <tr key={index}>
-                        <td>{product}</td>
+                    {selectedProducts.map((product) => (
+                      <tr key={product.id}>
+                        <td>{product.nombre}</td>
                         <td>
                           <Button variant="outline-danger" size="sm" onClick={() => handleRemoveProduct(product)}>
                             <FaTrashAlt />
@@ -254,7 +239,6 @@ export default function FormularioFruta() {
               </Alert>
             )}
 
-            {/* Botones para guardar y cancelar */}
             <div className="d-flex justify-content-end button-group">
               <Button variant="danger" type="submit" className="btn-custom me-2">
                 {isEditMode ? "ACTUALIZAR" : "GUARDAR"}
