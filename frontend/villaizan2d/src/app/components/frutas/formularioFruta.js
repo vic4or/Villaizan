@@ -29,7 +29,7 @@ export default function FormularioFruta() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/producto/listarTodos");
+        const response = await axios.get("http://localhost:3000/productos/listarTodos");
         setProductos(response.data);
       } catch (err) {
         console.error("Error al obtener los productos:", err);
@@ -82,10 +82,15 @@ export default function FormularioFruta() {
         });
       } else {
         // Crear nueva fruta
+        console.log({
+          nombre: initialValues.nombre,
+          descripcion: initialValues.descripcion,
+          productos: selectedProducts
+        });
         await axios.post("http://localhost:3000/fruta/registrar", {
           nombre: initialValues.nombre,
           descripcion: initialValues.descripcion,
-          productos: selectedProducts,
+          productos: selectedProducts
         });
       }
 
@@ -116,7 +121,7 @@ export default function FormularioFruta() {
 
   const handleClose = () => {
     setShowConfirmation(false);
-    router.push("/pages/frutas/lista");
+    router.push("/pages/fruta/lista");
   };
 
   // Filtrar productos según el término de búsqueda

@@ -58,7 +58,7 @@ export default function Home() {
               <div className="icon-container">
                 <Icon name="percent" />
               </div>
-              <h3>Gestión de Csnjes</h3>
+              <h3>Gestión de Canjes</h3>
               <p>Administra los códigos generados por los clientes para canjear recompensas</p>
             </div>
             <div className="card" onClick={() => window.location.href='/pages/notificaciones/lista'}>  
