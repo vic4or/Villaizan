@@ -62,7 +62,7 @@ export class Recompensa_PuntosService {
     async inactivateRecompensaPuntos(id: number): Promise<vi_recompensa_puntos> {
         return await this.prisma.vi_recompensa_puntos.update({
         where: {
-            id_recompensa: id,
+            id_recompensa: parseInt(id.toString(), 10),
         },
         data: {
             estado: false,

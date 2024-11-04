@@ -4,6 +4,7 @@ import { Form, Button, Alert, Modal } from 'react-bootstrap';
 
 const NuevaRecompensa = ({ show, handleClose }) => {
   const [productos, setProductos] = useState([]);
+  const [recompensas, setRecompensas] = useState([]);
   const [id_producto, setid_producto] = useState('');
   const [nombreProducto, setNombreProducto] = useState('');
   const [puntosnecesarios, setpuntosnecesarios] = useState('');
@@ -11,19 +12,22 @@ const NuevaRecompensa = ({ show, handleClose }) => {
   const [error, setError] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false); // Modal de confirmación
 
-  // Obtener productos al cargar el componente
+  // Obtener productos y recompensas al cargar el componente
   useEffect(() => {
-    const fetchProductos = async () => {
+    const fetchProductosYRecompensas = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/productos/listarTodos');
-        setProductos(response.data);
+        const productosResponse = await axios.get('http://localhost:3000/productos/listarTodos');
+        const recompensasResponse = await axios.get('http://localhost:3000/recompensa_puntos/listarTodos');
+        
+        setProductos(productosResponse.data);
+        setRecompensas(recompensasResponse.data);
       } catch (err) {
-        console.error('Error al obtener los productos:', err);
-        setError('Hubo un error al cargar los productos.');
+        console.error('Error al obtener los datos:', err);
+        setError('Hubo un error al cargar los productos y recompensas.');
       }
     };
 
-    fetchProductos();
+    fetchProductosYRecompensas();
   }, []);
 
   // Función para limpiar el formulario
@@ -50,15 +54,31 @@ const NuevaRecompensa = ({ show, handleClose }) => {
       return;
     }
 
+    const puntos = parseInt(puntosnecesarios);
+    if (puntos < 10 || puntos > 90) {
+      setError('El puntaje que se asignará debe de ser como mínimo 10 y como máximo 90.');
+      return;
+    }
+
+    // Verificar si el producto ya tiene asignada una recompensa activa
+    const recompensaExistente = recompensas.find(
+      (recompensa) => recompensa.id_producto === id_producto && recompensa.estado === true
+    );
+
+    if (recompensaExistente) {
+      setError(`El producto seleccionado ya tiene asignada una cantidad de puntos (${recompensaExistente.puntosnecesarios}).`);
+      return;
+    }
+
     const data = {
       id_producto: id_producto,
-      puntosnecesarios: parseInt(puntosnecesarios)
+      puntosnecesarios: puntos
     };
 
     try {
       const response = await axios.post('http://localhost:3000/recompensa_puntos/registrar', data);
       console.log(response); // Verifica el status de la respuesta
-      if (response.status === 20) {
+      if (response.status === 201) {
         setShowConfirmation(true); // Muestra el modal de confirmación
         setError('');
       }
@@ -142,9 +162,11 @@ const NuevaRecompensa = ({ show, handleClose }) => {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit">
-              Registrar Recompensa
-            </Button>
+            <div className="d-flex justify-content-center">
+              <Button variant="danger" type="submit">
+                Registrar Recompensa
+              </Button>
+            </div>
           </Form>
         </Modal.Body>
       </Modal>

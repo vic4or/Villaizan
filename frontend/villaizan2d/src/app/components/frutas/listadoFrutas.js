@@ -13,7 +13,7 @@ export default function ListadoFrutas() {
     const [frutas, setFrutas] = useState([]);
     const [productos, setProductos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [viewType, setViewType] = useState("todos"); // "todos", "activos" o "inactivos"
+    const [viewType, setViewType] = useState("activos"); // "todos", "activos" o "inactivos"
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedFruta, setSelectedFruta] = useState(null);
     const [newDescription, setNewDescription] = useState("");
@@ -24,7 +24,7 @@ export default function ListadoFrutas() {
         const fetchFrutasYProductos = async () => {
             try {
                 const frutasResponse = await axios.get("http://localhost:3000/fruta/listarTodos");
-                const productosResponse = await axios.get("http://localhost:3000/producto/listarTodos");
+                const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
 
                 setFrutas(frutasResponse.data);
                 setProductos(productosResponse.data);
@@ -39,8 +39,8 @@ export default function ListadoFrutas() {
     // Filtrar frutas según el estado y la búsqueda
     const filteredFrutas = frutas
         .filter((item) => {
-            if (viewType === "activos") return item.estado === true;
-            if (viewType === "inactivos") return item.estado === false;
+            if (viewType === "activos") return item.estaactivo === true;
+            if (viewType === "inactivos") return item.estaactivo === false;
             return true; // "todos" muestra todos los registros
         })
         .filter((item) => item.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
