@@ -2,15 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Container, InputGroup, FormControl, Table, Modal, Alert } from "react-bootstrap";
-import { useRouter, useSearchParams } from "next/navigation";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { FaTrashAlt } from "react-icons/fa";
 import axios from "axios";
 
-export default function FormularioFruta() {
+export default function FormularioFruta({ isEditMode, frutaId }) { 
+  console.log("Fruta ID:", frutaId); 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
-  const isEditMode = Boolean(id);
 
   const [initialValues, setInitialValues] = useState({
     nombre: "",
@@ -25,12 +23,15 @@ export default function FormularioFruta() {
   const [formError, setFormError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Obtener productos al cargar el componente
+  const [productosParaAgregar, setProductosParaAgregar] = useState([]);
+  const [productosParaQuitar, setProductosParaQuitar] = useState([]);
+  const [hasChanges, setHasChanges] = useState(false); // Nuevo estado para rastrear cambios
+
   useEffect(() => {
     const fetchProductos = async () => {
       try {
         const response = await axios.get("http://localhost:3000/productos/listarTodos");
-        setProductos(response.data); // Asegurarse de que los datos contienen id y nombre
+        setProductos(response.data);
       } catch (err) {
         console.error("Error al obtener los productos:", err);
         setErrorMessage("Hubo un error al cargar los productos.");
@@ -41,26 +42,31 @@ export default function FormularioFruta() {
   }, []);
 
   useEffect(() => {
-    if (isEditMode) {
+    if (isEditMode && frutaId) {
       const fetchFrutaById = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/fruta/${id}`);
+          const response = await axios.patch(`http://localhost:3000/fruta/editar/${frutaId}`, {
+            nombre: "",
+            descripcion: "",
+            productosParaAgregar: [],
+            productosParaQuitar: []
+          });
           const fruta = response.data;
-
+  
           setInitialValues({
             nombre: fruta.nombre,
             descripcion: fruta.descripcion,
-            productos: fruta.productos,
+            productos: fruta.vi_producto_fruta,
           });
-          setSelectedProducts(fruta.productos);
+          setSelectedProducts(fruta.vi_producto_fruta || []);
         } catch (error) {
           console.error("Error al obtener la fruta:", error);
         }
       };
-
+  
       fetchFrutaById();
     }
-  }, [isEditMode, id]);
+  }, [isEditMode, frutaId]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -71,15 +77,27 @@ export default function FormularioFruta() {
       return;
     }
 
+    if (selectedProducts.length === 0) {
+      setFormError(true);
+      setErrorMessage("Debes añadir al menos un producto.");
+      return;
+    }
+
+    if (!hasChanges) {
+      alert("No se han realizado cambios.");
+      return;
+    }
+
     try {
       const payload = {
         nombre: initialValues.nombre,
         descripcion: initialValues.descripcion,
-        productos: selectedProducts.map((product) => product.id), 
+        productosParaAgregar,
+        productosParaQuitar,
       };
 
       if (isEditMode) {
-        await axios.put(`http://localhost:3000/fruta/editar/${id}`, payload);
+        await axios.patch(`http://localhost:3000/fruta/editar/${frutaId}`, payload);
       } else {
         await axios.post("http://localhost:3000/fruta/registrar", payload);
       }
@@ -87,6 +105,12 @@ export default function FormularioFruta() {
       setShowConfirmation(true);
       setFormError(false);
       setErrorMessage("");
+      setHasChanges(false); // Resetear cambios después de guardar
+
+      setTimeout(() => {
+        setShowConfirmation(false);
+        router.push("/pages/frutas/lista");
+      }, 3000);
     } catch (error) {
       console.error("Error al guardar la fruta:", error);
       setFormError(true);
@@ -99,15 +123,33 @@ export default function FormularioFruta() {
   };
 
   const handleAddProduct = (product) => {
-    // Asegurarse de que el producto completo es el que se agrega
     if (product && !selectedProducts.some((p) => p.id === product.id)) {
       setSelectedProducts([...selectedProducts, product]);
+      setProductosParaAgregar([...productosParaAgregar, product.id]);
+
+      // Remover de productos para quitar si estaba antes seleccionado
+      setProductosParaQuitar(productosParaQuitar.filter((id) => id !== product.id));
       setSearchProduct("");
+      setHasChanges(true); // Marca que se ha hecho un cambio
     }
   };
 
   const handleRemoveProduct = (product) => {
-    setSelectedProducts(selectedProducts.filter((item) => item.id !== product.id));
+    setSelectedProducts((prevSelectedProducts) =>
+      prevSelectedProducts.filter((item) => item.id !== product.id)
+    );
+    
+    setProductosParaQuitar((prevProductosParaQuitar) => [
+      ...prevProductosParaQuitar,
+      product.id,
+    ]);
+  
+    // Remover de productos para agregar si fue recién añadido
+    setProductosParaAgregar((prevProductosParaAgregar) =>
+      prevProductosParaAgregar.filter((id) => id !== product.id)
+    );
+  
+    setHasChanges(true); // Marca que se ha hecho un cambio
   };
 
   const handleClose = () => {
@@ -115,7 +157,6 @@ export default function FormularioFruta() {
     router.push("/pages/frutas/lista");
   };
 
-  // Filtrar productos y asegurarse de que cada elemento tiene un objeto con id y nombre
   const filteredProductos = productos.filter((producto) =>
     producto.nombre.toLowerCase().includes(searchProduct.toLowerCase())
   );
@@ -162,7 +203,10 @@ export default function FormularioFruta() {
                     placeholder="Nombre de la fruta"
                     className="form-control-custom"
                     value={initialValues.nombre}
-                    onChange={(e) => setInitialValues({ ...initialValues, nombre: e.target.value })}
+                    onChange={(e) => {
+                      setInitialValues({ ...initialValues, nombre: e.target.value });
+                      setHasChanges(true);
+                    }}
                     required
                   />
                 </Form.Group>
@@ -175,7 +219,10 @@ export default function FormularioFruta() {
                     placeholder="Descripción de la fruta..."
                     className="form-control-custom"
                     value={initialValues.descripcion}
-                    onChange={(e) => setInitialValues({ ...initialValues, descripcion: e.target.value })}
+                    onChange={(e) => {
+                      setInitialValues({ ...initialValues, descripcion: e.target.value });
+                      setHasChanges(true);
+                    }}
                     required
                   />
                 </Form.Group>
@@ -218,17 +265,24 @@ export default function FormularioFruta() {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedProducts.map((product) => (
+                  {selectedProducts.length > 0 ? (
+                    selectedProducts.map((product) => (
                       <tr key={product.id}>
-                        <td>{product.nombre}</td>
-                        <td>
+                      <td>{product.vi_producto?.nombre || product.nombre || "Producto sin nombre"}</td>
+                      <td>
                           <Button variant="outline-danger" size="sm" onClick={() => handleRemoveProduct(product)}>
                             <FaTrashAlt />
                           </Button>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="2">No hay productos seleccionados</td>
+                    </tr>
+                  )}
+                </tbody>
+
                 </Table>
               </Col>
             </Row>
