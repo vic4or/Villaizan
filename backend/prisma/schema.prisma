@@ -2645,7 +2645,6 @@ model vi_promocion {
   fechafin             DateTime           @db.Date
   limitestock          Int
   porcentajedescuento  Decimal?           @default(0) @db.Decimal(5, 2)
-  estado               Boolean            @default(true)
   desactivadoen        DateTime?          @db.Timestamp(6)
   creadoen             DateTime?          @default(now()) @db.Timestamp(6)
   actualizadoen        DateTime?          @default(now()) @db.Timestamp(6)
