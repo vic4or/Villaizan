@@ -12,7 +12,7 @@ export class DescuentoService {
     async findAll(){
         return await this.prisma.vi_promocion.findMany({
             where: {
-                estado: true
+                estaactivo: true
             }
         })
     }
@@ -21,7 +21,7 @@ export class DescuentoService {
         return await this.prisma.vi_promocion.findFirst({
             where: {
                 id,
-                estado: true
+                estaactivo: true
             },
             include:{
                 vi_producto: true
@@ -148,8 +148,8 @@ export class DescuentoService {
         await this.prisma.vi_promocion.update({
             where: { id },
             data: { 
-                estado: false,
-                eliminadoen: actual.toISOString()
+                estaactivo: false,
+                desactivadoen: actual.toISOString()
             }
         });
     

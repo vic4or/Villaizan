@@ -11,6 +11,9 @@ export class PromocionService {
         // Por defecto, el estado es true si no se especifica
         const filter = { estado: true}
         if(estado) filter.estado = false; 
+
+        const filterPr = { estaactivo: true}
+        if(estado) filterPr.estaactivo = false; 
       
         // Obtiene los combos con el filtro de estado
         const combos = await this.prisma.vi_combo.findMany({
@@ -25,7 +28,7 @@ export class PromocionService {
       
         // Obtiene las promociones con el filtro de estado
         const promociones = await this.prisma.vi_promocion.findMany({
-          where: filter,
+          where: filterPr,
         });
       
         // Añade el campo 'tipo' a cada promoción
