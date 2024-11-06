@@ -9,15 +9,17 @@ export class DescuentoService {
 
     constructor(private prisma: PrismaService) {}
 
-    async findAll(){
+    async findAll(estado: string){
+        const activo = (estado === 'true') ? true : false;
         return await this.prisma.vi_promocion.findMany({
             where: {
-                estaactivo: true
+                estaactivo: activo
             }
         })
     }
 
     async findOne(id: string){
+        //console.log(id)
         return await this.prisma.vi_promocion.findFirst({
             where: {
                 id,
@@ -31,15 +33,17 @@ export class DescuentoService {
 
     async create(createPromocionDto: CreateDescuentoDto) {
         // Paso 1: Obtener el último ID para calcular el nuevo ID
-        const lastPromocion = await this.prisma.vi_promocion.findMany({
-            orderBy: { id: 'desc' },
-            take: 1
-        });
+        const promociones = await this.prisma.vi_promocion.findMany();
+        const lastPromocion = promociones
+          .sort((a, b) => parseInt(b.id) - parseInt(a.id))
+          .slice(0, 1);
+        
         const newId = lastPromocion.length > 0
-            ? (parseInt(lastPromocion[0].id) + 1).toString()
-            : '1';
+          ? (parseInt(lastPromocion[0].id) + 1).toString()
+          : '1';
     
         // Crear el objeto Prisma.vi_promocionCreateInput
+        //console.log("newId: ", newId);
         const promocionData: Prisma.vi_promocionCreateInput = {
             id: newId,
             titulo: createPromocionDto.titulo,
