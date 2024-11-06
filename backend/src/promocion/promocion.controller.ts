@@ -7,8 +7,8 @@ export class PromocionController {
     constructor(private readonly promocionService: PromocionService) {}
 
     @Get('/listarTodos')
-    findAll(@Query('estado') estado?: boolean){
-        return this.promocionService.findAll(estado);
+    findAll(){
+        return this.promocionService.findAll();
     }
 
 }
