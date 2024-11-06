@@ -2528,6 +2528,8 @@ model vi_persona {
   actualizadoen        DateTime     @default(now()) @db.Timestamp(6)
   usuariocreacion      String       @db.VarChar(50)
   usuarioactualizacion String?      @db.VarChar(50)
+  sexo                 String?      @db.VarChar(25)
+  edad                 Int?
   vi_usuario           vi_usuario[]
 }
 
@@ -2643,12 +2645,12 @@ model vi_promocion {
   fechafin             DateTime           @db.Date
   limitestock          Int
   porcentajedescuento  Decimal?           @default(0) @db.Decimal(5, 2)
-  estado               Boolean            @default(true)
-  eliminadoen          DateTime?          @db.Timestamp(6)
+  desactivadoen        DateTime?          @db.Timestamp(6)
   creadoen             DateTime?          @default(now()) @db.Timestamp(6)
   actualizadoen        DateTime?          @default(now()) @db.Timestamp(6)
   usuariocreacion      String             @db.VarChar(50)
   usuarioactualizacion String?            @db.VarChar(50)
+  estaactivo           Boolean            @default(true)
   vi_detallepedido     vi_detallepedido[]
   vi_notificacion      vi_notificacion[]
   vi_producto          vi_producto[]
@@ -2845,6 +2847,7 @@ model vi_usuario {
   id_rol                                                 String                               @db.VarChar(50)
   resettoken                                             String?                              @db.VarChar(255)
   resettokenexpiracion                                   DateTime?                            @db.Timestamp(6)
+  imagenperfil                                           String?
   marketing_campaigns_campanausuario                     marketing_campaigns_campanausuario[]
   vi_comentario                                          vi_comentario[]
   vi_direccion                                           vi_direccion[]
