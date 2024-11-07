@@ -44,7 +44,10 @@ export default function FormularioPromocion() {
     const fetchProducts = async () => {
       try {
         const response = await axios.get("http://localhost:3000/productos/listarTodos");
-        setAvailableProducts(response.data.map((product) => product.nombre)); // Set product names
+        setAvailableProducts(response.data.map((product) => ({
+          id: product.id,
+          nombre: product.nombre,
+        })));
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -111,7 +114,7 @@ export default function FormularioPromocion() {
       setErrorMessage(message);
     }
 
-    // Datos transformados al formato de la API
+    // Transformación de datos al formato esperado por la API
     const payload = {
       titulo: initialValues.nombre,
       descripcion: initialValues.descripcion,
@@ -119,11 +122,11 @@ export default function FormularioPromocion() {
       fechaFin: initialValues.fechaFin,
       limiteStock: parseInt(initialValues.limiteStock, 10),
       porcentajeDescuento: parseFloat(initialValues.descuento),
-      vi_productoIds: initialValues.productos,
+      vi_productoIds: selectedProducts.map((product) => product.id),  // Extrae solo los IDs
     };
 
     try {
-      // Solicitud POST a la API
+      console.log("Datos de la promoción:", payload);
       const response = await axios.post("http://localhost:3000/descuento/registrar", payload);
       setShowConfirmation(true);
       setFormError(false);
@@ -133,7 +136,6 @@ export default function FormularioPromocion() {
       console.error("Error al registrar el descuento:", error);
       setFormError(true);
       setErrorMessage("Error al registrar el descuento. Por favor, intenta nuevamente.");
-      console.error("Error al registrar el descuento:", error);
     }
   };
 
@@ -142,14 +144,16 @@ export default function FormularioPromocion() {
   };
 
   const handleAddProduct = () => {
-    if (searchProduct && availableProducts.includes(searchProduct) && !selectedProducts.includes(searchProduct)) {
-      setSelectedProducts([...selectedProducts, searchProduct]);
-      setSearchProduct("");
+    const selectedProduct = availableProducts.find((product) => product.nombre === searchProduct);
+
+    if (selectedProduct && !selectedProducts.includes(selectedProduct)) {
+        setSelectedProducts([...selectedProducts, selectedProduct]);
+        setSearchProduct("");
     }
   };
 
-  const handleRemoveProduct = (product) => {
-    setSelectedProducts(selectedProducts.filter((item) => item !== product));
+  const handleRemoveProduct = (productToRemove) => {
+    setSelectedProducts(selectedProducts.filter((product) => product.id !== productToRemove.id));
   };
 
   const handleClose = () => {
@@ -297,8 +301,8 @@ export default function FormularioPromocion() {
                     list="productOptions"
                   />
                   <datalist id="productOptions">
-                    {availableProducts.map((product, index) => (
-                      <option key={index} value={product} />
+                    {availableProducts.map((product) => (
+                      <option key={product.id} value={product.nombre} />
                     ))}
                   </datalist>
                   <Button variant="outline-secondary" onClick={handleAddProduct}>Agregar</Button>
@@ -315,7 +319,7 @@ export default function FormularioPromocion() {
                   <tbody>
                     {selectedProducts.map((product, index) => (
                       <tr key={index}>
-                        <td>{product}</td>
+                        <td>{product.nombre}</td>
                         <td>
                           <Button variant="outline-danger" size="sm" onClick={() => handleRemoveProduct(product)}>
                             Eliminar
