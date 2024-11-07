@@ -35,7 +35,7 @@ export default function Menu() {
       style={{
         position: "fixed",
         height: "100vh",
-        width: isExpanded ? "260px" : "80px",
+        width: isExpanded ? "80px" : "80px",
         background: "linear-gradient(to bottom, #e63946, #b2182b)",
         display: "flex",
         flexDirection: "column",
@@ -83,60 +83,60 @@ export default function Menu() {
         */}
 
         {/* Recompensas */}
-        <Link href="/pages/recompensas/lista">
+        {/*<Link href="/pages/recompensas/lista">
           <div style={menuItemStyle} title="Recompensas">
             <FaGift size="24px" style={{ color: "#000" }} />
             {isExpanded && <span style={textStyle}>Recompensas</span>}
           </div>
-        </Link>
+        </Link>*/}
 
         {/* Puntos */}
-        <Link href="/pages/puntos/lista">
+        {/*<Link href="/pages/puntos/lista">
           <div style={menuItemStyle} title="Puntos">
             <FaCreditCard size="24px" style={{ color: "#000" }} />
             {isExpanded && <span style={textStyle}>Puntos</span>}
           </div>
-        </Link>
+        </Link>*/}
 
         {/* Canje */}
-        <Link href="/pages/canje/lista">
+        {/*<Link href="/pages/canje/lista">
           <div style={menuItemStyle} title="Canje">
             <CiBarcode size="24px" style={{ color: "#000" }} />
             {isExpanded && <span style={textStyle}>Canje de Códigos</span>}
           </div>
-        </Link>
+        </Link>*/}
 
         {/* Notificaciones */}
-        <Link href="/pages/notificaciones/lista">
+        {/*<Link href="/pages/notificaciones/lista">
           <div style={menuItemStyle} title="Notificaciones">
             <FaBell size="24px" style={{ color: "#000" }} />
             {isExpanded && <span style={textStyle}>Notificaciones</span>}
           </div>
-        </Link>
+        </Link>*/}
 
         {/* Multimedia */}
-        <Link href="/pages/multimedia/lista">
+        {/*<Link href="/pages/multimedia/lista">
           <div style={menuItemStyle} title="Multimedia">
             <BsImage size="24px" style={{ color: "#000" }} />
             {isExpanded && <span style={textStyle}>Multimedia</span>}
           </div>
-        </Link>
+        </Link>*/}
 
         {/* Promociones */}
-        <Link href="/pages/promociones/lista">
+        {/*<Link href="/pages/promociones/lista">
           <div style={menuItemStyle} title="Promociones">
             <BiSolidDiscount size="24px" style={{ color: "#000" }} />
             {isExpanded && <span style={textStyle}>Promociones</span>}
           </div>
-        </Link>
+        </Link>*/}
 
         {/* Frutas */}
-        <Link href="/pages/frutas/lista">
+        {/*<Link href="/pages/frutas/lista">
           <div style={menuItemStyle} title="Frutas">
             <FaAppleAlt size="24px" style={{ color: "#000" }} />
             {isExpanded && <span style={textStyle}>Frutas</span>}
           </div>
-        </Link>
+        </Link>*/}
       </div>
 
       {/* Cerrar sesión */}
