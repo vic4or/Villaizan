@@ -186,7 +186,6 @@ export default function ListadoPromociones() {
           {currentItems.map((item) => (
             <tr key={item.id}>
               <td>{item.titulo}</td>
-              <td>{item.tipo}</td>
               <td>{item.descripcion}</td>
               <td>{formatDate(item.fechainicio)}</td>
               <td>{formatDate(item.fechafin)}</td>
