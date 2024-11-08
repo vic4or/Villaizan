@@ -11,7 +11,7 @@ export default function ListadoMultimedia() {
     const [multimedia, setMultimedia] = useState([]);
     const [frutas, setFrutas] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [viewType, setViewType] = useState("todos"); // "activos", "inactivos", "todos"
+    const [viewType, setViewType] = useState("activos"); // "activos", "inactivos", "todos"
     const [filterType, setFilterType] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const itemsPerPage = 5;
@@ -45,8 +45,8 @@ export default function ListadoMultimedia() {
     // Filtrado de multimedia según el estado, tipo, y palabras clave
     const filteredMultimedia = multimedia
         .filter((item) => {
-            if (viewType === "activos") return item.estado === true;
-            if (viewType === "inactivos") return item.estado === false;
+            if (viewType === "activos") return item.estaactivo === true;
+            if (viewType === "inactivos") return item.estaactivo === false;
             return true; // "todos" muestra todos los registros
         })
         .filter((item) => (filterType ? item.tipocontenido === filterType : true))
@@ -171,7 +171,7 @@ export default function ListadoMultimedia() {
             <Table hover>
                 <thead>
                     <tr>
-                        <th>ID Fruta</th>
+                        {/*<th>ID Fruta</th>*/}
                         <th>Fruta</th>
                         <th>Título</th>
                         <th>Información/URL</th>
@@ -181,7 +181,7 @@ export default function ListadoMultimedia() {
                 <tbody>
                     {currentItems.map((item) => (
                         <tr key={item.id}>
-                            <td>{item.id_fruta}</td>
+                            {/*<td>{item.id_fruta}</td>*/}
                             <td>{getNombreFruta(item.id_fruta)}</td>
                             <td>{item.titulo}</td>
                             <td>

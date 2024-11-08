@@ -174,7 +174,7 @@ export default function ListadoPromociones() {
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Tipo</th>
+            {/*<th>Tipo</th>*/}
             <th>Descripción</th>
             <th>Fecha Inicio</th>
             <th>Fecha Fin</th>

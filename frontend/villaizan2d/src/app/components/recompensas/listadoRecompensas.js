@@ -214,7 +214,7 @@ export default function ListadoRecompensas() {
             <Table hover>
                 <thead>
                     <tr>
-                        <th>Id Producto</th>
+                        {/*<th>Id Producto</th>*/}
                         <th>Nombre Producto</th>
                         <th>Cantidad Puntos</th>
                         <th>Fecha</th>
@@ -228,7 +228,7 @@ export default function ListadoRecompensas() {
                         const { fechaFormateada, horaFormateada } = formatFechaHora(item.actualizadoen);
                         return (
                             <tr key={item.id_recompensa}>
-                                <td>{producto ? producto.id : "Producto no encontrado"}</td>
+                                {/*<td>{producto ? producto.id : "Producto no encontrado"}</td>*/}
                                 <td>{producto ? producto.nombre : "Producto no encontrado"}</td>
                                 <td>{item.puntosnecesarios}</td>
                                 <td>{fechaFormateada}</td>
