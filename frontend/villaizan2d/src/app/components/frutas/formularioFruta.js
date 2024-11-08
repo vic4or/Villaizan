@@ -135,22 +135,33 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
   };
 
   const handleRemoveProduct = (product) => {
-    setSelectedProducts((prevSelectedProducts) =>
-      prevSelectedProducts.filter((item) => item.id !== product.id)
+    // Filtrar el producto eliminado de la lista de productos seleccionados usando id_producto
+    setSelectedProducts((prevSelectedProducts) => 
+      prevSelectedProducts.filter((item) => item.id_producto !== product.id_producto)
     );
-    
-    setProductosParaQuitar((prevProductosParaQuitar) => [
-      ...prevProductosParaQuitar,
-      product.id,
-    ]);
+
+    console.log("Eliminando producto:", product.id);
+    console.log("Productos seleccionados antes de eliminar:", selectedProducts);
+
   
-    // Remover de productos para agregar si fue recién añadido
+    // Si el producto no estaba previamente en productosParaQuitar, añadirlo
+    if (!productosParaQuitar.includes(product.id_producto)) {
+      setProductosParaQuitar((prevProductosParaQuitar) => [
+        ...prevProductosParaQuitar,
+        product.id_producto,
+      ]);
+    }
+  
+    // Remover de productosParaAgregar si fue añadido recién
     setProductosParaAgregar((prevProductosParaAgregar) =>
-      prevProductosParaAgregar.filter((id) => id !== product.id)
+      prevProductosParaAgregar.filter((id) => id !== product.id_producto)
     );
   
-    setHasChanges(true); // Marca que se ha hecho un cambio
+    // Marcar que se ha hecho un cambio en el formulario
+    setHasChanges(true);
   };
+  
+
 
   const handleClose = () => {
     setShowConfirmation(false);
@@ -270,9 +281,13 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
                       <tr key={product.id}>
                       <td>{product.vi_producto?.nombre || product.nombre || "Producto sin nombre"}</td>
                       <td>
-                          <Button variant="outline-danger" size="sm" onClick={() => handleRemoveProduct(product)}>
-                            <FaTrashAlt />
-                          </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleRemoveProduct(product)}
+                      >
+                        <FaTrashAlt />
+                      </Button>
                         </td>
                       </tr>
                     ))
