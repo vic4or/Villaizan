@@ -12,7 +12,6 @@ export default function Menu() {
       style={{
         position: "fixed",
         height: "100vh",
-        width: "80px",
         background: "linear-gradient(to bottom, #e63946, #b2182b)",
         display: "flex",
         flexDirection: "column",
@@ -55,43 +54,55 @@ export default function Menu() {
           </div>
         </Link>
 
-        <Link href="/pages/recompensas/lista">
+        {/* Recompensas */}
+        {/*<Link href="/pages/recompensas/lista">
           <div style={menuItemStyle} title="Recompensas">
             <FaGift size="24px" style={{ color: "#000" }} />
           </div>
-        </Link>
+        </Link>*/}
 
-        <Link href="/pages/puntos/lista">
+        {/* Puntos */}
+        {/*<Link href="/pages/puntos/lista">
           <div style={menuItemStyle} title="Puntos">
             <FaCreditCard size="24px" style={{ color: "#000" }} />
           </div>
-        </Link>
+        </Link>*/}
 
-        <Link href="/pages/canje/lista">
+        {/* Canje */}
+        {/*<Link href="/pages/canje/lista">
           <div style={menuItemStyle} title="Canje">
             <CiBarcode size="24px" style={{ color: "#000" }} />
           </div>
-        </Link>
+        </Link>*/}
 
-        <Link href="/pages/multimedia/lista">
+        {/* Notificaciones */}
+        {/*<Link href="/pages/notificaciones/lista">
+          <div style={menuItemStyle} title="Notificaciones">
+            <FaBell size="24px" style={{ color: "#000" }} />
+            {isExpanded && <span style={textStyle}>Notificaciones</span>}
+          </div>
+        </Link>*/}
+
+        {/* Multimedia */}
+        {/*<Link href="/pages/multimedia/lista">
           <div style={menuItemStyle} title="Multimedia">
             <BsImage size="24px" style={{ color: "#000" }} />
           </div>
-        </Link>
+        </Link>*/}
 
-        <Link href="/pages/promociones/lista">
+        {/* Promociones */}
+        {/*<Link href="/pages/promociones/lista">
           <div style={menuItemStyle} title="Promociones">
             <BiSolidDiscount size="24px" style={{ color: "#000" }} />
           </div>
-        </Link>
 
-        <Link href="/pages/frutas/lista">
+        {/* Frutas */}
+        {/*<Link href="/pages/frutas/lista">
           <div style={menuItemStyle} title="Frutas">
             <FaAppleAlt size="24px" style={{ color: "#000" }} />
           </div>
         </Link>
         */}
-
       </div>
 
       {/* Cerrar sesión */}

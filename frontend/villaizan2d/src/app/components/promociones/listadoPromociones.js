@@ -19,7 +19,7 @@ export default function ListadoPromociones() {
   ]);*/
   const [promociones, setPromociones] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewType, setViewType] = useState("Activo");
+  const [viewType, setViewType] = useState("activos");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTipo, setSelectedTipo] = useState("Todos");
   const itemsPerPage = 5;
@@ -59,8 +59,8 @@ export default function ListadoPromociones() {
   // Filtrado de promociones según el estado seleccionado (Activo/Inactivo) y tipo de promoción
   const filteredPromociones = promociones
     .filter((item) => {
-      if (viewType === "activos") return item.estado === true;
-      if (viewType === "inactivos") return item.estado === false;
+      if (viewType === "activos") return item.estaactivo === true;
+      if (viewType === "inactivos") return item.estaactivo === false;
       return true; // "todos" muestra todos los registros
     })
     .filter((item) => item.titulo.toLowerCase().includes(searchTerm.toLowerCase())) // Búsqueda por nombre de promoción
@@ -158,21 +158,12 @@ export default function ListadoPromociones() {
             />
           </InputGroup>
         </Col>
-        <Col md={4}>
-          <Form.Select value={selectedTipo} onChange={(e) => setSelectedTipo(e.target.value)}>
-            <option value="Todos">Todos los tipos</option>
-            <option value="Oferta Especial">Oferta Especial</option>
-            <option value="combo">Paquete</option>
-            <option value="descuento">Descuento</option>
-          </Form.Select>
-        </Col>
       </Row>
 
       {/* Barra de Acciones */}
       <Row className="mb-4">
         <Col md={8}></Col>
         <Col md={4} className="d-flex justify-content-end align-items-start">
-          <Button variant="outline-secondary" className="me-2">Filtrar</Button>
           <Button variant="danger" className="me-2" onClick={handleAddNew}>+ Agregar</Button>
           <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
         </Col>
@@ -195,7 +186,6 @@ export default function ListadoPromociones() {
           {currentItems.map((item) => (
             <tr key={item.id}>
               <td>{item.titulo}</td>
-              <td>{item.tipo}</td>
               <td>{item.descripcion}</td>
               <td>{formatDate(item.fechainicio)}</td>
               <td>{formatDate(item.fechafin)}</td>

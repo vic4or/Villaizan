@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { DescuentoService } from './descuento.service';
 import { CreateDescuentoDto } from './dto/create-descuento.dto';
 import { UpdateDescuentoDto } from './dto/update-descuento.dto';
@@ -9,12 +9,12 @@ export class DescuentoController {
     constructor(private readonly descuentoService: DescuentoService) {}
 
     @Get('/listarTodos')
-    findAll(){
-        return this.descuentoService.findAll();
+    findAll(@Query ('estado') estado: string){
+        return this.descuentoService.findAll(estado);
     }
 
     @Get('/listarUno/:id')
-    findOne(id: string){
+    findOne(@Param('id') id: string){
         return this.descuentoService.findOne(id);
     }
 

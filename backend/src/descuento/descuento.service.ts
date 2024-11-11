@@ -9,19 +9,21 @@ export class DescuentoService {
 
     constructor(private prisma: PrismaService) {}
 
-    async findAll(){
+    async findAll(estado: string){
+        const activo = (estado === 'true') ? true : false;
         return await this.prisma.vi_promocion.findMany({
             where: {
-                estado: true
+                estaactivo: activo
             }
         })
     }
 
     async findOne(id: string){
+        //console.log(id)
         return await this.prisma.vi_promocion.findFirst({
             where: {
                 id,
-                estado: true
+                estaactivo: true
             },
             include:{
                 vi_producto: true
@@ -31,15 +33,21 @@ export class DescuentoService {
 
     async create(createPromocionDto: CreateDescuentoDto) {
         // Paso 1: Obtener el último ID para calcular el nuevo ID
-        const lastPromocion = await this.prisma.vi_promocion.findMany({
-            orderBy: { id: 'desc' },
-            take: 1
-        });
+        const promociones = await this.prisma.vi_promocion.findMany();
+        const lastPromocion = promociones
+          .sort((a, b) => parseInt(b.id) - parseInt(a.id))
+          .slice(0, 1);
+        
         const newId = lastPromocion.length > 0
-            ? (parseInt(lastPromocion[0].id) + 1).toString()
-            : '1';
+          ? (parseInt(lastPromocion[0].id) + 1).toString()
+          : '1';
     
+
+        const fechaInicio = new Date(createPromocionDto.fechaInicio);
+        const fechaActual = new Date(); 
+
         // Crear el objeto Prisma.vi_promocionCreateInput
+        //console.log("newId: ", newId);
         const promocionData: Prisma.vi_promocionCreateInput = {
             id: newId,
             titulo: createPromocionDto.titulo,
@@ -49,7 +57,8 @@ export class DescuentoService {
             limitestock: createPromocionDto.limiteStock,
             porcentajedescuento: createPromocionDto.porcentajeDescuento ?? 0,
             usuariocreacion: "admin",
-            usuarioactualizacion: "admin"
+            usuarioactualizacion: "admin",
+            esvalido: fechaInicio <= fechaActual ? true : false
         };
     
         // Paso 2: Crear la nueva promoción
@@ -80,6 +89,9 @@ export class DescuentoService {
         
         const actual = new Date();
         // Paso 1: Actualizar la promoción
+        const fechaInicio = new Date(updatePromocionDto.fechaInicio);
+        const fechaFin = new Date(updatePromocionDto.fechaFin);
+
         const promocionData: Prisma.vi_promocionUpdateInput = {
             titulo: updatePromocionDto.titulo,
             descripcion: updatePromocionDto.descripcion,
@@ -87,7 +99,8 @@ export class DescuentoService {
             fechafin: new Date(updatePromocionDto.fechaFin),
             limitestock: updatePromocionDto.limiteStock,
             porcentajedescuento: updatePromocionDto.porcentajeDescuento,
-            actualizadoen: actual.toISOString()
+            actualizadoen: actual.toISOString(),
+            esvalido: fechaInicio > actual && actual < fechaFin ? true : false
             //usuariocreacion: updatePromocionDto.usuariocreacion
         };
         const updatedPromocion = await this.prisma.vi_promocion.update({
@@ -148,8 +161,8 @@ export class DescuentoService {
         await this.prisma.vi_promocion.update({
             where: { id },
             data: { 
-                estado: false,
-                eliminadoen: actual.toISOString()
+                estaactivo: false,
+                desactivadoen: actual.toISOString()
             }
         });
     
