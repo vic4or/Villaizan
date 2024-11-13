@@ -42,7 +42,7 @@ export class FrutaService {
               nombre: nombre,
               descripcion: descripcion ?? null ,
               urlimagen: "", //validar
-              usuariocreacion: "", //validar
+              usuariocreacion: "admin", // TODO: Cambiar por usuario logueado
             },
         });
 
@@ -53,7 +53,7 @@ export class FrutaService {
                 estaactivo: true,
                 creadoen: new Date(),
                 actualizadoen: new Date(),
-                usuariocreacion: "", //validar
+                usuariocreacion: "admin", // TODO: Cambiar por usuario logueado
             }));
 
             await this.prisma.vi_producto_fruta.createMany({
@@ -86,6 +86,7 @@ export class FrutaService {
             data: {
               ...data,
               actualizadoen: new Date(),
+                usuarioactualizacion: "admin", // TODO: Cambiar por usuario logueado
             },
         });
 
@@ -97,7 +98,7 @@ export class FrutaService {
                 estaactivo: true,
                 creadoen: new Date(),
                 actualizadoen: new Date(),
-                usuariocreacion: "", // validar/corregir despues
+                usuariocreacion: "admin", // TODO: Cambiar por usuario logueado
             }));
     
             await this.prisma.vi_producto_fruta.createMany({
@@ -116,7 +117,7 @@ export class FrutaService {
                     estaactivo: false,
                     desactivadoen: new Date(),
                     actualizadoen: new Date(),
-                    usuarioactualizacion: "", // validar/corregir despues
+                    usuarioactualizacion: "admin", // TODO: Cambiar por usuario logueado
                 },
             });
         }
@@ -136,12 +137,14 @@ export class FrutaService {
         
     }
 
-    /*async inactivateFruta(id: string): Promise<fruta > {
-        return this.prisma.vi_fruta.update({
+    async inactivateFruta(id: string): Promise<vi_fruta> {
+        const frutaActualizada = await this.prisma.vi_fruta.update({
         where: { id },
         data: {
             estaactivo: false,
+            actualizadoen: new Date(),
             desactivadoen: new Date(),
+            usuarioactualizacion: "admin", // TODO: Cambiar por usuario logueado
         },
         });
         await this.prisma.vi_producto_fruta.updateMany({
@@ -150,7 +153,10 @@ export class FrutaService {
                 estaactivo: false,
                 desactivadoen: new Date(),
                 actualizadoen: new Date(),
+                usuarioactualizacion: "admin", // TODO: Cambiar por usuario logueado
             },
         });
-    }*/
+
+        return frutaActualizada;
+    }
 }
