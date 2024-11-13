@@ -23,8 +23,7 @@ export class ContenidoEducativoService {
         tipocontenido: data.tipocontenido,
         urlcontenido: data.tipocontenido !== 'informacion' ? data.urlcontenido : null,
         fechapublicacion: new Date(),
-        usuariocreacion: "", 
-        usuarioactualizacion: null,
+        usuariocreacion: "admin", //TODO: Cambiar por usuario logueado 
         vi_fruta: {
           connect: {
             id: data.id_fruta,
@@ -53,6 +52,7 @@ export class ContenidoEducativoService {
         tipocontenido: data.tipocontenido,
         urlcontenido: data.tipocontenido !== 'Información' ? data.urlcontenido : null,
         actualizadoen: new Date(),
+        usuarioactualizacion: "admin", //TODO: Cambiar por usuario logueado
         vi_fruta: data.id_fruta
           ? {
               connect: {
@@ -86,6 +86,8 @@ export class ContenidoEducativoService {
       data: {
         estaactivo: false,
         desactivadoen: new Date(),
+        actualizadoen: new Date(),
+        usuarioactualizacion: "admin", //TODO: Cambiar por usuario logueado
       },
     });
   }
