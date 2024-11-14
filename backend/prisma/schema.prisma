@@ -2482,6 +2482,8 @@ model vi_pedido {
   entregadoen            DateTime?                @db.Timestamp(6)
   verificadoen           DateTime?                @db.Timestamp(6)
   urlevidencia           String?                  @db.VarChar(200)
+  pagado                 Boolean?                 @default(false)
+  pagadoen               DateTime?                @db.Timestamp(6)
   vi_detallepedido       vi_detallepedido[]
   vi_historialrepartidor vi_historialrepartidor[]
   vi_pago                vi_pago[]
@@ -2862,6 +2864,7 @@ model vi_usuario {
   resettoken                                             String?                              @db.VarChar(255)
   resettokenexpiracion                                   DateTime?                            @db.Timestamp(6)
   imagenperfil                                           String?
+  puntosacumulados                                       Int?
   marketing_campaigns_campanausuario                     marketing_campaigns_campanausuario[]
   vi_comentario                                          vi_comentario[]
   vi_direccion                                           vi_direccion[]
