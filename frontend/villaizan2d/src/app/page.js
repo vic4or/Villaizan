@@ -45,6 +45,12 @@ export default function Home() {
           <div style={{ width: "80px", backgroundColor: "#b71c1c", height: "100vh", position: "fixed", top: 0, left: 0 }}>
             <Menu />
           </div>
+              {/* Contenedor principal */}
+              <div style={{ marginLeft: "80px", padding: "40px", width: "100%", overflowY: "auto" }}>
+                <div className="container">
+                  <div className="header">
+                    <h1 style={{ textAlign: "center" }}>Bienvenido, Administrador!</h1>
+              </div>
               <div className="grid">
                 {/* Tarjetas de opciones */}
                 <div className="card" onClick={() => window.location.href='/pages/recompensas/lista'}>  
