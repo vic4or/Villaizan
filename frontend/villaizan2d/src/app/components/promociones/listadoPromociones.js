@@ -22,7 +22,7 @@ export default function ListadoPromociones() {
   const [viewType, setViewType] = useState("activos");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTipo, setSelectedTipo] = useState("Todos");
-  const itemsPerPage = 5;
+  const itemsPerPage = 15;
 
   // Llamada a la API para listar las promociones
   useEffect(() => {
