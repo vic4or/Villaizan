@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Modal } from "react-bootstrap";
+import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
 import { useRouter } from "next/navigation"; 
 import axios from "axios"; 
@@ -14,10 +14,7 @@ export default function ListadoFrutas() {
     const [currentPage, setCurrentPage] = useState(1);
     const [viewType, setViewType] = useState("activos"); // "todos", "activos" o "inactivos"
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedFruta, setSelectedFruta] = useState(null);
-    const [newDescription, setNewDescription] = useState("");
-    const [showModal, setShowModal] = useState(false);
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
 
     useEffect(() => {
         const fetchFrutas = async () => {
@@ -31,6 +28,22 @@ export default function ListadoFrutas() {
 
         fetchFrutas();
     }, []);
+
+    // Función para truncar texto
+    const truncateText = (text, maxLength = 30) => {
+        if (!text) return ''; // Si text es null o undefined, retorna una cadena vacía
+        if (text.length > maxLength) {
+            return `${text.slice(0, maxLength)}...`;
+        }
+        return text;
+    };
+
+    const formatFechaHora = (fechaString) => {
+        const fecha = new Date(fechaString);
+        const fechaFormateada = fecha.toLocaleDateString();
+        const horaFormateada = fecha.toLocaleTimeString();
+        return { fechaFormateada, horaFormateada };
+    };
 
     // Filtrar frutas según el estado y la búsqueda
     const filteredFrutas = frutas
@@ -47,40 +60,11 @@ export default function ListadoFrutas() {
     const currentItems = filteredFrutas.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredFrutas.length / itemsPerPage);
 
-    const handleEdit = (fruta) => {
-        setSelectedFruta(fruta);
-        setShowModal(true);
-    };
-
-    const handleClose = () => {
-        setShowModal(false);
-        setNewDescription("");
-    };
-
-    const handleSave = async () => {
-        try {
-            await axios.put("http://localhost:3000/fruta/editar", {
-                idFruta: selectedFruta.id,
-                nuevaDescripcion: newDescription,
-            });
-
-            const updatedFrutas = frutas.map((item) =>
-                item.id === selectedFruta.id ? { ...item, descripcion: newDescription } : item
-            );
-            setFrutas(updatedFrutas);
-
-            handleClose();
-        } catch (error) {
-            console.error("Error al editar la fruta:", error);
-            alert("Error al guardar los cambios. Inténtalo de nuevo.");
-        }
-    };
-
     const handleDelete = async (idFruta) => {
         try {
             await axios.put(`http://localhost:3000/fruta/inactivar/${idFruta}`);
             const updatedFrutas = frutas.map((item) =>
-                item.id === idFruta ? { ...item, estado: false } : item
+                item.id === idFruta ? { ...item, estaactivo: false } : item
             );
             setFrutas(updatedFrutas);
         } catch (error) {
@@ -98,6 +82,10 @@ export default function ListadoFrutas() {
                 Nombre: item.nombre,
                 Descripción: item.descripcion,
                 Productos: productosRelacionados,
+                Usuario: item.usuario,
+                "Fecha de Actualización": item.fechaActualizacion,
+                "Hora de Actualización": item.horaActualizacion,
+                Estado: item.estaactivo ? "Activo" : "Inactivo",
             };
         });
         const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -163,38 +151,50 @@ export default function ListadoFrutas() {
             <Table hover>
                 <thead>
                     <tr>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Productos</th>
-                        <th className="text-center">Opciones</th>
+                        <th style={{ width: "21%" , textAlign: "left" }}>Id Fruta</th>
+                        <th style={{ width: "15%" , textAlign: "left"}}>Nombre</th>
+                        <th style={{ width: "15%" , textAlign: "left"}}>Descripción</th>
+                        <th style={{ width: "15%" , textAlign: "left"}}>Productos</th>
+                        <th style={{ width: "10%" , textAlign: "center" }}>Usuario</th>
+                        <th style={{ width: "8%" , textAlign: "center" }}>Fecha Actualización</th>
+                        <th style={{ width: "8%" , textAlign: "center" }}>Hora Actualización</th>
+                        <th style={{ width: "8%" , textAlign: "center" }}>Acciones</th>
+                        <th style={{ width: "8%" , textAlign: "center" }}>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                 {currentItems.map((item) => {
-                    console.log("Fruta completa:", item); // Verifica la estructura completa de item
-
+                    const { fechaFormateada, horaFormateada } = formatFechaHora(item.actualizadoen);
                     const productosRelacionados = item.vi_producto_fruta && Array.isArray(item.vi_producto_fruta) && item.vi_producto_fruta.length > 0
                     ? item.vi_producto_fruta.map(p => p.vi_producto ? p.vi_producto.nombre : "Producto sin nombre").join(", ")
                     : "No tiene productos";
             
                     return (
                         <tr key={item.id}>
-                            <td>{item.nombre}</td>
-                            <td>{item.descripcion}</td>
-                            <td>{productosRelacionados}</td>
+                            <td style={{ textAlign: "left" }}>{item.id}</td>
+                            <td style={{ textAlign: "left" }}>{item.nombre}</td>
+                            <td style={{ textAlign: "left" }}>{truncateText(item.descripcion, 30)}</td>
+                            <td style={{ textAlign: "left" }}>{truncateText(productosRelacionados, 30)}</td> {/* Truncar también productos */}
+                            <td style={{ textAlign: "center" }}>-</td>
+                            <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
+                            <td style={{ textAlign: "center" }}>{horaFormateada}</td>
                             <td className="text-center">
                                 <Button variant="outline-primary" size="sm" onClick={() => router.push(`/pages/frutas/editar?id=${item.id}`)}>
                                     <FaEdit />
                                 </Button>
-                                <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(item.id)}>
-                                    <FaTrashAlt />
+                            </td>
+                            <td className="text-center">
+                                <Button 
+                                    variant={item.estaactivo ? "success" : "danger"} 
+                                    size="sm"
+                                >
+                                    {item.estaactivo ? "Activo" : "Inactivo"}
                                 </Button>
                             </td>
                         </tr>
                     );
                 })}
             </tbody>
-
             </Table>
 
             <Pagination style={{ position: 'relative', zIndex: 1 }}>
@@ -206,10 +206,6 @@ export default function ListadoFrutas() {
                 ))}
                 <Pagination.Next onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} />
             </Pagination>
-
-            
         </Container>
     );
 }
-
-
