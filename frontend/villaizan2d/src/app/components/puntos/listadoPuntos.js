@@ -42,8 +42,8 @@ export default function ListadoPuntos() {
     // Filtrar puntos según el estado seleccionado (Activo/Inactivo) y búsqueda por nombre de producto
     const filteredPuntos = puntos
         .filter((item) => {
-            if (viewType === "activos") return item.estado === true;
-            if (viewType === "inactivos") return item.estado === false;
+            if (viewType === "activos") return item.estaactivo === true;
+            if (viewType === "inactivos") return item.estaactivo === false;
             return true; // "todos" muestra todos los registros
         }) // Filtrar por estado (true = activo, false = inactivo)
         .filter((item) => {
