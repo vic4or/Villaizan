@@ -1,4 +1,9 @@
+"use client";
+
+import Image from 'next/image';
 import React from 'react';
+import { useRouter } from 'next/navigation';
+import NavMenu from '../NavMenu/NavMenu';
 
 interface Product {
   id: number;
@@ -25,91 +30,47 @@ const products: Product[] = [
     image: '/api/placeholder/300/300',
     tags: ['Paleta', 'Rellenos de Leche']
   },
-  {
-    id: 3,
-    name: 'Mafelete de Naranja',
-    price: 2,
-    image: '/api/placeholder/300/300',
-    discount: 30,
-    tags: ['Mafelete', 'Rellenos de Leche']
-  },
-  {
-    id: 4,
-    name: 'Paleta de Frambuesa',
-    price: 3,
-    image: '/api/placeholder/300/300',
-    tags: ['Paleta', 'Rellenos con Licor']
-  },
-  {
-    id: 5,
-    name: 'Paleta de Mango',
-    price: 3,
-    image: '/api/placeholder/300/300',
-    tags: ['Paleta', 'Rellenos de Leche']
-  },
-  {
-    id: 6,
-    name: 'Mafelete de Fresa',
-    price: 3,
-    image: '/api/placeholder/300/300',
-    tags: ['Mafelete', 'Rellenos de Leche']
-  },
-  {
-    id: 7,
-    name: 'Paleta de Arándano',
-    price: 2,
-    image: '/api/placeholder/300/300',
-    tags: ['Paleta', 'Rellenos de Leche']
-  },
-  {
-    id: 8,
-    name: 'Paleta de Limón',
-    price: 3,
-    image: '/api/placeholder/300/300',
-    tags: ['Paleta', 'Rellenos de Leche']
-  }
+  // ...otros productos
 ];
 
-const CatalogoProductosSuma = () => {
+const CatalogoProductosSuma: React.FC = () => {
+  const router = useRouter();
+
+  const handleComprar = () => {
+    router.push('/carrito');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-red-600 text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex space-x-4">
-            <a href="#" className="hover:text-gray-200">Home</a>
-            <a href="#" className="hover:text-gray-200">Comprar</a>
-            <a href="#" className="hover:text-gray-200">Acerca</a>
-            <a href="#" className="hover:text-gray-200">Contacto</a>
-          </div>
-          <div>
-            <span>Hola, Usuario!</span>
-          </div>
-        </div>
-      </header>
-
+      <NavMenu />
       {/* Logo */}
-      <div className="text-center py-8">
-        <img
-          src="/api/placeholder/150/150"
+      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
+        <Image
+          src="/images/bannerFlujoCompra.png"
           alt="Villaizan Logo"
-          className="mx-auto w-[150px] h-[150px]"
+          width={1920}
+          height={1080}
+          style={{
+            width: '100%',
+            height: 'auto',
+          }}
+          priority
         />
       </div>
 
       {/* Search and Filter */}
       <div className="container mx-auto px-4 flex justify-between items-center mb-8">
         <button className="flex items-center space-x-2 px-4 py-2 bg-white rounded shadow">
-          <span>Filtrar por categoría</span>
+          <span className="text-black">Filtrar por categoría</span>
         </button>
-        <button className="px-8 py-2 bg-red-600 text-white rounded">
+        <button className="px-8 py-2 bg-red-600 text-white rounded" onClick={handleComprar}>
           Comprar
         </button>
         <div className="relative">
           <input
             type="text"
             placeholder="Buscar tu helado"
-            className="pl-10 pr-4 py-2 border rounded-lg"
+            className="pl-10 pr-4 py-2 border rounded-lg text-black"
           />
           <svg
             className="w-5 h-5 absolute left-3 top-2.5 text-gray-400"
@@ -146,19 +107,19 @@ const CatalogoProductosSuma = () => {
                   alt={product.name}
                   className="w-full h-48 object-cover rounded-lg"
                 />
-                <h3 className="mt-4 text-lg font-semibold">{product.name}</h3>
+                <h3 className="mt-4 text-lg font-semibold text-black">{product.name}</h3>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {product.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 bg-gray-100 text-sm rounded-full"
+                      className="px-2 py-1 bg-gray-100 text-sm rounded-full text-black"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
                 <div className="mt-4 flex justify-between items-center">
-                  <span className="text-lg font-bold">S/ {product.price}</span>
+                  <span className="text-lg font-bold text-black">S/ {product.price}</span>
                 </div>
               </div>
             </div>
@@ -179,28 +140,28 @@ const CatalogoProductosSuma = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <h4 className="font-bold mb-4">Helados Villaizan</h4>
+              <h4 className="font-bold mb-4 text-black">Helados Villaizan</h4>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Links</h4>
+              <h4 className="font-bold mb-4 text-black">Links</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Carro</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Catálogo</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Acerca</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Contacto</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Carro</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Catálogo</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Acerca</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Contacto</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Ayuda</h4>
+              <h4 className="font-bold mb-4 text-black">Ayuda</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Opciones de Pago</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Returns</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Privacy Policies</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900">Libro de Reclamaciones</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Opciones de Pago</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Returns</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Privacy Policies</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Libro de Reclamaciones</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 text-center text-gray-600">
+          <div className="mt-8 text-center text-gray-600 text-black">
             <p>2023 Helados Villaizan. All rights reserved</p>
           </div>
         </div>
@@ -210,3 +171,5 @@ const CatalogoProductosSuma = () => {
 };
 
 export default CatalogoProductosSuma;
+
+
