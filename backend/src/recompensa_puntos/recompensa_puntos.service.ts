@@ -24,7 +24,7 @@ export class Recompensa_PuntosService {
             data: {
               id_producto: id_producto,
               puntosnecesarios: puntosnecesarios,
-              stockdisponible: 0,
+              usuariocreacion: "admin", // cambiar por el usuario logueado luego
             },
         });
     }
@@ -40,8 +40,10 @@ export class Recompensa_PuntosService {
             id_recompensa: idRecompensa,
           },
           data: {
-            estado: false,            
+            estaactivo: false,            
             actualizadoen: new Date(),
+            desactivadoen:new Date(),
+            usuarioactualizacion: "admin", // cambiar por el usuario logueado luego
           },
         });
       
@@ -50,11 +52,9 @@ export class Recompensa_PuntosService {
           data: {
             id_producto: idProducto,
             puntosnecesarios: puntosNecesarios,
-            stockdisponible: 0,
             creadoen: new Date(),          
             actualizadoen: new Date(),     
-            usuariocreacion: null,        
-            usuarioactualizacion: null,
+            usuariocreacion: "admin", // cambiar por el usuario logueado luego
           },
         });
       }
@@ -65,9 +65,22 @@ export class Recompensa_PuntosService {
             id_recompensa: parseInt(id.toString(), 10),
         },
         data: {
-            estado: false,
+            estaactivo: false,
             actualizadoen: new Date(),
+            desactivadoen: new Date(),
+            usuarioactualizacion: "admin", // cambiar por el usuario logueado luego
         },
+        });
+    }
+
+    //Para Usuario
+    
+    async getAllRecompensaPuntosWithProducto(): Promise<vi_recompensa_puntos[]> {
+        return await this.prisma.vi_recompensa_puntos.findMany({
+          where: {estaactivo: true},
+            include: {
+                vi_producto: true,
+            },
         });
     }
 }

@@ -14,7 +14,7 @@ export default function ListadoPuntos() {
     const [puntos, setPuntos] = useState([]);
     const [productos, setProductos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [viewType, setViewType] = useState("todos"); // "activos", "inactivos", "todos"
+    const [viewType, setViewType] = useState("activos"); // "activos", "inactivos", "todos"
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [newPoints, setNewPoints] = useState("");
@@ -42,8 +42,8 @@ export default function ListadoPuntos() {
     // Filtrar puntos según el estado seleccionado (Activo/Inactivo) y búsqueda por nombre de producto
     const filteredPuntos = puntos
         .filter((item) => {
-            if (viewType === "activos") return item.estado === true;
-            if (viewType === "inactivos") return item.estado === false;
+            if (viewType === "activos") return item.estaactivo === true;
+            if (viewType === "inactivos") return item.estaactivo === false;
             return true; // "todos" muestra todos los registros
         }) // Filtrar por estado (true = activo, false = inactivo)
         .filter((item) => {
@@ -207,7 +207,7 @@ export default function ListadoPuntos() {
             <Table hover>
                 <thead>
                     <tr>
-                        <th>IdProducto</th>
+                        {/*<th>IdProducto</th>*/}
                         <th>Nombre Producto</th>
                         <th>Puntos</th>
                         <th>Fecha</th>
@@ -221,7 +221,7 @@ export default function ListadoPuntos() {
                         const { fechaFormateada, horaFormateada } = formatFechaHora(item.fechaactivo);
                         return (
                             <tr key={item.id_puntosproducto}>
-                                <td>{producto ? producto.id : "Producto no encontrado"}</td>
+                                {/*<td>{producto ? producto.id : "Producto no encontrado"}</td>*/}
                                 <td>{producto ? producto.nombre : "Producto no encontrado"}</td>
                                 <td>{item.cantidadpuntos}</td>
                                 <td>{fechaFormateada}</td>

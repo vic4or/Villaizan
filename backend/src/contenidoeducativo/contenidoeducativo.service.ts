@@ -2,10 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { vi_contenidoeducativo } from '@prisma/client';
 import * as crypto from 'crypto';
+import { url } from 'inspector';
 
 @Injectable()
 export class ContenidoEducativoService {
   constructor(private prisma: PrismaService) {}
+
+  private convertirUrlImagen(driveUrl: string): string {
+    try {
+      const fileId = driveUrl.match(/\/d\/(.*?)\//)![1];
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    } catch (error) {
+      throw new Error('URL de Drive invalida');
+    }
+  }
 
   // Crear un nuevo contenido educativo
   async createContenidoEducativo(data: {
@@ -15,16 +25,23 @@ export class ContenidoEducativoService {
     tipocontenido: string;
     urlcontenido?: string;
   }): Promise<vi_contenidoeducativo> {
+    let urlFinal = null;
+
+    if (data.tipocontenido === 'Imagen' && data.urlcontenido) {
+      urlFinal = this.convertirUrlImagen(data.urlcontenido);
+    } else if (data.tipocontenido !== 'Información') {
+      urlFinal = data.urlcontenido;
+    }
+    
     return this.prisma.vi_contenidoeducativo.create({
       data: {
         id: crypto.randomUUID(), 
         titulo: data.titulo,
         contenidoinformacion: data.tipocontenido === 'Información' ? data.contenidoinformacion : null,
         tipocontenido: data.tipocontenido,
-        urlcontenido: data.tipocontenido !== 'informacion' ? data.urlcontenido : null,
+        urlcontenido: urlFinal,
         fechapublicacion: new Date(),
-        usuariocreacion: "", 
-        usuarioactualizacion: null,
+        usuariocreacion: "admin", //TODO: Cambiar por usuario logueado 
         vi_fruta: {
           connect: {
             id: data.id_fruta,
@@ -45,14 +62,28 @@ export class ContenidoEducativoService {
       id_fruta?: string;
     },
   ): Promise<vi_contenidoeducativo> {
+
+    let urlFinal = null;
+
+    if (data.urlcontenido !== undefined) {
+      if (data.tipocontenido === 'Imagen') {
+        urlFinal = this.convertirUrlImagen(data.urlcontenido);
+      } else if (data.tipocontenido !== 'Información') {
+        urlFinal = data.urlcontenido;
+      } else {
+        urlFinal = null;
+      }
+    }
+    
     return this.prisma.vi_contenidoeducativo.update({
       where: { id: id },
       data: {
         titulo: data.titulo,
         contenidoinformacion: data.tipocontenido === 'Información' ? data.contenidoinformacion : null,
         tipocontenido: data.tipocontenido,
-        urlcontenido: data.tipocontenido !== 'Información' ? data.urlcontenido : null,
+        urlcontenido: urlFinal,
         actualizadoen: new Date(),
+        usuarioactualizacion: "admin", //TODO: Cambiar por usuario logueado
         vi_fruta: data.id_fruta
           ? {
               connect: {
@@ -86,6 +117,8 @@ export class ContenidoEducativoService {
       data: {
         estaactivo: false,
         desactivadoen: new Date(),
+        actualizadoen: new Date(),
+        usuarioactualizacion: "admin", //TODO: Cambiar por usuario logueado
       },
     });
   }

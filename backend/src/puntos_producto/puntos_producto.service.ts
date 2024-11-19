@@ -23,7 +23,8 @@ export class Puntos_ProductoService {
         return await this.prisma.vi_puntos_producto.create({
             data: {
                 id_producto: idProducto,
-                cantidadpuntos: cantidadPuntos 
+                cantidadpuntos: cantidadPuntos,
+                usuariocreacion: "admin", // cambiar por el usuario logueado luego
             }
         });
     }
@@ -35,8 +36,10 @@ export class Puntos_ProductoService {
               id_puntosproducto: idPuntosProducto,
             },
             data: {
-              estado: false,
-              fechainactivo: new Date(),  
+              estaactivo: false,
+              actualizadoen: new Date(),
+              desactivadoen: new Date(),
+              usuarioactualizacion: "admin", // cambiar por el usuario logueado luego 
             },
         }); 
 
@@ -44,6 +47,7 @@ export class Puntos_ProductoService {
             data:{
                 id_producto: idProducto,
                 cantidadpuntos: nuevaCantidad,
+                usuariocreacion: "admin", // cambiar por el usuario logueado luego
             },
         });
     }
@@ -54,8 +58,10 @@ export class Puntos_ProductoService {
             id_puntosproducto: idPuntosProducto, 
           },
           data: {
-            estado: false,
-            fechainactivo: new Date(),
+            estaactivo: false,
+            actualizadoen: new Date(),
+            desactivadoen: new Date(),
+            usuarioactualizacion:"admin", // cambiar por el usuario logueado luego
           },
         });
     }

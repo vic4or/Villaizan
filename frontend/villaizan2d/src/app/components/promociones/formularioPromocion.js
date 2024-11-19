@@ -55,66 +55,54 @@ export default function FormularioPromocion() {
     fetchProducts();
   }, []);
 
-  // Simular la búsqueda de la promoción por ID
-  const fetchPromotionById = (id) => {
-    const promociones = [
-      { id: 1, nombre: "Helado gratis", tipo: "Oferta Especial", descripcion: "Obtén un 100% de descuento en un helado por día de fundación de helados Villizan", fechaInicio: "2024-09-27", fechaFin: "2024-10-27", descuento: "100", productos: ["Paleta - Fresa", "Mafeleta - Coco"] },
-      { id: 2, nombre: "50% de Descuento", tipo: "Paquete", descripcion: "Obtén un 30% de descuento en total por llevarte este paquete", fechaInicio: "2024-09-28", fechaFin: "2024-10-28", descuento: "30", productos: ["Paleta - Aguaje", "Helado - Vainilla"] }
-      // Agregar más promociones si es necesario
-    ];
-    return promociones.find((promo) => promo.id === parseInt(id));
+  // Función para formatear la fecha a yyyy-MM-dd
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const fetchPromotionById = async (id) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/descuento/listarUno/${id}`);
+      return response.data; // Retorna los datos de la promoción obtenidos de la API
+    } catch (error) {
+      console.error("Error al obtener la promoción: ", error);
+      return null; // Retorna null en caso de error
+    }
   };
 
   useEffect(() => {
-    if (isEditMode) {
-      const promotion = fetchPromotionById(id);
-      if (promotion) {
-        setInitialValues({
-          nombre: promotion.nombre,
-          tipo: promotion.tipo,
-          descuento: promotion.descuento,
-          limiteStock: promotion.limiteStock || "",
-          fechaInicio: promotion.fechaInicio,
-          fechaFin: promotion.fechaFin,
-          descripcion: promotion.descripcion,
-          productos: promotion.productos,
-        });
-        setSelectedProducts(promotion.productos);
+    const loadPromotion = async () => {
+      if (isEditMode) {
+        const promotion = await fetchPromotionById(id);
+        console.log("ID: ", id);
+        console.log("Promotion: ",promotion);
+        if (promotion) {
+          const formattedFechaInicio = promotion.fechainicio ? formatDate(promotion.fechainicio) : '';
+          const formattedFechaFin = promotion.fechafin ? formatDate(promotion.fechafin) : '';
+          setInitialValues({
+            nombre: promotion.titulo,
+            tipo: "Descuento",
+            descuento: promotion.porcentajedescuento,
+            limiteStock: promotion.limitestock || "",
+            fechaInicio: formattedFechaInicio,
+            fechaFin: formattedFechaFin,
+            descripcion: promotion.descripcion,
+            productos: promotion.vi_producto,
+          });
+          setSelectedProducts(promotion.vi_producto || []); // Asegúrate de que productos es un array
+        }
       }
-    }
+    };
+
+    loadPromotion();
   }, [isEditMode, id]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    let valid = true;
-    let message = "";
-
-    if (!initialValues.nombre || !initialValues.tipo || !initialValues.descuento || !initialValues.fechaInicio || !initialValues.fechaFin || !initialValues.descripcion) {
-      valid = false;
-      message = "Todos los campos obligatorios deben ser completados.";
-    }
-
-    if (initialValues.tipo === "Paquete" && selectedProducts.length < 2) {
-      valid = false;
-      message = "Para el tipo \"Paquete\", debe seleccionar al menos dos productos.";
-    }
-
-    if (new Date(initialValues.fechaFin) < new Date(initialValues.fechaInicio)) {
-      valid = false;
-      message = "La fecha de fin no puede ser menor a la fecha de inicio.";
-    }
-
-    if (valid) {
-      setShowConfirmation(true);
-      setFormError(false);
-      setErrorMessage("");
-    } else {
-      setFormError(true);
-      setErrorMessage(message);
-    }
-
-    // Transformación de datos al formato esperado por la API
+  const updateDiscount = async () => {
+    // Construir el payload para la API de edición
     const payload = {
       titulo: initialValues.nombre,
       descripcion: initialValues.descripcion,
@@ -122,23 +110,103 @@ export default function FormularioPromocion() {
       fechaFin: initialValues.fechaFin,
       limiteStock: parseInt(initialValues.limiteStock, 10),
       porcentajeDescuento: parseFloat(initialValues.descuento),
-      vi_productoIds: selectedProducts.map((product) => product.id),  // Extrae solo los IDs
+      vi_productoIds: selectedProducts.map((product) => product.id),
+    };
+  
+    try {
+      console.log("Actualizando el descuento con datos:", payload);
+      // Llamar a la API de edición usando el método PATCH y pasando el id del descuento
+      const response = await axios.patch(`http://localhost:3000/descuento/editar/${id}`, payload);
+      setShowConfirmation(true);
+      setFormError(false);
+      setErrorMessage("");
+      console.log("Descuento actualizado:", response.data);
+    } catch (error) {
+      console.error("Error al actualizar el descuento:", error);
+      setFormError(true);
+      setErrorMessage("Error al actualizar el descuento. Por favor, intenta nuevamente.");
+    }
+  };
+
+  // Modificación de la función handleSubmit
+const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  let valid = true;
+  let message = "";
+
+  if (!initialValues.nombre || !initialValues.tipo || !initialValues.descuento || !initialValues.fechaInicio || !initialValues.fechaFin || !initialValues.descripcion) {
+    valid = false;
+    message = "Todos los campos obligatorios deben ser completados.";
+  }
+
+  if (initialValues.tipo === "Paquete" && selectedProducts.length < 2) {
+    valid = false;
+    message = "Para el tipo \"Paquete\", debe seleccionar al menos dos productos.";
+  }
+
+  if (initialValues.descuento < 1 || initialValues.descuento > 100) {
+    valid = false;
+    message = "El descuento debe estar entre 1 y 100.";
+  }
+
+  if (parseInt(initialValues.limiteStock, 10) < 10) {
+    valid = false;
+    message = "El stock debe ser al menos 10.";
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  if (new Date(initialValues.fechaInicio) < new Date(today)) {
+    valid = false;
+    message = "La fecha de inicio no puede ser anterior a hoy.";
+  } else if (new Date(initialValues.fechaFin) < new Date(today)) {
+    valid = false;
+    message = "La fecha de fin no puede ser anterior a hoy.";
+  } else if (new Date(initialValues.fechaFin) < new Date(initialValues.fechaInicio)) {
+    valid = false;
+    message = "La fecha de fin no puede ser menor a la fecha de inicio.";
+  }
+
+  if (selectedProducts.length === 0) {
+    valid = false;
+    message = "Debe seleccionar al menos un producto.";
+  }
+
+  if (valid) {
+    const payload = {
+      titulo: initialValues.nombre,
+      descripcion: initialValues.descripcion,
+      fechaInicio: initialValues.fechaInicio,
+      fechaFin: initialValues.fechaFin,
+      limiteStock: parseInt(initialValues.limiteStock, 10),
+      porcentajeDescuento: parseFloat(initialValues.descuento),
+      vi_productoIds: selectedProducts.map((product) => product.id),
     };
 
     try {
       console.log("Datos de la promoción:", payload);
-      const response = await axios.post("http://localhost:3000/descuento/registrar", payload);
-      setShowConfirmation(true);
-      setFormError(false);
-      setErrorMessage("");
-      console.log("Descuento registrado:", response.data);
+      
+      if (isEditMode) {
+        // Llamar a la función de actualización si está en modo edición
+        await updateDiscount();
+      } else {
+        // Llamar a la API de registro si no está en modo edición
+        const response = await axios.post("http://localhost:3000/descuento/registrar", payload);
+        setShowConfirmation(true);
+        setFormError(false);
+        setErrorMessage("");
+        console.log("Descuento registrado:", response.data);
+      }
     } catch (error) {
-      console.error("Error al registrar el descuento:", error);
+      console.error("Error al procesar la solicitud:", error);
       setFormError(true);
-      setErrorMessage("Error al registrar el descuento. Por favor, intenta nuevamente.");
+      setErrorMessage("Error al procesar la solicitud. Por favor, intenta nuevamente.");
     }
-  };
-
+  } else {
+    setFormError(true);
+    setErrorMessage(message);
+  }
+};
   const handleProductSearch = (event) => {
     setSearchProduct(event.target.value);
   };
@@ -221,9 +289,9 @@ export default function FormularioPromocion() {
                     value={initialValues.tipo}
                   >
                     <option value="">--Selecciona un tipo--</option>
-                    <option value="Oferta Especial">Oferta Especial</option>
+                    {/*<option value="Oferta Especial">Oferta Especial</option>*/}
                     <option value="Descuento">Descuento</option>
-                    <option value="Paquete">Paquete</option>
+                    {/*<option value="Paquete">Paquete</option>*/}
                   </Form.Select>
                 </Form.Group>
 

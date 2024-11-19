@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { FaHome, FaGift, FaTags, FaBell, FaSignOutAlt, FaClipboardList, FaCreditCard, FaAppleAlt } from 'react-icons/fa';
 import { BsImage } from 'react-icons/bs';
 import { BiSolidDiscount } from "react-icons/bi";
@@ -7,43 +7,17 @@ import { CiBarcode } from "react-icons/ci";
 import Link from 'next/link';
 
 export default function Menu() {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const menuRef = useRef(null);
-
-  const toggleMenu = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  // Cierra el menú si se hace clic fuera de él
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsExpanded(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
     <div
-      ref={menuRef}
-      onClick={toggleMenu}
       style={{
         position: "fixed",
         height: "100vh",
-        width: isExpanded ? "80px" : "80px",
         background: "linear-gradient(to bottom, #e63946, #b2182b)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
         padding: "20px 0",
-        cursor: "pointer",
-        transition: "width 0.3s ease", // Animación suave al expandir/contraer
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
         zIndex: "10000"
       }}
@@ -68,25 +42,22 @@ export default function Menu() {
         display: "flex",
         flexDirection: "column",
         gap: "20px",
-        alignItems: isExpanded ? "flex-start" : "center",
+        alignItems: "center",
         width: "100%",
-        paddingLeft: isExpanded ? "20px" : "0",
+        paddingLeft: "0",
         zIndex: "10000"
       }}>
-        {/*         
+      {/*
         <Link href="/">
           <div style={menuItemStyle} title="Inicio">
             <FaHome size="24px" style={{ color: "#000" }} />
-            {isExpanded && <span style={textStyle}>Inicio</span>}
           </div>
-        </Link> 
-        */}
+        </Link>
 
         {/* Recompensas */}
         {/*<Link href="/pages/recompensas/lista">
           <div style={menuItemStyle} title="Recompensas">
             <FaGift size="24px" style={{ color: "#000" }} />
-            {isExpanded && <span style={textStyle}>Recompensas</span>}
           </div>
         </Link>*/}
 
@@ -94,7 +65,6 @@ export default function Menu() {
         {/*<Link href="/pages/puntos/lista">
           <div style={menuItemStyle} title="Puntos">
             <FaCreditCard size="24px" style={{ color: "#000" }} />
-            {isExpanded && <span style={textStyle}>Puntos</span>}
           </div>
         </Link>*/}
 
@@ -102,7 +72,6 @@ export default function Menu() {
         {/*<Link href="/pages/canje/lista">
           <div style={menuItemStyle} title="Canje">
             <CiBarcode size="24px" style={{ color: "#000" }} />
-            {isExpanded && <span style={textStyle}>Canje de Códigos</span>}
           </div>
         </Link>*/}
 
@@ -118,7 +87,6 @@ export default function Menu() {
         {/*<Link href="/pages/multimedia/lista">
           <div style={menuItemStyle} title="Multimedia">
             <BsImage size="24px" style={{ color: "#000" }} />
-            {isExpanded && <span style={textStyle}>Multimedia</span>}
           </div>
         </Link>*/}
 
@@ -126,17 +94,15 @@ export default function Menu() {
         {/*<Link href="/pages/promociones/lista">
           <div style={menuItemStyle} title="Promociones">
             <BiSolidDiscount size="24px" style={{ color: "#000" }} />
-            {isExpanded && <span style={textStyle}>Promociones</span>}
           </div>
-        </Link>*/}
 
         {/* Frutas */}
         {/*<Link href="/pages/frutas/lista">
           <div style={menuItemStyle} title="Frutas">
             <FaAppleAlt size="24px" style={{ color: "#000" }} />
-            {isExpanded && <span style={textStyle}>Frutas</span>}
           </div>
-        </Link>*/}
+        </Link>
+        */}
       </div>
 
       {/* Cerrar sesión */}
@@ -157,14 +123,7 @@ const menuItemStyle = {
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
   display: "flex",
   alignItems: "center",
-  gap: "15px",
+  justifyContent: "center",
   width: "100%",
-  transition: "background 0.3s ease, padding 0.3s ease",
   zIndex: "999999"
-};
-
-const textStyle = {
-  color: "#000",
-  fontSize: "18px",
-  fontWeight: "500",
 };

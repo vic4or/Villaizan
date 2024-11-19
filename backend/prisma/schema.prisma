@@ -2974,25 +2974,6 @@ model vi_detallepuntosacumulados {
   vi_puntos_producto   vi_puntos_producto  @relation(fields: [id_puntosproducto], references: [id_puntosproducto], onDelete: NoAction, onUpdate: NoAction, map: "fk_puntosproducto")
 }
 
-model vi_detalleredencion {
-  id                      String               @id @db.VarChar(50)
-  id_redencion            String               @db.VarChar(50)
-  id_recompensa           Int
-  id_producto             String               @db.VarChar(50)
-  puntosredencion         Int
-  cantidad                Int
-  subtotalpuntosredencion Int
-  estaactivo              Boolean              @default(true)
-  desactivadoen           DateTime?            @db.Timestamp(6)
-  creadoen                DateTime             @default(now()) @db.Timestamp(6)
-  actualizadoen           DateTime             @default(now()) @db.Timestamp(6)
-  usuariocreacion         String               @db.VarChar(50)
-  usuarioactualizacion    String?              @db.VarChar(50)
-  vi_producto             vi_producto          @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_producto")
-  vi_recompensa_puntos    vi_recompensa_puntos @relation(fields: [id_recompensa], references: [id_recompensa], onDelete: NoAction, onUpdate: NoAction, map: "fk_recompensa")
-  vi_redencion            vi_redencion         @relation(fields: [id_redencion], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_redencion")
-}
-
 model vi_plantillamotorizado {
   id                              String                            @id @db.VarChar(50)
   nombre                          String                            @db.VarChar(255)
@@ -3038,6 +3019,34 @@ model vi_puntosacumulados {
   vi_usuario                 vi_usuario                   @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario")
 }
 
+model vi_sentimiento {
+  id            Int             @id @default(autoincrement())
+  nombre        String          @db.VarChar(255)
+  estaactivo    Boolean         @default(true)
+  colorfondo    String?         @db.VarChar(20)
+  colortexto    String?         @db.VarChar(20)
+  vi_comentario vi_comentario[]
+}
+
+model vi_detalleredencion {
+  id                      String               @id @db.VarChar(50)
+  id_redencion            String               @db.VarChar(50)
+  id_recompensa           Int
+  id_producto             String               @db.VarChar(50)
+  puntosredencion         Int
+  cantidad                Int
+  subtotalpuntosredencion Int
+  estaactivo              Boolean              @default(true)
+  desactivadoen           DateTime?            @db.Timestamp(6)
+  creadoen                DateTime             @default(now()) @db.Timestamp(6)
+  actualizadoen           DateTime             @default(now()) @db.Timestamp(6)
+  usuariocreacion         String               @db.VarChar(50)
+  usuarioactualizacion    String?              @db.VarChar(50)
+  vi_producto             vi_producto          @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_producto")
+  vi_recompensa_puntos    vi_recompensa_puntos @relation(fields: [id_recompensa], references: [id_recompensa], onDelete: NoAction, onUpdate: NoAction, map: "fk_recompensa")
+  vi_redencion            vi_redencion         @relation(fields: [id_redencion], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_redencion")
+}
+
 model vi_redencion {
   id                   String                @id @db.VarChar(50)
   id_usuario           String                @db.VarChar(50)
@@ -3055,15 +3064,6 @@ model vi_redencion {
   usuarioactualizacion String?               @db.VarChar(50)
   vi_detalleredencion  vi_detalleredencion[]
   vi_usuario           vi_usuario            @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario")
-}
-
-model vi_sentimiento {
-  id            Int             @id @default(autoincrement())
-  nombre        String          @db.VarChar(255)
-  estaactivo    Boolean         @default(true)
-  colorfondo    String?         @db.VarChar(20)
-  colortexto    String?         @db.VarChar(20)
-  vi_comentario vi_comentario[]
 }
 
 enum PAYMENT_COLLECTION_STATUS_ENUM {

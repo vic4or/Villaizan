@@ -127,24 +127,17 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
       setSelectedProducts([...selectedProducts, product]);
       setProductosParaAgregar([...productosParaAgregar, product.id]);
 
-      // Remover de productos para quitar si estaba antes seleccionado
       setProductosParaQuitar(productosParaQuitar.filter((id) => id !== product.id));
       setSearchProduct("");
-      setHasChanges(true); // Marca que se ha hecho un cambio
+      setHasChanges(true); 
     }
   };
 
   const handleRemoveProduct = (product) => {
-    // Filtrar el producto eliminado de la lista de productos seleccionados usando id_producto
     setSelectedProducts((prevSelectedProducts) => 
       prevSelectedProducts.filter((item) => item.id_producto !== product.id_producto)
     );
-
-    console.log("Eliminando producto:", product.id);
-    console.log("Productos seleccionados antes de eliminar:", selectedProducts);
-
-  
-    // Si el producto no estaba previamente en productosParaQuitar, añadirlo
+    
     if (!productosParaQuitar.includes(product.id_producto)) {
       setProductosParaQuitar((prevProductosParaQuitar) => [
         ...prevProductosParaQuitar,
@@ -152,12 +145,10 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
       ]);
     }
   
-    // Remover de productosParaAgregar si fue añadido recién
     setProductosParaAgregar((prevProductosParaAgregar) =>
       prevProductosParaAgregar.filter((id) => id !== product.id_producto)
     );
   
-    // Marcar que se ha hecho un cambio en el formulario
     setHasChanges(true);
   };
   

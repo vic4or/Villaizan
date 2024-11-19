@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Put, Body, Param, Patch } from '@nestjs/common';import { FrutaService } from './fruta.service';
+import { Controller, Get, Post, Put, Body, Param, Patch } from '@nestjs/common';
+import { FrutaService } from './fruta.service';
 import { vi_fruta } from '@prisma/client';
 
 @Controller('fruta')
@@ -36,10 +37,10 @@ export class FrutaController {
     ) {
         return await this.frutaService.updateFruta(id, nombre, descripcion, productosParaAgregar, productosParaQuitar);
     }
-    /*
-    @Put('/inactivar/:id')
+    
+    @Patch('/inactivar/:id')
     async inactivarFruta(@Param('id') id: string) {
         return this.frutaService.inactivateFruta(id);
-    }*/
+    }
 }
 //prueba
