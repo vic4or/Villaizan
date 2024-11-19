@@ -38,4 +38,10 @@ export class Recompensa_PuntosController {
     async inactivarRecompensaPuntos(@Param('idRecompensa') idRecompensa: number) {
         return await this.recompensaPuntosService.inactivateRecompensaPuntos(idRecompensa);
     }
+
+    //Para Usuario
+    @Get('/listarTodosProducto')
+    async getAllRecompensaPuntosProducto() {
+        return await this.recompensaPuntosService.getAllRecompensaPuntosWithProducto();
+    }
 }
