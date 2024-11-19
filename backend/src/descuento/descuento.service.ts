@@ -127,7 +127,7 @@ export class DescuentoService {
             }
         }
        
-        const promoActualiza = await this.prisma.vi_promocion.update({
+        await this.prisma.vi_promocion.update({
             where: { id: newPromocion.id }, // Utiliza el 'id' como filtro para encontrar la promoción a actualizar.
             data: {
               id_crm: id_crm, // Aquí actualizas el campo 'id_crm' con el nuevo valor.
