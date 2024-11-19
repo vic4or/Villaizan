@@ -8,6 +8,7 @@ import { DescuentoModule } from './descuento/descuento.module';
 import { ComboModule } from './combo/combo.module';
 import { PromocionModule } from './promocion/promocion.module';
 
+
 @Module({
   imports: [ProductoModule, Puntos_ProductoModule, FrutaModule, ContenidoEducativoModule, Recompensa_PuntosModule, DescuentoModule, ComboModule, PromocionModule],
   controllers: [],

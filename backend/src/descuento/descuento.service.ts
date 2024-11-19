@@ -3,11 +3,14 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDescuentoDto } from './dto/create-descuento.dto';
 import { UpdateDescuentoDto } from './dto/update-descuento.dto';
+import axios from 'axios';
 
 @Injectable()
 export class DescuentoService {
 
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService
+    ) {}
 
     async findAll(estado: string){
         const activo = (estado === 'true') ? true : false;
@@ -81,6 +84,58 @@ export class DescuentoService {
             where: { id: newPromocion.id },
             include: { vi_producto: true } // Incluye los productos actualizados
         });
+
+        const username = 'dep2.crm@gmail.com'; // Usuario de la API
+        const password = '97FO4nsSpV6UneKW'; // Contraseña de la API
+  
+        const body = {
+            "promoname": createPromocionDto.titulo,
+            "promodesc": createPromocionDto.descripcion,
+            "dscto": createPromocionDto.porcentajeDescuento,
+            "estado": 1,
+            "fechaini": createPromocionDto.fechaInicio,
+            "fechafin": createPromocionDto.fechaFin,
+            "stockmax": createPromocionDto.limiteStock,
+            "stockact": createPromocionDto.limiteStock,
+            "bdidpromo": newPromocion.id
+        }
+
+        // Codificar las credenciales para el encabezado Authorization (Basic Auth)
+        const auth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
+        
+        let id_crm=null;
+        // Realizar la solicitud HTTP a la API externa usando HttpService
+        try {
+            const response = await axios.post('https://heladeria2.od2.vtiger.com/restapi/vtap/api/addPromotion',
+                body, {
+                headers: {
+                    'Authorization': auth,
+                    'Content-Type': 'application/json',  // Especificar que el cuerpo es JSON
+                },
+            });
+            id_crm = response.data.result.id;
+        } catch (error) {
+            if (error.response) {
+              // Si hay una respuesta del servidor
+              console.error('Error de la API externa:', error.response.data);
+            } else if (error.request) {
+              // Si no hubo respuesta
+              console.error('No se recibió respuesta de la API externa:', error.request);
+            } else {
+              // Otro error
+              console.error('Error en la solicitud:', error.message);
+            }
+        }
+       
+        const promoActualiza = await this.prisma.vi_promocion.update({
+            where: { id: newPromocion.id }, // Utiliza el 'id' como filtro para encontrar la promoción a actualizar.
+            data: {
+              id_crm: id_crm, // Aquí actualizas el campo 'id_crm' con el nuevo valor.
+            },
+        });
+
+        
+
     
         return updatedPromocion; // Retorna la nueva promoción con los productos asociados
     }
