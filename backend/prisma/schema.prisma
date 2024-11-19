@@ -2599,6 +2599,8 @@ model vi_producto {
   id_tipoproducto                 String?                           @db.VarChar(50)
   id_igv                          String?                           @db.VarChar(50)
   id_promocion                    String?                           @db.VarChar(50)
+  stockseguridad                  Int?
+  id_crm                          String?                           @db.VarChar(50)
   vi_combo_x_producto             vi_combo_x_producto[]
   vi_detallepedido                vi_detallepedido[]
   vi_detallepuntosacumulados      vi_detallepuntosacumulados[]
@@ -2652,7 +2654,7 @@ model vi_promocion {
   descripcion          String?            @db.VarChar(255)
   fechainicio          DateTime           @db.Date
   fechafin             DateTime           @db.Date
-  limitestock          Int
+  limitestock          Int?
   porcentajedescuento  Decimal?           @default(0) @db.Decimal(5, 2)
   desactivadoen        DateTime?          @db.Timestamp(6)
   creadoen             DateTime?          @default(now()) @db.Timestamp(6)
@@ -2661,6 +2663,7 @@ model vi_promocion {
   usuarioactualizacion String?            @db.VarChar(50)
   estaactivo           Boolean            @default(true)
   esvalido             Boolean
+  id_crm               String?            @db.VarChar(50)
   vi_detallepedido     vi_detallepedido[]
   vi_notificacion      vi_notificacion[]
   vi_producto          vi_producto[]
@@ -2865,6 +2868,7 @@ model vi_usuario {
   resettokenexpiracion                                   DateTime?                            @db.Timestamp(6)
   imagenperfil                                           String?
   puntosacumulados                                       Int?
+  id_crm                                                 String?                              @db.VarChar(50)
   marketing_campaigns_campanausuario                     marketing_campaigns_campanausuario[]
   vi_comentario                                          vi_comentario[]
   vi_direccion                                           vi_direccion[]

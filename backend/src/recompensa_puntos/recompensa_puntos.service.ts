@@ -72,5 +72,16 @@ export class Recompensa_PuntosService {
         },
         });
     }
+
+    //Para Usuario
+    
+    async getAllRecompensaPuntosWithProducto(): Promise<vi_recompensa_puntos[]> {
+        return await this.prisma.vi_recompensa_puntos.findMany({
+          where: {estaactivo: true},
+            include: {
+                vi_producto: true,
+            },
+        });
+    }
 }
 
