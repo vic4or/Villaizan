@@ -9,7 +9,16 @@ export class FrutaService {
     constructor(private prisma: PrismaService) {}
 
     async getAllFrutas(): Promise<vi_fruta[]> {
-        return await this.prisma.vi_fruta.findMany();
+        return await this.prisma.vi_fruta.findMany({
+            include: {
+                vi_producto_fruta: {
+                    include: {
+                        vi_producto: true,
+                    },
+                    where: { estaactivo: true },
+                },
+            },
+        });
     }
 
     async getFrutaById(id: string): Promise<vi_fruta> {

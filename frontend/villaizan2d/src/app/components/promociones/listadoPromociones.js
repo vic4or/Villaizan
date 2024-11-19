@@ -1,32 +1,69 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Form } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import * as XLSX from "xlsx";
+import axios from "axios";
 
 export default function ListadoPromociones() {
   const router = useRouter();
-  const [promociones, setPromociones] = useState([
+  /*const [promociones, setPromociones] = useState([
     { id: 1, nombre: "Helado gratis", tipo: "Oferta Especial", descripcion: "Obtén un 100% de descuento en un helado por día de fundación de helados Villizan", fechaInicio: "27/09/24", fechaFin: "27/10/24", descuento: "100%", estado: "Activo" },
     { id: 2, nombre: "50% de Descuento", tipo: "Paquete", descripcion: "Obtén un 30% de descuento en total por llevarte este paquete", fechaInicio: "28/09/24", fechaFin: "28/10/24", descuento: "30%", estado: "Activo" },
     { id: 3, nombre: "Combo Familiar", tipo: "Paquete", descripcion: "10% de descuento por llevar tres sabores diferentes", fechaInicio: "28/09/24", fechaFin: "28/10/24", descuento: "10%", estado: "Inactivo" },
     { id: 4, nombre: "Helado Natural", tipo: "Oferta Especial", descripcion: "Obtén un 50% de descuento por un helado por día de las frutas", fechaInicio: "29/09/24", fechaFin: "29/10/24", descuento: "50%", estado: "Activo" },
     { id: 5, nombre: "2x1 en helados en chocolate", tipo: "Descuento", descripcion: "Llévate 2 helados al 50% de descuento", fechaInicio: "30/09/24", fechaFin: "30/10/24", descuento: "50%", estado: "Activo" },
-  ]);
-
+  ]);*/
+  const [promociones, setPromociones] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewType, setViewType] = useState("Activo");
+  const [viewType, setViewType] = useState("activos");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTipo, setSelectedTipo] = useState("Todos");
   const itemsPerPage = 5;
 
+  // Llamada a la API para listar las promociones
+  useEffect(() => {
+    const fetchPromociones = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/promocion/listarTodos");
+        //const descuentosActivos = response.data.filter((promo) => promo.estado === "Activo"); // Filtrar promociones activas
+        setPromociones(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error al obtener las promociones:", error);
+      }
+    };
+    
+    fetchPromociones();
+  }, []);
+
+  // Función para eliminar una promoción
+  const handleDelete = async (id) => {
+    const confirmDelete = confirm("¿Está seguro de que desea eliminar esta promoción?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:3000/descuento/eliminar/${id}`);
+      // Actualizar la lista de promociones después de la eliminación
+      setPromociones(promociones.filter((promo) => promo.id !== id));
+      alert("Promoción eliminada exitosamente.");
+    } catch (error) {
+      console.error("Error al eliminar la promoción:", error);
+      alert("Error al eliminar la promoción. Intente nuevamente.");
+    }
+  };
+
   // Filtrado de promociones según el estado seleccionado (Activo/Inactivo) y tipo de promoción
   const filteredPromociones = promociones
-    .filter((item) => item.estado === viewType)
-    .filter((item) => item.nombre.toLowerCase().includes(searchTerm.toLowerCase())) // Búsqueda por nombre de promoción
+    .filter((item) => {
+      if (viewType === "activos") return item.estaactivo === true;
+      if (viewType === "inactivos") return item.estaactivo === false;
+      return true; // "todos" muestra todos los registros
+    })
+    .filter((item) => item.titulo.toLowerCase().includes(searchTerm.toLowerCase())) // Búsqueda por nombre de promoción
     .filter((item) => selectedTipo === "Todos" || item.tipo === selectedTipo); // Filtrado por tipo de promoción
 
   // Paginación
@@ -66,6 +103,14 @@ export default function ListadoPromociones() {
     XLSX.writeFile(workbook, "promociones_export.xlsx");
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // Asegúrate de que el día tenga dos dígitos
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses son indexados desde 0
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };  
+
   return (
     <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
       {/* Breadcrumb y Filtro de Activos/Inactivos */}
@@ -81,35 +126,20 @@ export default function ListadoPromociones() {
         <Col>
           <ButtonGroup>
             <Button
-              variant={viewType === "Activo" ? "danger" : "outline-danger"}
-              style={{
-                backgroundColor: viewType === "Activo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                borderColor: "rgba(230, 57, 70, 0.6)",
-                color: viewType === "Activo" ? "#fff" : "rgba(230, 57, 70, 0.8)",
-              }}
-              onClick={() => setViewType("Activo")}
+              variant={viewType === "activos" ? "danger" : "outline-danger"}
+              onClick={() => setViewType("activos")}
             >
               Activos
             </Button>
             <Button
-              variant={viewType === "Inactivo" ? "danger" : "outline-danger"}
-              style={{
-                backgroundColor: viewType === "Inactivo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                borderColor: "rgba(230, 57, 70, 0.6)",
-                color: viewType === "Inactivo" ? "#fff" : "rgba(230, 57, 70, 0.8)",
-              }}
-              onClick={() => setViewType("Inactivo")}
+              variant={viewType === "inactivos" ? "danger" : "outline-danger"}
+              onClick={() => setViewType("inactivos")}
             >
               Inactivos
             </Button>
             <Button
-              variant={viewType === "Todos" ? "danger" : "outline-danger"}
-              style={{
-                  backgroundColor: viewType === "Inactivo" ? "rgba(230, 57, 70, 0.8)" : "transparent",
-                  borderColor: "rgba(230, 57, 70, 0.6)",
-                  color: viewType === "Todos" ? "#fff" : "rgba(230, 57, 70, 0.8)",
-              }}
-              onClick={() => setViewType("Todos")}
+              variant={viewType === "todos" ? "danger" : "outline-danger"}
+              onClick={() => setViewType("todos")}
           >
               Todos
           </Button>
@@ -128,21 +158,12 @@ export default function ListadoPromociones() {
             />
           </InputGroup>
         </Col>
-        <Col md={4}>
-          <Form.Select value={selectedTipo} onChange={(e) => setSelectedTipo(e.target.value)}>
-            <option value="Todos">Todos los tipos</option>
-            <option value="Oferta Especial">Oferta Especial</option>
-            <option value="Paquete">Paquete</option>
-            <option value="Descuento">Descuento</option>
-          </Form.Select>
-        </Col>
       </Row>
 
       {/* Barra de Acciones */}
       <Row className="mb-4">
         <Col md={8}></Col>
         <Col md={4} className="d-flex justify-content-end align-items-start">
-          <Button variant="outline-secondary" className="me-2">Filtrar</Button>
           <Button variant="danger" className="me-2" onClick={handleAddNew}>+ Agregar</Button>
           <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
         </Col>
@@ -164,12 +185,11 @@ export default function ListadoPromociones() {
         <tbody>
           {currentItems.map((item) => (
             <tr key={item.id}>
-              <td>{item.nombre}</td>
-              <td>{item.tipo}</td>
+              <td>{item.titulo}</td>
               <td>{item.descripcion}</td>
-              <td>{item.fechaInicio}</td>
-              <td>{item.fechaFin}</td>
-              <td>{item.descuento}</td>
+              <td>{formatDate(item.fechainicio)}</td>
+              <td>{formatDate(item.fechafin)}</td>
+              <td>{item.porcentajedescuento}</td>
               <td className="text-center">
                 {/* Botones de Edición y Eliminación */}
                 <Link href={`/pages/promociones/editar/?id=${item.id}`} key={item.id}>
@@ -180,7 +200,7 @@ export default function ListadoPromociones() {
                 <Button
                   variant="outline-danger"
                   size="sm"
-                  onClick={() => alert(`Eliminando ${item.nombre}`)}
+                  onClick={() => handleDelete(item.id)}
                 >
                   <FaTrashAlt /> 
                 </Button>

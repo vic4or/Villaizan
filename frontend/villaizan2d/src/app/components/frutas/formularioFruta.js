@@ -2,15 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Container, InputGroup, FormControl, Table, Modal, Alert } from "react-bootstrap";
-import { useRouter, useSearchParams } from "next/navigation";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { FaTrashAlt } from "react-icons/fa";
 import axios from "axios";
 
-export default function FormularioFruta() {
+export default function FormularioFruta({ isEditMode, frutaId }) { 
+  console.log("Fruta ID:", frutaId); 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
-  const isEditMode = Boolean(id); // Determina si estamos en modo edición o creación
 
   const [initialValues, setInitialValues] = useState({
     nombre: "",
@@ -18,14 +16,17 @@ export default function FormularioFruta() {
     productos: [],
   });
 
-  const [productos, setProductos] = useState([]); // Estado para los productos cargados de la API
+  const [productos, setProductos] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [searchProduct, setSearchProduct] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formError, setFormError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Obtener productos al cargar el componente
+  const [productosParaAgregar, setProductosParaAgregar] = useState([]);
+  const [productosParaQuitar, setProductosParaQuitar] = useState([]);
+  const [hasChanges, setHasChanges] = useState(false); // Nuevo estado para rastrear cambios
+
   useEffect(() => {
     const fetchProductos = async () => {
       try {
@@ -41,27 +42,31 @@ export default function FormularioFruta() {
   }, []);
 
   useEffect(() => {
-    // Cargar datos de la fruta si estamos en modo edición
-    if (isEditMode) {
+    if (isEditMode && frutaId) {
       const fetchFrutaById = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/frutas/${id}`);
+          const response = await axios.patch(`http://localhost:3000/fruta/editar/${frutaId}`, {
+            nombre: "",
+            descripcion: "",
+            productosParaAgregar: [],
+            productosParaQuitar: []
+          });
           const fruta = response.data;
-
+  
           setInitialValues({
             nombre: fruta.nombre,
             descripcion: fruta.descripcion,
-            productos: fruta.productos,
+            productos: fruta.vi_producto_fruta,
           });
-          setSelectedProducts(fruta.productos);
+          setSelectedProducts(fruta.vi_producto_fruta || []);
         } catch (error) {
           console.error("Error al obtener la fruta:", error);
         }
       };
-
+  
       fetchFrutaById();
     }
-  }, [isEditMode, id]);
+  }, [isEditMode, frutaId]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -72,26 +77,40 @@ export default function FormularioFruta() {
       return;
     }
 
+    if (selectedProducts.length === 0) {
+      setFormError(true);
+      setErrorMessage("Debes añadir al menos un producto.");
+      return;
+    }
+
+    if (!hasChanges) {
+      alert("No se han realizado cambios.");
+      return;
+    }
+
     try {
+      const payload = {
+        nombre: initialValues.nombre,
+        descripcion: initialValues.descripcion,
+        productosParaAgregar,
+        productosParaQuitar,
+      };
+
       if (isEditMode) {
-        // Editar fruta existente
-        await axios.put(`http://localhost:3000/frutas/editar/${id}`, {
-          nombre: initialValues.nombre,
-          descripcion: initialValues.descripcion,
-          productos: selectedProducts,
-        });
+        await axios.patch(`http://localhost:3000/fruta/editar/${frutaId}`, payload);
       } else {
-        // Crear nueva fruta
-        await axios.post("http://localhost:3000/frutas/crear", {
-          nombre: initialValues.nombre,
-          descripcion: initialValues.descripcion,
-          productos: selectedProducts,
-        });
+        await axios.post("http://localhost:3000/fruta/registrar", payload);
       }
 
       setShowConfirmation(true);
       setFormError(false);
       setErrorMessage("");
+      setHasChanges(false); // Resetear cambios después de guardar
+
+      setTimeout(() => {
+        setShowConfirmation(false);
+        router.push("/pages/frutas/lista");
+      }, 3000);
     } catch (error) {
       console.error("Error al guardar la fruta:", error);
       setFormError(true);
@@ -104,22 +123,51 @@ export default function FormularioFruta() {
   };
 
   const handleAddProduct = (product) => {
-    if (product && !selectedProducts.includes(product)) {
+    if (product && !selectedProducts.some((p) => p.id === product.id)) {
       setSelectedProducts([...selectedProducts, product]);
+      setProductosParaAgregar([...productosParaAgregar, product.id]);
+
+      // Remover de productos para quitar si estaba antes seleccionado
+      setProductosParaQuitar(productosParaQuitar.filter((id) => id !== product.id));
       setSearchProduct("");
+      setHasChanges(true); // Marca que se ha hecho un cambio
     }
   };
 
   const handleRemoveProduct = (product) => {
-    setSelectedProducts(selectedProducts.filter((item) => item !== product));
+    // Filtrar el producto eliminado de la lista de productos seleccionados usando id_producto
+    setSelectedProducts((prevSelectedProducts) => 
+      prevSelectedProducts.filter((item) => item.id_producto !== product.id_producto)
+    );
+
+    console.log("Eliminando producto:", product.id);
+    console.log("Productos seleccionados antes de eliminar:", selectedProducts);
+
+  
+    // Si el producto no estaba previamente en productosParaQuitar, añadirlo
+    if (!productosParaQuitar.includes(product.id_producto)) {
+      setProductosParaQuitar((prevProductosParaQuitar) => [
+        ...prevProductosParaQuitar,
+        product.id_producto,
+      ]);
+    }
+  
+    // Remover de productosParaAgregar si fue añadido recién
+    setProductosParaAgregar((prevProductosParaAgregar) =>
+      prevProductosParaAgregar.filter((id) => id !== product.id_producto)
+    );
+  
+    // Marcar que se ha hecho un cambio en el formulario
+    setHasChanges(true);
   };
+  
+
 
   const handleClose = () => {
     setShowConfirmation(false);
     router.push("/pages/frutas/lista");
   };
 
-  // Filtrar productos según el término de búsqueda
   const filteredProductos = productos.filter((producto) =>
     producto.nombre.toLowerCase().includes(searchProduct.toLowerCase())
   );
@@ -127,7 +175,6 @@ export default function FormularioFruta() {
   return (
     <>
       <div>
-        {/* Popup de confirmación */}
         <Modal show={showConfirmation} onHide={handleClose}>
           <Modal.Header closeButton>
             <Modal.Title>Confirmación</Modal.Title>
@@ -160,7 +207,6 @@ export default function FormularioFruta() {
             <Row className="mb-4">
               <Col md={6}>
                 <h4>Información general</h4>
-                {/* Nombre de la fruta */}
                 <Form.Group className="mb-3">
                   <Form.Label>Nombre de la Fruta</Form.Label>
                   <Form.Control
@@ -168,12 +214,14 @@ export default function FormularioFruta() {
                     placeholder="Nombre de la fruta"
                     className="form-control-custom"
                     value={initialValues.nombre}
-                    onChange={(e) => setInitialValues({ ...initialValues, nombre: e.target.value })}
+                    onChange={(e) => {
+                      setInitialValues({ ...initialValues, nombre: e.target.value });
+                      setHasChanges(true);
+                    }}
                     required
                   />
                 </Form.Group>
 
-                {/* Descripción de la fruta */}
                 <Form.Group className="mb-3">
                   <Form.Label>Descripción</Form.Label>
                   <Form.Control
@@ -182,13 +230,15 @@ export default function FormularioFruta() {
                     placeholder="Descripción de la fruta..."
                     className="form-control-custom"
                     value={initialValues.descripcion}
-                    onChange={(e) => setInitialValues({ ...initialValues, descripcion: e.target.value })}
+                    onChange={(e) => {
+                      setInitialValues({ ...initialValues, descripcion: e.target.value });
+                      setHasChanges(true);
+                    }}
                     required
                   />
                 </Form.Group>
               </Col>
 
-              {/* Sección de Productos */}
               <Col md={6}>
                 <h4>Agregar productos</h4>
                 <InputGroup className="mb-3">
@@ -197,20 +247,18 @@ export default function FormularioFruta() {
                     value={searchProduct}
                     onChange={handleProductSearch}
                   />
-                  <Button variant="outline-secondary" onClick={() => handleAddProduct(searchProduct)}>Agregar</Button>
                 </InputGroup>
 
-                {/* Lista de productos filtrados */}
                 {searchProduct && (
                   <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px' }}>
                     {filteredProductos.map((product) => (
                       <div
                         key={product.id}
-                        onClick={() => handleAddProduct(product.nombre)}
+                        onClick={() => handleAddProduct(product)}
                         style={{
                           padding: '8px',
                           cursor: 'pointer',
-                          backgroundColor: selectedProducts.includes(product.nombre) ? '#f0f0f0' : 'white'
+                          backgroundColor: selectedProducts.some((p) => p.id === product.id) ? '#f0f0f0' : 'white'
                         }}
                       >
                         {product.nombre}
@@ -228,17 +276,28 @@ export default function FormularioFruta() {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedProducts.map((product, index) => (
-                      <tr key={index}>
-                        <td>{product}</td>
-                        <td>
-                          <Button variant="outline-danger" size="sm" onClick={() => handleRemoveProduct(product)}>
-                            <FaTrashAlt />
-                          </Button>
+                  {selectedProducts.length > 0 ? (
+                    selectedProducts.map((product) => (
+                      <tr key={product.id}>
+                      <td>{product.vi_producto?.nombre || product.nombre || "Producto sin nombre"}</td>
+                      <td>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleRemoveProduct(product)}
+                      >
+                        <FaTrashAlt />
+                      </Button>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="2">No hay productos seleccionados</td>
+                    </tr>
+                  )}
+                </tbody>
+
                 </Table>
               </Col>
             </Row>
@@ -249,7 +308,6 @@ export default function FormularioFruta() {
               </Alert>
             )}
 
-            {/* Botones para guardar y cancelar */}
             <div className="d-flex justify-content-end button-group">
               <Button variant="danger" type="submit" className="btn-custom me-2">
                 {isEditMode ? "ACTUALIZAR" : "GUARDAR"}
