@@ -1,42 +1,65 @@
 "use client";
 
 import Image from 'next/image';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../NavMenu/NavMenu';
 
 interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  discount?: number;
-  tags: string[];
+  id_recompensa: number;
+  puntosnecesarios: number;
+  vi_producto: {
+    id: string;
+    nombre: string;
+    precioecommerce: string;
+    urlimagen: string;
+    descripcion: string;
+  };
 }
-
-const products: Product[] = [
-  {
-    id: 1,
-    name: 'Paleta de Piña',
-    price: 2,
-    image: '/api/placeholder/300/300',
-    discount: 25,
-    tags: ['Paleta', 'Rellenos de Leche']
-  },
-  {
-    id: 2,
-    name: 'Paleta de Coco',
-    price: 2,
-    image: '/api/placeholder/300/300',
-    tags: ['Paleta', 'Rellenos de Leche']
-  },
-  // ...otros productos
-];
 
 const CatalogoProductosSuma: React.FC = () => {
   const router = useRouter();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [userPoints, setUserPoints] = useState<number>(200); // Puntos iniciales del usuario
+  const [selectedProducts, setSelectedProducts] = useState<{ [key: string]: number }>({}); // Productos seleccionados
 
-  const handleComprar = () => {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/recompensa_puntos/listarTodosProducto');
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleAddProduct = (productId: string, puntosNecesarios: number) => {
+    if (userPoints >= puntosNecesarios) {
+      setSelectedProducts((prev) => ({
+        ...prev,
+        [productId]: (prev[productId] || 0) + 1,
+      }));
+      setUserPoints((prev) => prev - puntosNecesarios);
+    } else {
+      alert('No tienes suficientes puntos para añadir este producto.');
+    }
+  };
+
+  const handleRemoveProduct = (productId: string, puntosNecesarios: number) => {
+    if (selectedProducts[productId] > 0) {
+      setSelectedProducts((prev) => ({
+        ...prev,
+        [productId]: prev[productId] - 1,
+      }));
+      setUserPoints((prev) => prev + puntosNecesarios);
+    }
+  };
+
+  const handleCanjear = () => {
     router.push('/carrito');
   };
 
@@ -63,8 +86,8 @@ const CatalogoProductosSuma: React.FC = () => {
         <button className="flex items-center space-x-2 px-4 py-2 bg-white rounded shadow">
           <span className="text-black">Filtrar por categoría</span>
         </button>
-        <button className="px-8 py-2 bg-red-600 text-white rounded" onClick={handleComprar}>
-          Comprar
+        <button className="px-8 py-2 bg-red-600 text-white rounded" onClick={handleCanjear}>
+          Canjear
         </button>
         <div className="relative">
           <input
@@ -88,38 +111,47 @@ const CatalogoProductosSuma: React.FC = () => {
         </div>
       </div>
 
+      {/* User Points */}
+      <div className="container mx-auto px-4 mb-8">
+        <h2 className="text-2xl font-semibold text-black">Puntos disponibles: {userPoints}</h2>
+      </div>
+
       {/* Products Grid */}
       <div className="container mx-auto px-4 mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
             <div
-              key={product.id}
+              key={product.id_recompensa}
               className="bg-white rounded-lg shadow-md overflow-hidden relative"
             >
-              {product.discount && (
-                <div className="absolute top-2 right-2 bg-pink-500 text-white text-sm px-2 py-1 rounded-full">
-                  -{product.discount}%
-                </div>
-              )}
               <div className="p-4">
-                <img
-                  src={product.image}
-                  alt={product.name}
+                <Image
+                  src={product.vi_producto.urlimagen}
+                  alt={product.vi_producto.nombre}
+                  width={300}
+                  height={300}
                   className="w-full h-48 object-cover rounded-lg"
+                  onError={(e) => (e.currentTarget.src = '/images/defaultImage.png')} // Cargar una imagen predeterminada en caso de error
                 />
-                <h3 className="mt-4 text-lg font-semibold text-black">{product.name}</h3>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {product.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-gray-100 text-sm rounded-full text-black"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <h3 className="mt-4 text-lg font-semibold text-black">{product.vi_producto.nombre}</h3>
+                <p className="mt-2 text-black">{product.vi_producto.descripcion}</p>
                 <div className="mt-4 flex justify-between items-center">
-                  <span className="text-lg font-bold text-black">S/ {product.price}</span>
+                  <span className="text-lg font-bold text-black">Puntos: {product.puntosnecesarios}</span>
+                </div>
+                <div className="mt-4 flex items-center space-x-4">
+                  <button
+                    className="px-4 py-2 bg-red-500 text-white rounded"
+                    onClick={() => handleRemoveProduct(product.vi_producto.id, product.puntosnecesarios)}
+                  >
+                    -
+                  </button>
+                  <span className="text-lg text-black">{selectedProducts[product.vi_producto.id] || 0}</span>
+                  <button
+                    className="px-4 py-2 bg-green-500 text-white rounded"
+                    onClick={() => handleAddProduct(product.vi_producto.id, product.puntosnecesarios)}
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             </div>
@@ -171,5 +203,9 @@ const CatalogoProductosSuma: React.FC = () => {
 };
 
 export default CatalogoProductosSuma;
+
+
+
+
 
 
