@@ -60,7 +60,7 @@ const CatalogoProductosSuma: React.FC = () => {
   };
 
   const handleCanjear = () => {
-    router.push('/carrito');
+    router.push('/pages/carrito');
   };
 
   return (
