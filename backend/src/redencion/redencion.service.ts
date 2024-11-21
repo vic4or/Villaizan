@@ -11,14 +11,15 @@ export class RedencionService {
     // Pantallas administrador
     async getAllRedenciones(): Promise<vi_redencion[]> {
         return await this.prisma.vi_redencion.findMany({
-            where: { estaactivo: true },
             include: {
                 vi_detalleredencion: {
                     include: {
                         vi_producto: true,
                     },
-                    where: { estaactivo: true },
                 },
+                vi_usuario: {
+                    include: { vi_persona: true },
+                }
             },
             orderBy: { fechageneracion: 'desc' },
         });
