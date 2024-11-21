@@ -67,19 +67,12 @@ export default function Home() {
                   <h3>Gestión de Puntos</h3>
                   <p>Administra los puntos asignados por la compra de cada producto</p>
                 </div>
-                <div className="card" onClick={() => handleClick("Gestión de Códigos")}>  
+                <div className="card" onClick={() => window.location.href='/pages/canjes/lista'}>  
                   <div className="icon-container">
                     <Icon name="percent" />
                   </div>
                   <h3>Gestión de Canjes</h3>
                   <p>Administra los códigos generados por los clientes para canjear recompensas</p>
-                </div>
-                <div className="card" onClick={() => window.location.href='/pages/notificaciones/lista'}>  
-                  <div className="icon-container">
-                    <Icon name="bell" />
-                  </div>
-                  <h3>Gestión de Notificaciones</h3>
-                  <p>Gestiona el envío de notificaciones sobre promociones y la programación de las notificaciones</p>
                 </div>
                 <div className="card" onClick={() => window.location.href='/pages/multimedia/lista'}>  
                   <div className="icon-container">

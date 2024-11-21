@@ -46,8 +46,8 @@ export default function ListadoRecompensas() {
     // Filtrar recompensas según el estado seleccionado (Activos, Inactivos, Todos) y búsqueda por nombre de producto
     const filteredRecompensas = recompensas
         .filter((item) => {
-            if (viewType === "activos") return item.estado === true;
-            if (viewType === "inactivos") return item.estado === false;
+            if (viewType === "activos") return item.estaactivo === true;
+            if (viewType === "inactivos") return item.estaactivo === false;
             return true; // "todos" muestra todos los registros
         })
         .filter((item) => {
@@ -126,7 +126,7 @@ export default function ListadoRecompensas() {
     };
 
     const handleDelete = (recompensa) => {
-        if (recompensa.estado) {
+        if (recompensa.estaactivo) {
             // Si la recompensa está activa, abrir el modal de confirmación para inactivarla
             setSelectedRecompensa(recompensa);
             setShowConfirmDeleteModal(true);
@@ -137,11 +137,11 @@ export default function ListadoRecompensas() {
     const confirmDelete = async () => {
         try {
             // Solo inactivar si la recompensa seleccionada está actualmente activa
-            if (selectedRecompensa && selectedRecompensa.estado) {
+            if (selectedRecompensa && selectedRecompensa.estaactivo) {
                 await axios.put(`http://localhost:3000/recompensa_puntos/inactivar/${parseInt(selectedRecompensa.id_recompensa)}`);
                 const updatedRecompensas = recompensas.map((item) =>
                     item.id_recompensa === selectedRecompensa.id_recompensa
-                    ? { ...item, estado: false }
+                    ? { ...item, estaactivo: false }
                     : item
                 );
                 setRecompensas(updatedRecompensas);
@@ -260,11 +260,11 @@ export default function ListadoRecompensas() {
 
                                 <td className="text-center">
                                     <Button 
-                                        variant={item.estado ? "success" : "danger"} 
+                                        variant={item.estaactivo ? "success" : "danger"} 
                                         size="sm" 
                                         onClick={() => handleDelete(item)} // Llama a handleDelete solo si está activo
                                     >
-                                        {item.estado ? "Activo" : "Inactivo"}
+                                        {item.estaactivo ? "Activo" : "Inactivo"}
                                     </Button>
                                 </td>
                             </tr>
