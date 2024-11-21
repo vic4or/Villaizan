@@ -7,9 +7,12 @@ import { Recompensa_PuntosModule } from './recompensa_puntos/recompensa_puntos.m
 import { DescuentoModule } from './descuento/descuento.module';
 import { ComboModule } from './combo/combo.module';
 import { PromocionModule } from './promocion/promocion.module';
+import { RedencionModule } from './redencion/redencion.module';
+import { PuntosAcumuladosModule } from './puntosacumulados/puntosacumulados.module';
 
 @Module({
-  imports: [ProductoModule, Puntos_ProductoModule, FrutaModule, ContenidoEducativoModule, Recompensa_PuntosModule, DescuentoModule, ComboModule, PromocionModule],
+  imports: [ProductoModule, Puntos_ProductoModule, FrutaModule, ContenidoEducativoModule, Recompensa_PuntosModule, DescuentoModule, ComboModule, 
+    PromocionModule,RedencionModule, PuntosAcumuladosModule],
   controllers: [],
   providers: [],
 })
