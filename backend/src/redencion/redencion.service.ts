@@ -113,9 +113,9 @@ export class RedencionService {
               fechageneracion: fecha_generacion,
               fechaexpiracion: fecha_expiracion,
               codigo: data.codigo,
-              estado: "Creado",
+              estado: "Por canjear",
               //usuariocreacion: data.usuariocreacion,
-              usuariocreacion: "admin",
+              usuariocreacion: "admin", //TODO: Cambiar por usuario logueado
             },
           });
           
@@ -135,7 +135,7 @@ export class RedencionService {
                 puntosredencion: detalle.puntosredencion,
                 cantidad: detalle.cantidad,
                 subtotalpuntosredencion: detalle.subtotalpuntosredencion,
-                usuariocreacion: detalle.usuariocreacion,
+                usuariocreacion: "admin", //TODO: Cambiar por usuario logueado
               },
             });
           }
