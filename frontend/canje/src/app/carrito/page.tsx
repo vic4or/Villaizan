@@ -6,69 +6,58 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
 
 interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  puntosNecesarios: number;
+  id_recompensa: number;
+  id_producto: string;
+  puntosredencion: number;
+  cantidad: number;
+  subtotalpuntosredencion: number;
+  nombre: string;
 }
 
 const Carrito: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [userPoints, setUserPoints] = useState<number>(200); // Puntos iniciales del usuario
-  
+  const [userPoints, setUserPoints] = useState<number>(0);
+  const [codigo, setCodigo] = useState<string>('');
+
   useEffect(() => {
-    const products = JSON.parse(searchParams.get('products') || '[]');
-    const points = parseInt(searchParams.get('userPoints') || '0', 10);
-    
-    // Aquí deberías obtener los detalles completos de cada producto usando el ID
-    // Por ahora, usaremos datos ficticios para ilustrar
-    const fetchedCartItems = products.map((product: any) => ({
-      id: product.id,
-      name: `Producto ${product.id}`,
-      price: 10, // Precio ficticio
-      quantity: product.quantity,
-      image: '/images/defaultImage.png',
-      puntosNecesarios: 20 // Puntos necesarios ficticios
-    }));
-    
-    setCartItems(fetchedCartItems);
-    setUserPoints(points);
+    const dataString = searchParams.get('data');
+    if (dataString) {
+      const data = JSON.parse(dataString);
+      console.log('Datos recibidos:', data);
+      setCartItems(data.detalles || []);
+      setUserPoints(data.puntoscanjeado || 0);
+      setCodigo(data.codigo || '');
+    }
   }, [searchParams]);
 
-  const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+  const handleCheckout = async () => {
+    const dataToSend = {
+      id_usuario: 'us_256de824',
+      puntoscanjeado: userPoints,
+      codigo: codigo,
+      detalles: cartItems,
+    };
 
-  const handleIncrement = (id: string) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  };
-
-  const handleDecrement = (id: string) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
-  };
-
-  const handleRemove = (id: string) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
-  };
-
-  const subtotal = calculateSubtotal();
-
-  const handleCheckout = () => {
-    router.push('/checkout');
+    try {
+      const response = await fetch('http://localhost:3000/redencion/cliente/crear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSend)
+      });
+      if (response.ok) {
+        alert('Redención exitosa!');
+        router.push('/success'); // Puedes redirigir a una página de éxito
+      } else {
+        alert('Error en la redención');
+      }
+    } catch (error) {
+      console.error('Error en la redención:', error);
+      alert('Error en la redención');
+    }
   };
 
   return (
@@ -93,30 +82,18 @@ const Carrito: React.FC = () => {
           <h1 className="text-3xl font-bold mb-6 text-black">Carrito de Compras</h1>
           
           <div className="bg-white p-4 rounded-lg shadow mb-6">
-            <div className="grid grid-cols-6 font-bold border-b pb-2 mb-4">
-              <span className="text-center">Imagen</span>
+            <div className="grid grid-cols-4 font-bold border-b pb-2 mb-4">
               <span className="text-center">Producto</span>
-              <span className="text-center">Precio</span>
+              <span className="text-center">Puntos</span>
               <span className="text-center">Cantidad</span>
               <span className="text-center">Subtotal</span>
-              <span className="text-center">Acciones</span>
             </div>
             {cartItems.map((item) => (
-              <div key={item.id} className="grid grid-cols-6 items-center mb-4 text-black">
-                <div className="flex justify-center">
-                  <Image src={item.image} alt={item.name} width={100} height={100} className="rounded-lg" />
-                </div>
-                <span className="text-center text-lg font-semibold">{item.name}</span>
-                <span className="text-center text-lg font-bold">S/ {item.price}</span>
-                <div className="flex justify-center items-center">
-                  <button onClick={() => handleDecrement(item.id)} className="text-xl px-2">-</button>
-                  <span className="text-lg font-bold">{item.quantity}</span>
-                  <button onClick={() => handleIncrement(item.id)} className="text-xl px-2">+</button>
-                </div>
-                <span className="text-center text-lg font-bold">S/ {item.price * item.quantity}</span>
-                <div className="flex justify-center">
-                  <button onClick={() => handleRemove(item.id)} className="ml-4 text-red-600 text-2xl">🗑️</button>
-                </div>
+              <div key={item.id_producto} className="grid grid-cols-4 items-center mb-4 text-black">
+                <span className="text-center text-lg font-semibold">{item.nombre}</span>
+                <span className="text-center text-lg font-bold">{item.puntosredencion}</span>
+                <span className="text-center text-lg font-bold">{item.cantidad}</span>
+                <span className="text-center text-lg font-bold">{item.subtotalpuntosredencion}</span>
               </div>
             ))}
           </div>
@@ -124,16 +101,12 @@ const Carrito: React.FC = () => {
         
         <div className="w-1/4 ml-6 bg-white p-4 rounded-lg shadow self-start">
           <div className="flex justify-between mb-2 text-lg text-black">
-            <span>Puntos disponibles:</span>
+            <span>Puntos canjeados:</span>
             <span>{userPoints}</span>
           </div>
-          <div className="flex justify-between mb-2 text-lg text-black">
-            <span>Subtotal:</span>
-            <span>S/ {subtotal.toFixed(2)}</span>
-          </div>
           <div className="flex justify-between font-bold text-xl mb-4 text-black">
-            <span>Total:</span>
-            <span>S/ {subtotal.toFixed(2)}</span>
+            <span>Total Puntos:</span>
+            <span>{userPoints}</span>
           </div>
           <button 
             onClick={handleCheckout} 
@@ -151,7 +124,7 @@ const Carrito: React.FC = () => {
               <h4 className="font-bold mb-4 text-black">Helados Villaizan</h4>
             </div>
             <div>
-              <h4 className="font-bold           mb-4 text-black">Links</h4>
+              <h4 className="font-bold mb-4 text-black">Links</h4>
               <ul className="space-y-2">
                 <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Carro</a></li>
                 <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Catálogo</a></li>
@@ -179,6 +152,7 @@ const Carrito: React.FC = () => {
 };
 
 export default Carrito;
+
 
 
 

@@ -18,6 +18,23 @@ interface Product {
   };
 }
 
+// Función para generar un código aleatorio de 3 letras y 5 números
+const generateRandomCode = () => {
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
+  let result = '';
+  
+  for (let i = 0; i < 3; i++) {
+    result += letters.charAt(Math.floor(Math.random() * letters.length));
+  }
+  
+  for (let i = 0; i < 6; i++) {
+    result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+  }
+
+  return result;
+};
+
 const CatalogoProductosSuma: React.FC = () => {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
@@ -61,15 +78,31 @@ const CatalogoProductosSuma: React.FC = () => {
   };
 
   const handleCanjear = () => {
-    const selectedProductsData = Object.entries(selectedProducts).map(([id, quantity]) => ({
-      id,
-      quantity,
-    }));
+    const selectedProductsData = Object.entries(selectedProducts).map(([id, quantity]) => {
+      const product = products.find(p => p.vi_producto.id === id);
+      if (product) {
+        return {
+          id_recompensa: product.id_recompensa,
+          id_producto: product.vi_producto.id,
+          puntosredencion: product.puntosnecesarios,
+          cantidad: quantity,
+          subtotalpuntosredencion: product.puntosnecesarios * quantity,
+          //nombre: product.vi_producto.nombre,
+        };
+      }
+      return null;
+    }).filter(item => item !== null);
+
+    const dataToSend = {
+      id_usuario: "us-256de824",
+      puntoscanjeado: selectedProductsData.reduce((sum, product) => sum + (product ? product.subtotalpuntosredencion : 0), 0),
+      codigo: generateRandomCode(),
+      detalles: selectedProductsData,
+    };
 
     // Convertimos los datos a una cadena de consulta (query string)
     const queryString = new URLSearchParams({
-      products: JSON.stringify(selectedProductsData),
-      userPoints: userPoints.toString(),
+      data: JSON.stringify(dataToSend)
     }).toString();
 
     // Navegar a la página de carrito con los productos y los puntos en la URL
@@ -187,6 +220,7 @@ const CatalogoProductosSuma: React.FC = () => {
         <button className="px-4 py-2 bg-gray-200 rounded">3</button>
         <button className="px-4 py-2 bg-gray-200 rounded">Next</button>
       </div>
+
       {/* Footer */}
       <footer className="bg-white py-8">
         <div className="container mx-auto px-4">
