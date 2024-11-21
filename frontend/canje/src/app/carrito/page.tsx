@@ -1,53 +1,71 @@
 "use client";
 
 import Image from 'next/image';
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import NavMenu from '../NavMenu/NavMenu';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import NavMenu from '../components/NavMenu/NavMenu';
 
 interface CartItem {
-  id: number;
+  id: string;
   name: string;
   price: number;
   quantity: number;
   image: string;
-  discount?: number;
+  puntosNecesarios: number;
 }
-
-const cartItems: CartItem[] = [
-  {
-    id: 1,
-    name: 'Helado de Mango',
-    price: 2,
-    quantity: 10,
-    image: '/api/placeholder/300/300',
-    discount: 5,
-  },
-  {
-    id: 2,
-    name: 'Helado de Coco',
-    price: 2,
-    quantity: 5,
-    image: '/api/placeholder/300/300',
-  },
-];
 
 const Carrito: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [userPoints, setUserPoints] = useState<number>(200); // Puntos iniciales del usuario
+  
+  useEffect(() => {
+    const products = JSON.parse(searchParams.get('products') || '[]');
+    const points = parseInt(searchParams.get('userPoints') || '0', 10);
+    
+    // Aquí deberías obtener los detalles completos de cada producto usando el ID
+    // Por ahora, usaremos datos ficticios para ilustrar
+    const fetchedCartItems = products.map((product: any) => ({
+      id: product.id,
+      name: `Producto ${product.id}`,
+      price: 10, // Precio ficticio
+      quantity: product.quantity,
+      image: '/images/defaultImage.png',
+      puntosNecesarios: 20 // Puntos necesarios ficticios
+    }));
+    
+    setCartItems(fetchedCartItems);
+    setUserPoints(points);
+  }, [searchParams]);
 
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const calculateDiscount = () => {
-    return cartItems.reduce((total, item) => {
-      return item.discount ? total + item.price * item.quantity * (item.discount / 100) : total;
-    }, 0);
+  const handleIncrement = (id: string) => {
+    setCartItems(prevItems =>
+      prevItems.map(item =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+
+  const handleDecrement = (id: string) => {
+    setCartItems(prevItems =>
+      prevItems.map(item =>
+        item.id === id && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
+    );
+  };
+
+  const handleRemove = (id: string) => {
+    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
   };
 
   const subtotal = calculateSubtotal();
-  const discount = calculateDiscount();
-  const total = subtotal - discount;
 
   const handleCheckout = () => {
     router.push('/checkout');
@@ -75,7 +93,7 @@ const Carrito: React.FC = () => {
           <h1 className="text-3xl font-bold mb-6 text-black">Carrito de Compras</h1>
           
           <div className="bg-white p-4 rounded-lg shadow mb-6">
-            <div className="grid grid-cols-5 font-bold border-b pb-2 mb-4">
+            <div className="grid grid-cols-6 font-bold border-b pb-2 mb-4">
               <span className="text-center">Imagen</span>
               <span className="text-center">Producto</span>
               <span className="text-center">Precio</span>
@@ -84,16 +102,20 @@ const Carrito: React.FC = () => {
               <span className="text-center">Acciones</span>
             </div>
             {cartItems.map((item) => (
-              <div key={item.id} className="grid grid-cols-5 items-center mb-4 text-black">
+              <div key={item.id} className="grid grid-cols-6 items-center mb-4 text-black">
                 <div className="flex justify-center">
                   <Image src={item.image} alt={item.name} width={100} height={100} className="rounded-lg" />
                 </div>
                 <span className="text-center text-lg font-semibold">{item.name}</span>
                 <span className="text-center text-lg font-bold">S/ {item.price}</span>
-                <span className="text-center text-lg font-bold">{item.quantity}</span>
+                <div className="flex justify-center items-center">
+                  <button onClick={() => handleDecrement(item.id)} className="text-xl px-2">-</button>
+                  <span className="text-lg font-bold">{item.quantity}</span>
+                  <button onClick={() => handleIncrement(item.id)} className="text-xl px-2">+</button>
+                </div>
                 <span className="text-center text-lg font-bold">S/ {item.price * item.quantity}</span>
                 <div className="flex justify-center">
-                  <button className="ml-4 text-red-600 text-2xl">🗑️</button>
+                  <button onClick={() => handleRemove(item.id)} className="ml-4 text-red-600 text-2xl">🗑️</button>
                 </div>
               </div>
             ))}
@@ -102,16 +124,16 @@ const Carrito: React.FC = () => {
         
         <div className="w-1/4 ml-6 bg-white p-4 rounded-lg shadow self-start">
           <div className="flex justify-between mb-2 text-lg text-black">
+            <span>Puntos disponibles:</span>
+            <span>{userPoints}</span>
+          </div>
+          <div className="flex justify-between mb-2 text-lg text-black">
             <span>Subtotal:</span>
             <span>S/ {subtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between mb-2 text-lg text-black">
-            <span>Descuento:</span>
-            <span>-S/ {discount.toFixed(2)}</span>
-          </div>
           <div className="flex justify-between font-bold text-xl mb-4 text-black">
             <span>Total:</span>
-            <span>S/ {total.toFixed(2)}</span>
+            <span>S/ {subtotal.toFixed(2)}</span>
           </div>
           <button 
             onClick={handleCheckout} 
@@ -129,7 +151,7 @@ const Carrito: React.FC = () => {
               <h4 className="font-bold mb-4 text-black">Helados Villaizan</h4>
             </div>
             <div>
-              <h4 className="font-bold mb-4 text-black">Links</h4>
+              <h4 className="font-bold           mb-4 text-black">Links</h4>
               <ul className="space-y-2">
                 <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Carro</a></li>
                 <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Catálogo</a></li>
@@ -157,6 +179,8 @@ const Carrito: React.FC = () => {
 };
 
 export default Carrito;
+
+
 
 
 
