@@ -12,6 +12,7 @@ export default function Menu() {
       style={{
         position: "fixed",
         height: "100vh",
+        width: "80px", 
         background: "linear-gradient(to bottom, #e63946, #b2182b)",
         display: "flex",
         flexDirection: "column",
@@ -37,74 +38,6 @@ export default function Menu() {
         </Link>
       </div>
 
-      {/* Menú de iconos */}
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "20px",
-        alignItems: "center",
-        width: "100%",
-        paddingLeft: "0",
-        zIndex: "10000"
-      }}>
-      {/*
-        <Link href="/">
-          <div style={menuItemStyle} title="Inicio">
-            <FaHome size="24px" style={{ color: "#000" }} />
-          </div>
-        </Link>
-
-        {/* Recompensas */}
-        {/*<Link href="/pages/recompensas/lista">
-          <div style={menuItemStyle} title="Recompensas">
-            <FaGift size="24px" style={{ color: "#000" }} />
-          </div>
-        </Link>*/}
-
-        {/* Puntos */}
-        {/*<Link href="/pages/puntos/lista">
-          <div style={menuItemStyle} title="Puntos">
-            <FaCreditCard size="24px" style={{ color: "#000" }} />
-          </div>
-        </Link>*/}
-
-        {/* Canje */}
-        {/*<Link href="/pages/canje/lista">
-          <div style={menuItemStyle} title="Canje">
-            <CiBarcode size="24px" style={{ color: "#000" }} />
-          </div>
-        </Link>*/}
-
-        {/* Notificaciones */}
-        {/*<Link href="/pages/notificaciones/lista">
-          <div style={menuItemStyle} title="Notificaciones">
-            <FaBell size="24px" style={{ color: "#000" }} />
-            {isExpanded && <span style={textStyle}>Notificaciones</span>}
-          </div>
-        </Link>*/}
-
-        {/* Multimedia */}
-        {/*<Link href="/pages/multimedia/lista">
-          <div style={menuItemStyle} title="Multimedia">
-            <BsImage size="24px" style={{ color: "#000" }} />
-          </div>
-        </Link>*/}
-
-        {/* Promociones */}
-        {/*<Link href="/pages/promociones/lista">
-          <div style={menuItemStyle} title="Promociones">
-            <BiSolidDiscount size="24px" style={{ color: "#000" }} />
-          </div>
-
-        {/* Frutas */}
-        {/*<Link href="/pages/frutas/lista">
-          <div style={menuItemStyle} title="Frutas">
-            <FaAppleAlt size="24px" style={{ color: "#000" }} />
-          </div>
-        </Link>
-        */}
-      </div>
-
       {/* Cerrar sesión */}
       <Link href="/">
         <div style={menuItemStyle} title="Cerrar Sesión">
@@ -117,13 +50,13 @@ export default function Menu() {
 
 const menuItemStyle = {
   background: "#ffffff",
-  borderRadius: "12px",
-  padding: "12px",
+  borderRadius: "50%", 
+  padding: "16px", 
   cursor: "pointer",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: "100%",
-  zIndex: "999999"
+  width: "50px",
+  height: "50px", 
 };

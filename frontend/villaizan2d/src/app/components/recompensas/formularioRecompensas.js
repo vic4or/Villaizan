@@ -10,6 +10,10 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
   const [puntosnecesarios, setpuntosnecesarios] = useState('');
   const [error, setError] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredProductos, setFilteredProductos] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  
 
   // Obtener productos y recompensas al cargar el componente
   const fetchProductosYRecompensas = async () => {
@@ -30,6 +34,18 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
       fetchProductosYRecompensas();
     }
   }, [show]);
+  
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = productos.filter(producto =>
+        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProductos(filtered);
+    } else {
+      setFilteredProductos(productos);
+    }
+  }, [searchTerm, productos]);
+  
   
   // Función para limpiar el formulario
   const resetForm = () => {
@@ -109,6 +125,15 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
     handleModalClose();
   };
 
+  const dropdownStyle = {
+    maxHeight: '200px',
+    overflowY: 'auto',
+    position: 'absolute',
+    zIndex: 1000,
+    width: '100%',
+  };
+  
+
   return (
     <>
       {/* Modal principal para registrar recompensa */}
@@ -124,18 +149,36 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
             <Form.Group className="mb-3">
               <Form.Label>Producto</Form.Label>
               <Form.Control
-                list="productos"
-                placeholder="Seleccione un producto..."
-                value={nombreProducto}
-                onChange={handleProductoSelect}
-                autoComplete="off"
+                type="text"
+                placeholder="Buscar producto..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onClick={() => setShowDropdown(true)}
               />
-              <datalist id="productos">
-                {productos.map((producto) => (
-                  <option key={producto.id} value={producto.nombre} />
-                ))}
-              </datalist>
+              {showDropdown && (
+                <ul className="list-group mt-2" style={dropdownStyle}>
+                  {filteredProductos.length > 0 ? (
+                    filteredProductos.map((producto) => (
+                      <li
+                        key={producto.id}
+                        className="list-group-item list-group-item-action"
+                        onClick={() => {
+                          setid_producto(producto.id);
+                          setNombreProducto(producto.nombre);
+                          setSearchTerm('');
+                          setShowDropdown(false);
+                        }}
+                      >
+                        {producto.nombre}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="list-group-item">No se encontraron productos.</li>
+                  )}
+                </ul>
+              )}
             </Form.Group>
+
 
             <Form.Group className="mb-3">
               <Form.Label>Cantidad de puntos necesarios</Form.Label>

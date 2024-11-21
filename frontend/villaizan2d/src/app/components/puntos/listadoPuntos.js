@@ -207,31 +207,40 @@ export default function ListadoPuntos() {
             <Table hover>
                 <thead>
                     <tr>
-                        {/*<th>IdProducto</th>*/}
-                        <th>Nombre Producto</th>
-                        <th>Puntos</th>
-                        <th>Fecha</th>
-                        <th>Hora</th>
-                        <th className="text-center">Opciones</th>
+                        <th style={{ width: "23%", textAlign: "left" }}>Id Producto</th>
+                        <th style={{ width: "18%", textAlign: "left" }}>Nombre Producto</th>
+                        <th style={{ width: "10%", textAlign: "center" }}>Cantidad Puntos</th>
+                        <th style={{ width: "15%", textAlign: "center" }}>Usuario</th>
+                        <th style={{ width: "12%", textAlign: "center" }}>Fecha Actualización</th>
+                        <th style={{ width: "12%", textAlign: "center" }}>Hora Actualización</th>
+                        <th style={{ width: "10%", textAlign: "center" }}>Acciones</th> 
+                        <th style={{ width: "10%", textAlign: "center" }}>Estado</th> 
                     </tr>
                 </thead>
                 <tbody>
                     {currentItems.map((item) => {
                         const producto = productos.find(p => p.id === item.id_producto);
-                        const { fechaFormateada, horaFormateada } = formatFechaHora(item.fechaactivo);
+                        const { fechaFormateada, horaFormateada } = formatFechaHora(item.actualizadoen);
                         return (
                             <tr key={item.id_puntosproducto}>
-                                {/*<td>{producto ? producto.id : "Producto no encontrado"}</td>*/}
-                                <td>{producto ? producto.nombre : "Producto no encontrado"}</td>
-                                <td>{item.cantidadpuntos}</td>
-                                <td>{fechaFormateada}</td>
-                                <td>{horaFormateada}</td>
+                                <td style={{ textAlign: "left" }}> {producto ? producto.id : "Producto no encontrado"}</td>
+                                <td style={{ textAlign: "left" }}>{producto ? producto.nombre : "Producto no encontrado"}</td>
+                                <td style={{ textAlign: "center" }}>{item.cantidadpuntos}</td>
+                                <td style={{ textAlign: "center" }}>-</td>
+                                <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
+                                <td style={{ textAlign: "center" }}>{horaFormateada}</td>
                                 <td className="text-center">
                                     <Button variant="outline-primary" size="sm" onClick={() => handleEdit(item)}>
                                         <FaEdit /> 
                                     </Button>
-                                    <Button variant="outline-danger" size="sm" className="ms-2" onClick={() => handleDelete(item.id_puntosproducto)}>
-                                        <FaTrashAlt /> 
+                                </td>
+                                <td className="text-center">
+                                    <Button 
+                                        variant={item.estaactivo ? "success" : "danger"} 
+                                        size="sm" 
+                                        onClick={() => handleDelete(item)} 
+                                    >
+                                        {item.estaactivo ? "Activo" : "Inactivo"}
                                     </Button>
                                 </td>
                             </tr>
