@@ -1,9 +1,10 @@
 "use client";
 
 import Image from 'next/image';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import NavMenu from '../NavMenu/NavMenu';
+import NavMenu from '../components/NavMenu/NavMenu';
+import Link from 'next/link';
 
 interface Product {
   id_recompensa: number;
@@ -60,8 +61,25 @@ const CatalogoProductosSuma: React.FC = () => {
   };
 
   const handleCanjear = () => {
-    router.push('/pages/carrito');
+    const selectedProductsData = Object.entries(selectedProducts).map(([id, quantity]) => ({
+      id,
+      quantity,
+    }));
+
+    // Convertimos los datos a una cadena de consulta (query string)
+    const queryString = new URLSearchParams({
+      products: JSON.stringify(selectedProductsData),
+      userPoints: userPoints.toString(),
+    }).toString();
+
+    // Navegar a la página de carrito con los productos y los puntos en la URL
+    router.push(`/carrito?${queryString}`);
   };
+
+  const filteredProducts = useMemo(() => {
+    // Puedes agregar lógica para filtrar productos aquí
+    return products;
+  }, [products]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -86,8 +104,11 @@ const CatalogoProductosSuma: React.FC = () => {
         <button className="flex items-center space-x-2 px-4 py-2 bg-white rounded shadow">
           <span className="text-black">Filtrar por categoría</span>
         </button>
-        <button className="px-8 py-2 bg-red-600 text-white rounded" onClick={handleCanjear}>
-          Canjear
+        <button
+          onClick={handleCanjear}  // Use the handleCanjear function here to navigate
+          className="px-8 py-2 bg-red-600 text-white rounded"
+        >
+          Canje
         </button>
         <div className="relative">
           <input
@@ -119,7 +140,7 @@ const CatalogoProductosSuma: React.FC = () => {
       {/* Products Grid */}
       <div className="container mx-auto px-4 mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div
               key={product.id_recompensa}
               className="bg-white rounded-lg shadow-md overflow-hidden relative"
@@ -166,7 +187,6 @@ const CatalogoProductosSuma: React.FC = () => {
         <button className="px-4 py-2 bg-gray-200 rounded">3</button>
         <button className="px-4 py-2 bg-gray-200 rounded">Next</button>
       </div>
-
       {/* Footer */}
       <footer className="bg-white py-8">
         <div className="container mx-auto px-4">
@@ -186,15 +206,12 @@ const CatalogoProductosSuma: React.FC = () => {
             <div>
               <h4 className="font-bold mb-4 text-black">Ayuda</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Opciones de Pago</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Returns</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Privacy Policies</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Libro de Reclamaciones</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">FAQs</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Soporte</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Política de Privacidad</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Términos</a></li>
               </ul>
             </div>
-          </div>
-          <div className="mt-8 text-center text-gray-600 text-black">
-            <p>2023 Helados Villaizan. All rights reserved</p>
           </div>
         </div>
       </footer>
