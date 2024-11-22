@@ -14,7 +14,7 @@ export default function ListadoMultimedia() {
     const [viewType, setViewType] = useState("activos"); // "activos", "inactivos", "todos"
     const [filterType, setFilterType] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
 
     useEffect(() => {
         // Cargar multimedia desde la API
@@ -104,6 +104,14 @@ export default function ListadoMultimedia() {
         XLSX.writeFile(workbook, "multimedia_export.xlsx");
     };
 
+    const formatFechaHora = (fechaString) => {
+        const fecha = new Date(fechaString);
+        const fechaFormateada = fecha.toLocaleDateString(); // Formato de fecha (dd/mm/yyyy)
+        const horaFormateada = fecha.toLocaleTimeString();  // Formato de hora (hh:mm:ss)
+        return { fechaFormateada, horaFormateada };
+    };
+
+
     return (
         <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
             <Row className="mb-4">
@@ -156,6 +164,7 @@ export default function ListadoMultimedia() {
                         <option value="">Todos los Tipos</option>
                         <option value="Video">Video</option>
                         <option value="Información">Información</option>
+                        <option value="Imagen">Imagen</option>
                     </Form.Select>
                 </Col>
             </Row>
@@ -171,46 +180,71 @@ export default function ListadoMultimedia() {
             <Table hover>
                 <thead>
                     <tr>
-                        {/*<th>ID Fruta</th>*/}
+                        <th>Id Multimedia</th>
                         <th>Fruta</th>
                         <th>Título</th>
+                        <th style={{ textAlign: "center" }}>Tipo Contenido</th>
                         <th>Información/URL</th>
-                        <th className="text-center">Opciones</th>
+                        <th style={{ textAlign: "center" }}>Fecha Actualización</th>
+                        <th style={{ textAlign: "center" }}>Hora Actualización</th>
+                        <th style={{ textAlign: "center" }}>Usuario Actualización</th>
+                        <th className="text-center">Acciones</th>
+                        <th style={{ textAlign: "center" }}>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentItems.map((item) => (
-                        <tr key={item.id}>
-                            {/*<td>{item.id_fruta}</td>*/}
-                            <td>{getNombreFruta(item.id_fruta)}</td>
-                            <td>{item.titulo}</td>
-                            <td>
-                                {item.urlcontenido ? (
-                                    <a href={item.urlcontenido} target="_blank" rel="noopener noreferrer">
-                                        {item.urlcontenido}
-                                    </a>
-                                ) : (
-                                    item.contenidoinformacion
-                                )}
-                            </td>
-                            <td className="text-center">
-                                <Link href={`/pages/multimedia/editar?id=${item.id}`} key={item.id}>
-                                    <Button variant="outline-primary" size="sm" className="me-2">
-                                        <FaEdit /> 
+                    {currentItems.map((item) => {
+                        const { fechaFormateada, horaFormateada } = formatFechaHora(item.actualizadoen);
+
+                        // Truncar texto de URL o información
+                        const truncateText = (text, maxLength = 30) =>
+                            text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+
+                        return (
+                            <tr key={item.id}>
+                                <td style={{ textAlign: "left" }}>{item.id.slice(0, 6)}...</td> {/* Truncar ID */}
+                                <td style={{ textAlign: "left" }}>{getNombreFruta(item.id_fruta)}</td>
+                                <td style={{ textAlign: "left" }}>{item.titulo}</td>
+                                <td style={{ textAlign: "center" }}>{item.tipocontenido}</td>
+                                <td style={{ textAlign: "left" }}>
+                                    {item.urlcontenido ? (
+                                        <a
+                                            href={item.urlcontenido}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            title={item.urlcontenido} // Mostrar completa al pasar el mouse
+                                        >
+                                            {truncateText(item.urlcontenido)}
+                                        </a>
+                                    ) : (
+                                        truncateText(item.contenidoinformacion)
+                                    )}
+                                </td>
+                                <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
+                                <td style={{ textAlign: "center" }}>{horaFormateada}</td>
+                                <td style={{ textAlign: "center" }}>-</td>
+                                <td className="text-center">
+                                    <Link href={`/pages/multimedia/editar?id=${item.id}`} key={item.id}>
+                                        <Button variant="outline-primary" size="sm" className="me-2">
+                                            <FaEdit />
+                                        </Button>
+                                    </Link>
+                                </td>
+                                <td className="text-center">
+                                    <Button 
+                                        variant={item.estaactivo ? "success" : "danger"} 
+                                        size="sm" 
+                                        onClick={() => handleDelete(item.id)} 
+                                    >
+                                        {item.estaactivo ? "Activo" : "Inactivo"}
                                     </Button>
-                                </Link>
-                                <Button
-                                    variant="outline-danger"
-                                    size="sm"
-                                    onClick={() => handleDelete(item.id)} // Cambiar a handleDelete
-                                >
-                                    <FaTrashAlt /> 
-                                </Button>
-                            </td>
-                        </tr>
-                    ))}
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </Table>
+
 
             <Row>
                 <Col className="d-flex justify-content-between">

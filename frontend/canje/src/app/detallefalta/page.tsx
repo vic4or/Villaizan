@@ -1,17 +1,44 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import NavMenu from '../NavMenu/NavMenu';
+import NavMenu from '../components/NavMenu/NavMenu';
 
-const pointsHistory = [
-  { date: '06/09/2024', type: 'Compra', pointsEarned: 50, pointsRedeemed: null },
-  { date: '06/09/2024', type: 'Canje', pointsEarned: null, pointsRedeemed: 100 },
-  { date: '17/09/2024', type: 'Canje', pointsEarned: null, pointsRedeemed: 100 },
-  { date: '26/09/2024', type: 'Compra', pointsEarned: 100, pointsRedeemed: null },
-];
+interface ProductDetail {
+  nombre: string;
+  puntos: number;
+  cantidad: number;
+  subtotal: number;
+}
 
-const HistorialPuntos: React.FC = () => {
+const DetalleFalta: React.FC = () => {
+  const searchParams = useSearchParams();
+  const [productDetails, setProductDetails] = useState<ProductDetail[]>([]);
+  const [transactionType, setTransactionType] = useState<string>('');
+  const [transactionDate, setTransactionDate] = useState<string>('');
+
+  useEffect(() => {
+    const type = searchParams.get('type');
+    const date = searchParams.get('date');
+    const detallesString = searchParams.get('detalles');
+
+    if (type && date && detallesString) {
+      setTransactionType(type);
+      setTransactionDate(date);
+
+      const detalles = JSON.parse(decodeURIComponent(detallesString)) as any[];
+      const mappedDetails = detalles.map((item: any) => ({
+        nombre: item.vi_producto.nombre,
+        puntos: item.puntosredencion,
+        cantidad: item.cantidad,
+        subtotal: item.subtotalpuntosredencion,
+      }));
+      
+      setProductDetails(mappedDetails);
+    }
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
@@ -29,41 +56,34 @@ const HistorialPuntos: React.FC = () => {
           priority
         />
       </div>
-      
+
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6 text-black">PuntosVillaizan</h1>
-        <p className="text-lg mb-4 text-black">
-          ¡Tienes <span className="text-yellow-500">50</span> puntos acumulados!
-        </p>
+        <h1 className="text-3xl font-bold mb-6 text-black">Historial de {transactionType}</h1>
+        <p className="text-lg mb-4 text-black">Fecha: {transactionDate}</p>
         
         <div className="overflow-x-auto bg-white p-4 rounded-lg shadow">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b bg-red-600 text-white">
-                <th className="py-2">Fecha</th>
-                <th className="py-2">Tipo</th>
-                <th className="py-2">Puntos ganados</th>
-                <th className="py-2">Puntos canjeados</th>
-                <th className="py-2"></th>
+                <th className="py-2">Producto</th>
+                <th className="py-2">Puntos</th>
+                <th className="py-2">Cantidad</th>
+                <th className="py-2">Subtotal</th>
               </tr>
             </thead>
             <tbody className="text-black">
-              {pointsHistory.map((entry, index) => (
+              {productDetails.map((detail, index) => (
                 <tr key={index} className="border-b">
-                  <td className="py-2">{entry.date}</td>
-                  <td className="py-2">{entry.type}</td>
-                  <td className="py-2">{entry.pointsEarned ? entry.pointsEarned : '-'}</td>
-                  <td className="py-2">{entry.pointsRedeemed ? entry.pointsRedeemed : '-'}</td>
-                  <td className="py-2">
-                    <button className="px-4 py-2 bg-red-600 text-white rounded">VER DETALLE</button>
-                  </td>
+                  <td className="py-2">{detail.nombre}</td>
+                  <td className="py-2">{detail.puntos}</td>
+                  <td className="py-2">{detail.cantidad}</td>
+                  <td className="py-2">{detail.subtotal}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        
-        <div className="flex justify-between items-center mt-4 text-black"> <span>Filas por página:</span> <select className="border rounded px-2 py-1"> <option value="10">10</option> <option value="20">20</option> <option value="50">50</option> </select> <span> 1-4 de 4 </span> <button className="px-2 py-1 border rounded bg-gray-200 text-black">{'<'}</button> <button className="px-2 py-1 border rounded bg-gray-200 text-black">{'>'}</button> </div> </div>
+      </div>
 
       <footer className="bg-white py-8">
         <div className="container mx-auto px-4">
@@ -99,5 +119,4 @@ const HistorialPuntos: React.FC = () => {
   );
 };
 
-export default HistorialPuntos;
-
+export default DetalleFalta;

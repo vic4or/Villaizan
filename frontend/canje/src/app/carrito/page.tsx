@@ -1,56 +1,67 @@
 "use client";
 
 import Image from 'next/image';
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import NavMenu from '../NavMenu/NavMenu';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import NavMenu from '../components/NavMenu/NavMenu';
 
 interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  discount?: number;
+  id_recompensa: number;
+  id_producto: string;
+  puntosredencion: number;
+  cantidad: number;
+  subtotalpuntosredencion: number;
+  nombre: string;
 }
-
-const cartItems: CartItem[] = [
-  {
-    id: 1,
-    name: 'Helado de Mango',
-    price: 2,
-    quantity: 10,
-    image: '/api/placeholder/300/300',
-    discount: 5,
-  },
-  {
-    id: 2,
-    name: 'Helado de Coco',
-    price: 2,
-    quantity: 5,
-    image: '/api/placeholder/300/300',
-  },
-];
 
 const Carrito: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [userPoints, setUserPoints] = useState<number>(0);
+  const [codigo, setCodigo] = useState<string>('');
 
-  const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  useEffect(() => {
+    const dataString = searchParams.get('data');
+    if (dataString) {
+      const data = JSON.parse(dataString);
+      console.log('Datos recibidos:', data);
+      setCartItems(data.detalles || []);
+      setUserPoints(data.puntoscanjeado || 0);
+      setCodigo(data.codigo || '');
+    }
+  }, [searchParams]);
+
+  const handleCheckout = async () => {
+    const dataToSend = {
+      id_usuario: 'us-256de824',
+      puntoscanjeado: userPoints,
+      codigo: codigo,
+      detalles: cartItems,
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/redencion/cliente/crear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSend)
+      });
+      if (response.ok) {
+        alert('Redención exitosa!');
+        router.push('/historial'); // Puedes redirigir a una página de éxito
+      } else {
+        alert('Error en la redención');
+      }
+    } catch (error) {
+      console.error('Error en la redención:', error);
+      alert('Error en la redención');
+    }
   };
 
-  const calculateDiscount = () => {
-    return cartItems.reduce((total, item) => {
-      return item.discount ? total + item.price * item.quantity * (item.discount / 100) : total;
-    }, 0);
-  };
-
-  const subtotal = calculateSubtotal();
-  const discount = calculateDiscount();
-  const total = subtotal - discount;
-
-  const handleCheckout = () => {
-    router.push('/checkout');
+  const handleCanjear = () => {
+    router.push('/historial');
   };
 
   return (
@@ -75,26 +86,18 @@ const Carrito: React.FC = () => {
           <h1 className="text-3xl font-bold mb-6 text-black">Carrito de Compras</h1>
           
           <div className="bg-white p-4 rounded-lg shadow mb-6">
-            <div className="grid grid-cols-5 font-bold border-b pb-2 mb-4">
-              <span className="text-center">Imagen</span>
+            <div className="grid grid-cols-4 font-bold border-b pb-2 mb-4">
               <span className="text-center">Producto</span>
-              <span className="text-center">Precio</span>
+              <span className="text-center">Puntos</span>
               <span className="text-center">Cantidad</span>
               <span className="text-center">Subtotal</span>
-              <span className="text-center">Acciones</span>
             </div>
             {cartItems.map((item) => (
-              <div key={item.id} className="grid grid-cols-5 items-center mb-4 text-black">
-                <div className="flex justify-center">
-                  <Image src={item.image} alt={item.name} width={100} height={100} className="rounded-lg" />
-                </div>
-                <span className="text-center text-lg font-semibold">{item.name}</span>
-                <span className="text-center text-lg font-bold">S/ {item.price}</span>
-                <span className="text-center text-lg font-bold">{item.quantity}</span>
-                <span className="text-center text-lg font-bold">S/ {item.price * item.quantity}</span>
-                <div className="flex justify-center">
-                  <button className="ml-4 text-red-600 text-2xl">🗑️</button>
-                </div>
+              <div key={item.id_producto} className="grid grid-cols-4 items-center mb-4 text-black">
+                <span className="text-center text-lg font-semibold">{item.nombre}</span>
+                <span className="text-center text-lg font-bold">{item.puntosredencion}</span>
+                <span className="text-center text-lg font-bold">{item.cantidad}</span>
+                <span className="text-center text-lg font-bold">{item.subtotalpuntosredencion}</span>
               </div>
             ))}
           </div>
@@ -102,16 +105,12 @@ const Carrito: React.FC = () => {
         
         <div className="w-1/4 ml-6 bg-white p-4 rounded-lg shadow self-start">
           <div className="flex justify-between mb-2 text-lg text-black">
-            <span>Subtotal:</span>
-            <span>S/ {subtotal.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between mb-2 text-lg text-black">
-            <span>Descuento:</span>
-            <span>-S/ {discount.toFixed(2)}</span>
+            <span>Puntos canjeados:</span>
+            <span>{userPoints}</span>
           </div>
           <div className="flex justify-between font-bold text-xl mb-4 text-black">
-            <span>Total:</span>
-            <span>S/ {total.toFixed(2)}</span>
+            <span>Total Puntos:</span>
+            <span>{userPoints}</span>
           </div>
           <button 
             onClick={handleCheckout} 
@@ -157,6 +156,9 @@ const Carrito: React.FC = () => {
 };
 
 export default Carrito;
+
+
+
 
 
 

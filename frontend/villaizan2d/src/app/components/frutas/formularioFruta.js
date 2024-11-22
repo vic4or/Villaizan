@@ -25,7 +25,9 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
 
   const [productosParaAgregar, setProductosParaAgregar] = useState([]);
   const [productosParaQuitar, setProductosParaQuitar] = useState([]);
-  const [hasChanges, setHasChanges] = useState(false); // Nuevo estado para rastrear cambios
+  const [frutasActivas, setFrutasActivas] = useState([]);
+  const [hasChanges, setHasChanges] = useState(false); 
+
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -38,8 +40,32 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
       }
     };
 
+    const fetchFrutasActivas = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/fruta/listarTodos");
+        const frutas = response.data.filter((fruta) => fruta.estaactivo); 
+        setFrutasActivas(frutas);
+      } catch (err) {
+        console.error("Error al obtener las frutas activas:", err);
+      }
+    };
+
+    fetchFrutasActivas();
     fetchProductos();
   }, []);
+
+  useEffect(() => {
+    if (searchProduct) {
+      const filtered = productos.filter((producto) =>
+        producto.nombre.toLowerCase().includes(searchProduct.toLowerCase())
+      );
+      setFilteredProductos(filtered);
+    } else {
+      setFilteredProductos(productos); // Muestra todos los productos si no hay búsqueda
+    }
+  }, [searchProduct, productos]);
+  
+  
 
   useEffect(() => {
     if (isEditMode && frutaId) {
@@ -85,6 +111,17 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
 
     if (!hasChanges) {
       alert("No se han realizado cambios.");
+      return;
+    }
+
+    // Validar duplicado de nombre (normalizando texto)
+    const nombreNormalizado = initialValues.nombre.trim().toLowerCase();
+    const nombreDuplicado = frutasActivas.some(
+      (fruta) => fruta.nombre.trim().toLowerCase() === nombreNormalizado
+    );
+    if (nombreDuplicado) {
+      setFormError(true);
+      setErrorMessage("Ya existe una fruta activa con este nombre.");
       return;
     }
 
@@ -159,9 +196,21 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
     router.push("/pages/frutas/lista");
   };
 
-  const filteredProductos = productos.filter((producto) =>
-    producto.nombre.toLowerCase().includes(searchProduct.toLowerCase())
-  );
+  const [filteredProductos, setFilteredProductos] = useState([]); 
+  const [showDropdown, setShowDropdown] = useState(false); // Controlar si se muestra el dropdown
+
+
+  const dropdownStyle = {
+    maxHeight: "150px",
+    overflowY: "auto",
+    border: "1px solid #ddd",
+    borderRadius: "4px",
+    backgroundColor: "white",
+    position: "absolute",
+    zIndex: 1000,
+    width: "100%",
+  };
+  
 
   return (
     <>
@@ -232,31 +281,43 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
 
               <Col md={6}>
                 <h4>Agregar productos</h4>
-                <InputGroup className="mb-3">
-                  <FormControl
-                    placeholder="Buscar producto"
-                    value={searchProduct}
-                    onChange={handleProductSearch}
-                  />
-                </InputGroup>
+                <div style={{ position: "relative" }}>
+                  <InputGroup className="mb-3">
+                    <FormControl
+                      placeholder="Buscar producto"
+                      value={searchProduct}
+                      onChange={(e) => setSearchProduct(e.target.value)}
+                      onFocus={() => setShowDropdown(true)} // Muestra el dropdown al hacer clic
+                    />
+                  </InputGroup>
 
-                {searchProduct && (
-                  <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px' }}>
-                    {filteredProductos.map((product) => (
-                      <div
-                        key={product.id}
-                        onClick={() => handleAddProduct(product)}
-                        style={{
-                          padding: '8px',
-                          cursor: 'pointer',
-                          backgroundColor: selectedProducts.some((p) => p.id === product.id) ? '#f0f0f0' : 'white'
-                        }}
-                      >
-                        {product.nombre}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  {showDropdown && (
+                    <div style={dropdownStyle}>
+                      {filteredProductos.length > 0 ? (
+                        filteredProductos.map((producto) => (
+                          <div
+                            key={producto.id}
+                            onClick={() => {
+                              handleAddProduct(producto); // Lógica para agregar el producto
+                              setShowDropdown(false); // Oculta el dropdown después de seleccionar
+                              setSearchProduct(""); // Limpia el término de búsqueda
+                            }}
+                            style={{
+                              padding: "8px",
+                              cursor: "pointer",
+                              backgroundColor: "white",
+                              borderBottom: "1px solid #ddd",
+                            }}
+                          >
+                            {producto.nombre}
+                          </div>
+                        ))
+                      ) : (
+                        <div style={{ padding: "8px" }}>No se encontraron productos.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 <h5>Listado final</h5>
                 <Table bordered>
@@ -288,7 +349,6 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
                     </tr>
                   )}
                 </tbody>
-
                 </Table>
               </Col>
             </Row>
