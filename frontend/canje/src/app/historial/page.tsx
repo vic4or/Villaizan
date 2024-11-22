@@ -1,17 +1,57 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import NavMenu from '../NavMenu/NavMenu';
+import NavMenu from '../components/NavMenu/NavMenu';
 
-const pointsHistory = [
-  { date: '06/09/2024', type: 'Compra', pointsEarned: 50, pointsRedeemed: null },
-  { date: '06/09/2024', type: 'Canje', pointsEarned: null, pointsRedeemed: 100 },
-  { date: '17/09/2024', type: 'Canje', pointsEarned: null, pointsRedeemed: 100 },
-  { date: '26/09/2024', type: 'Compra', pointsEarned: 100, pointsRedeemed: null },
-];
+interface PointEntry {
+  date: string;
+  type: string;
+  pointsEarned?: number | null;
+  pointsRedeemed?: number | null;
+}
 
 const HistorialPuntos: React.FC = () => {
+  const [pointsHistory, setPointsHistory] = useState<PointEntry[]>([]);
+  const [accumulatedPoints, setAccumulatedPoints] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchPointsHistory = async () => {
+      try {
+        const [compraResponse, canjeResponse] = await Promise.all([
+          fetch('http://localhost:3000/puntosacumulados/cliente/listarTodos/us-256de824'),
+          fetch('http://localhost:3000/redencion/cliente/listarCanjeados/us-256de824')
+        ]);
+
+        const compraData = await compraResponse.json();
+        const canjeData = await canjeResponse.json();
+
+        const pointsEarned = compraData.reduce((acc: number, item: any) => acc + item.cantidadpuntosganados, 0);
+        setAccumulatedPoints(pointsEarned);
+
+        const compraEntries = compraData.map((item: any) => ({
+          date: new Date(item.fechatransaccion).toLocaleDateString(),
+          type: 'Compra',
+          pointsEarned: item.cantidadpuntosganados,
+          pointsRedeemed: null
+        }));
+
+        const canjeEntries = canjeData.map((item: any) => ({
+          date: new Date(item.fecharedencion).toLocaleDateString(),
+          type: 'Canje',
+          pointsEarned: null,
+          pointsRedeemed: item.puntoscanjeado
+        }));
+
+        setPointsHistory([...compraEntries, ...canjeEntries]);
+      } catch (error) {
+        console.error("Error fetching points history:", error);
+      }
+    };
+
+    fetchPointsHistory();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
@@ -33,7 +73,7 @@ const HistorialPuntos: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6 text-black">PuntosVillaizan</h1>
         <p className="text-lg mb-4 text-black">
-          ¡Tienes <span className="text-yellow-500">50</span> puntos acumulados!
+          ¡Tienes <span className="text-yellow-500">{accumulatedPoints}</span> puntos acumulados!
         </p>
         
         <div className="overflow-x-auto bg-white p-4 rounded-lg shadow">
@@ -52,8 +92,8 @@ const HistorialPuntos: React.FC = () => {
                 <tr key={index} className="border-b">
                   <td className="py-2">{entry.date}</td>
                   <td className="py-2">{entry.type}</td>
-                  <td className="py-2">{entry.pointsEarned ? entry.pointsEarned : '-'}</td>
-                  <td className="py-2">{entry.pointsRedeemed ? entry.pointsRedeemed : '-'}</td>
+                  <td className="py-2">{entry.pointsEarned !== null ? entry.pointsEarned : '-'}</td>
+                  <td className="py-2">{entry.pointsRedeemed !== null ? entry.pointsRedeemed : '-'}</td>
                   <td className="py-2">
                     <button className="px-4 py-2 bg-red-600 text-white rounded">VER DETALLE</button>
                   </td>
@@ -63,7 +103,18 @@ const HistorialPuntos: React.FC = () => {
           </table>
         </div>
         
-        <div className="flex justify-between items-center mt-4 text-black"> <span>Filas por página:</span> <select className="border rounded px-2 py-1"> <option value="10">10</option> <option value="20">20</option> <option value="50">50</option> </select> <span> 1-4 de 4 </span> <button className="px-2 py-1 border rounded bg-gray-200 text-black">{'<'}</button> <button className="px-2 py-1 border rounded bg-gray-200 text-black">{'>'}</button> </div> </div>
+        <div className="flex justify-between items-center mt-4 text-black">
+          <span>Filas por página:</span>
+          <select className="border rounded px-2 py-1">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          <span> 1-4 de {pointsHistory.length} </span>
+          <button className="px-2 py-1 border rounded bg-gray-200 text-black">{'<'}</button>
+          <button className="px-2 py-1 border rounded bg-gray-200 text-black">{'>'}</button>
+        </div>
+      </div>
 
       <footer className="bg-white py-8">
         <div className="container mx-auto px-4">
@@ -100,4 +151,5 @@ const HistorialPuntos: React.FC = () => {
 };
 
 export default HistorialPuntos;
+
 
