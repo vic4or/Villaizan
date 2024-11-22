@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup } from "react-bootstrap";
+import { Container, Row, Col, Button, InputGroup, FormControl, Table, Pagination, ButtonGroup, Modal } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; 
 import { useRouter } from "next/navigation"; 
 import axios from "axios"; 
@@ -15,6 +15,9 @@ export default function ListadoFrutas() {
     const [viewType, setViewType] = useState("activos"); // "todos", "activos" o "inactivos"
     const [searchTerm, setSearchTerm] = useState("");
     const itemsPerPage = 10;
+    const [showModal, setShowModal] = useState(false);
+    const [selectedFruta, setSelectedFruta] = useState(null); // Fruta seleccionada para inactivar
+
 
     useEffect(() => {
         const fetchFrutas = async () => {
@@ -26,6 +29,10 @@ export default function ListadoFrutas() {
             }
         };
 
+        fetchFrutas();
+    }, []);
+
+    useEffect(() => {
         fetchFrutas();
     }, []);
 
@@ -60,13 +67,30 @@ export default function ListadoFrutas() {
     const currentItems = filteredFrutas.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredFrutas.length / itemsPerPage);
 
-    const handleDelete = async (idFruta) => {
+    const fetchFrutas = async () => {
         try {
-            await axios.put(`http://localhost:3000/fruta/inactivar/${idFruta}`);
+            const frutasResponse = await axios.get("http://localhost:3000/fruta/listarTodos");
+            setFrutas(frutasResponse.data);
+        } catch (error) {
+            console.error("Error al obtener los datos:", error);
+        }
+    };
+
+    const handleDeleteConfirmation = (idFruta) => {
+        setSelectedFruta(idFruta);
+        setShowModal(true);
+    };
+
+    const handleDelete = async () => {
+        if (!selectedFruta) return;
+
+        try {
+            await axios.patch(`http://localhost:3000/fruta/inactivar/${selectedFruta}`);
             const updatedFrutas = frutas.map((item) =>
-                item.id === idFruta ? { ...item, estaactivo: false } : item
+                item.id === selectedFruta ? { ...item, estaactivo: false } : item
             );
-            setFrutas(updatedFrutas);
+            setFrutas(updatedFrutas);            
+            setShowModal(false); // Cerrar el modal
         } catch (error) {
             console.error("Error al inactivar la fruta:", error);
             alert("Error al inactivar la fruta. Inténtalo de nuevo.");
@@ -187,6 +211,7 @@ export default function ListadoFrutas() {
                                 <Button 
                                     variant={item.estaactivo ? "success" : "danger"} 
                                     size="sm"
+                                    onClick={() => handleDeleteConfirmation(item.id)}
                                 >
                                     {item.estaactivo ? "Activo" : "Inactivo"}
                                 </Button>
@@ -196,6 +221,24 @@ export default function ListadoFrutas() {
                 })}
             </tbody>
             </Table>
+
+            {/* Modal de confirmación */}
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Inactivación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que deseas inactivar esta fruta? 
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="danger" onClick={handleDelete}>
+                        Inactivar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             <Pagination style={{ position: 'relative', zIndex: 1 }}>
                 <Pagination.Prev onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} />

@@ -25,6 +25,7 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
 
   const [productosParaAgregar, setProductosParaAgregar] = useState([]);
   const [productosParaQuitar, setProductosParaQuitar] = useState([]);
+  const [frutasActivas, setFrutasActivas] = useState([]);
   const [hasChanges, setHasChanges] = useState(false); 
 
 
@@ -39,6 +40,17 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
       }
     };
 
+    const fetchFrutasActivas = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/fruta/listarTodos");
+        const frutas = response.data.filter((fruta) => fruta.estaactivo); 
+        setFrutasActivas(frutas);
+      } catch (err) {
+        console.error("Error al obtener las frutas activas:", err);
+      }
+    };
+
+    fetchFrutasActivas();
     fetchProductos();
   }, []);
 
@@ -99,6 +111,17 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
 
     if (!hasChanges) {
       alert("No se han realizado cambios.");
+      return;
+    }
+
+    // Validar duplicado de nombre (normalizando texto)
+    const nombreNormalizado = initialValues.nombre.trim().toLowerCase();
+    const nombreDuplicado = frutasActivas.some(
+      (fruta) => fruta.nombre.trim().toLowerCase() === nombreNormalizado
+    );
+    if (nombreDuplicado) {
+      setFormError(true);
+      setErrorMessage("Ya existe una fruta activa con este nombre.");
       return;
     }
 
