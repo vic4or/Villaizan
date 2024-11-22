@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
 
 interface PointEntry {
@@ -9,11 +10,14 @@ interface PointEntry {
   type: string;
   pointsEarned?: number | null;
   pointsRedeemed?: number | null;
+  id: string;
+  detalles: any; // agregar la propiedad para los detalles
 }
 
 const HistorialPuntos: React.FC = () => {
   const [pointsHistory, setPointsHistory] = useState<PointEntry[]>([]);
   const [accumulatedPoints, setAccumulatedPoints] = useState<number>(0);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPointsHistory = async () => {
@@ -33,14 +37,18 @@ const HistorialPuntos: React.FC = () => {
           date: new Date(item.fechatransaccion).toLocaleDateString(),
           type: 'Compra',
           pointsEarned: item.cantidadpuntosganados,
-          pointsRedeemed: null
+          pointsRedeemed: null,
+          id: item.id,
+          detalles: item.vi_detallepuntosacumulados // pasar los detalles
         }));
 
         const canjeEntries = canjeData.map((item: any) => ({
           date: new Date(item.fecharedencion).toLocaleDateString(),
           type: 'Canje',
           pointsEarned: null,
-          pointsRedeemed: item.puntoscanjeado
+          pointsRedeemed: item.puntoscanjeado,
+          id: item.id,
+          detalles: item.vi_detalleredencion // pasar los detalles
         }));
 
         setPointsHistory([...compraEntries, ...canjeEntries]);
@@ -51,6 +59,11 @@ const HistorialPuntos: React.FC = () => {
 
     fetchPointsHistory();
   }, []);
+
+  const handleViewDetail = (entry: PointEntry) => {
+    // Pasar detalles a la página de detalle usando el estado o parámetros de la URL
+    router.push(`/detalle?type=${entry.type}&date=${entry.date}&detalles=${encodeURIComponent(JSON.stringify(entry.detalles))}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -95,7 +108,12 @@ const HistorialPuntos: React.FC = () => {
                   <td className="py-2">{entry.pointsEarned !== null ? entry.pointsEarned : '-'}</td>
                   <td className="py-2">{entry.pointsRedeemed !== null ? entry.pointsRedeemed : '-'}</td>
                   <td className="py-2">
-                    <button className="px-4 py-2 bg-red-600 text-white rounded">VER DETALLE</button>
+                    <button
+                      className="px-4 py-2 bg-red-600 text-white rounded"
+                      onClick={() => handleViewDetail(entry)}
+                    >
+                      VER DETALLE
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -151,5 +169,7 @@ const HistorialPuntos: React.FC = () => {
 };
 
 export default HistorialPuntos;
+
+
 
 

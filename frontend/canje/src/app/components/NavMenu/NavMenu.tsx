@@ -14,9 +14,9 @@ const NavMenu: React.FC = () => {
     <header className="bg-red-600 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex space-x-4">
-          <a onClick={() => handleNavigation('/catalogo')} className="hover:text-gray-200 cursor-pointer">Comprar</a>
+          <a onClick={() => handleNavigation('/catalogo')} className="hover:text-gray-200 cursor-pointer">Canje</a>
           <a onClick={() => handleNavigation('/carrito')} className="hover:text-gray-200 cursor-pointer">Carrito</a>
-          <a href="#" className="hover:text-gray-200">HistorialPuntos</a>
+          <a onClick={() => handleNavigation('/historial')} className="hover:text-gray-200 cursor-pointer">HistorialPuntos</a>
           <a href="#" className="hover:text-gray-200">CanjePuntos</a>
         </div>
         <div>

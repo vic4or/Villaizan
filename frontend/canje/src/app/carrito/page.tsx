@@ -50,7 +50,7 @@ const Carrito: React.FC = () => {
       });
       if (response.ok) {
         alert('Redención exitosa!');
-        router.push('/success'); // Puedes redirigir a una página de éxito
+        router.push('/historial'); // Puedes redirigir a una página de éxito
       } else {
         alert('Error en la redención');
       }
@@ -59,7 +59,10 @@ const Carrito: React.FC = () => {
       alert('Error en la redención');
     }
   };
-  
+
+  const handleCanjear = () => {
+    router.push('/historial');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
