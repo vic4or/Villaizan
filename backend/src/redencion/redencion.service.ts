@@ -74,30 +74,32 @@ export class RedencionService {
     // Pantallas usuario
 
     private async obtenerUltimoIdDetalleRedencion(): Promise<number> {
-        const ultimoRegistro = await this.prisma.vi_detalleredencion.findFirst({
-          orderBy: { id: 'desc' },
-        });
-    
-        const ultimoId = ultimoRegistro ? parseInt(ultimoRegistro.id, 10) : 0;
-    
-        return ultimoId;
-    }
-
-    private async generarIdRedencion(): Promise<string> {
-        const ultimoRegistro = await this.prisma.vi_redencion.findFirst({
-          orderBy: { id: 'desc' }, 
-        });
-
-        const ultimoId = ultimoRegistro ? parseInt(ultimoRegistro.id, 10) : 0;
+        const [ultimoRegistro]: any = await this.prisma.$queryRawUnsafe(`
+          SELECT CAST(id AS INTEGER) AS id
+          FROM vi_detalleredencion
+          ORDER BY id DESC
+          LIMIT 1
+        `);
       
-        return (ultimoId + 1).toString();
+        return ultimoRegistro?.id ?? 0;
+      }
+
+    private async obtenerUltimoIdRedencion(): Promise<number> {
+        const [ultimoRegistro]: any = await this.prisma.$queryRawUnsafe(`
+            SELECT CAST(id AS INTEGER) AS id
+            FROM vi_redencion
+            ORDER BY id DESC
+            LIMIT 1
+        `);
+
+        return ultimoRegistro?.id ?? 0;
     }
 
     // Crear una redención
     async createRedencionConDetalles(data: CreateRedencionDto) {
         return await this.prisma.$transaction(async (prisma) => {
           // Generar el ID para la redención
-          const idRedencion = await this.generarIdRedencion();
+          const idRedencion = await this.obtenerUltimoIdRedencion()+1;
           console.log("idRedencion: ", idRedencion);
           const fecha_generacion = new Date();
 
@@ -107,7 +109,7 @@ export class RedencionService {
           // Crear la redención
           const redencion = await prisma.vi_redencion.create({
             data: {
-              id: idRedencion,
+              id: idRedencion.toString(),
               id_usuario: data.id_usuario,
               puntoscanjeado: data.puntoscanjeado,
               fechageneracion: fecha_generacion,
