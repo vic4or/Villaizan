@@ -34,7 +34,7 @@ const Carrito: React.FC = () => {
 
   const handleCheckout = async () => {
     const dataToSend = {
-      id_usuario: 'us_256de824',
+      id_usuario: 'us-256de824',
       puntoscanjeado: userPoints,
       codigo: codigo,
       detalles: cartItems,
@@ -59,6 +59,7 @@ const Carrito: React.FC = () => {
       alert('Error en la redención');
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
