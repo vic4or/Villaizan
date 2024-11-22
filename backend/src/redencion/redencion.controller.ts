@@ -29,9 +29,10 @@ export class RedencionController {
         return await this.redencionService.createRedencionConDetalles(data);
     }
 
-    @Get('/cliente/listarTodos/:idUsuario')
-    async getRedencionesByUser(@Param('idUsuario') idUsuario: string): Promise<vi_redencion[]> {
-        return await this.redencionService.getRedencionesByUser(idUsuario);
+    // Obtener redenciones de un usuario con estado 'Por canjear'
+    @Get('/cliente/listarPorCanjear/:idUsuario')
+    async getRedencionesByUserPorCanjear(@Param('idUsuario') idUsuario: string): Promise<vi_redencion[]> {
+        return await this.redencionService.getRedencionesByUserPorCanjear(idUsuario);
     }
 
     // Obtener redenciones de un usuario con estado 'CANJEADO'
