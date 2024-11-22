@@ -148,9 +148,9 @@ export class RedencionService {
     
 
     // Listar redenciones por usuario (TODAS PARA UNA VISUALIZACION DE REDENCIONES DEL USUARIO SIN CONSIDERAR EL ESTADO)
-    async getRedencionesByUser(idUsuario: string): Promise<vi_redencion[]> {
+    async getRedencionesByUserPorCanjear(idUsuario: string): Promise<vi_redencion[]> {
         return await this.prisma.vi_redencion.findMany({
-            where: { id_usuario: idUsuario,
+            where: { id_usuario: idUsuario, estado: 'Por canjear' 
                 //estaactivo: true
              },
             include: {
