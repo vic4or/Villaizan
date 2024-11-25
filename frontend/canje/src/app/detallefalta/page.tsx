@@ -31,25 +31,28 @@ const DetalleFaltaContent: React.FC = () => {
   const [transactionDate, setTransactionDate] = useState<string>('');
 
   useEffect(() => {
-    const type = searchParams.get('type');
-    const date = searchParams.get('date');
-    const detallesString = searchParams.get('detalles');
-
-    if (type && date && detallesString) {
-      setTransactionType(type);
-      setTransactionDate(date);
-
-      const detalles = JSON.parse(decodeURIComponent(detallesString)) as DetalleItem[];
-      const mappedDetails = detalles.map((item) => ({
-        nombre: item.vi_producto.nombre,
-        puntos: item.puntosredencion,
-        cantidad: item.cantidad,
-        subtotal: item.subtotalpuntosredencion,
-      }));
-      
-      setProductDetails(mappedDetails);
+    if (searchParams) {
+      const type = searchParams.get('type');
+      const date = searchParams.get('date');
+      const detallesString = searchParams.get('detalles');
+  
+      if (type && date && detallesString) {
+        setTransactionType(type);
+        setTransactionDate(date);
+  
+        const detalles = JSON.parse(decodeURIComponent(detallesString)) as DetalleItem[];
+        const mappedDetails = detalles.map((item) => ({
+          nombre: item.vi_producto.nombre,
+          puntos: item.puntosredencion,
+          cantidad: item.cantidad,
+          subtotal: item.subtotalpuntosredencion,
+        }));
+  
+        setProductDetails(mappedDetails);
+      }
     }
   }, [searchParams]);
+  
 
   return (
     <div className="min-h-screen bg-gray-50">

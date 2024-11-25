@@ -5,6 +5,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
 import Banner from '../components/Banner/Banner';
+import {getRecompensaPuntos} from '../api/recompensaPuntos.api';
 
 interface Product {
   id_recompensa: number;
@@ -41,7 +42,7 @@ const CatalogoProductosSuma: React.FC = () => {
   const [userPoints, setUserPoints] = useState<number>(200); // Puntos iniciales del usuario
   const [selectedProducts, setSelectedProducts] = useState<{ [key: string]: number }>({}); // Productos seleccionados
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch('http://localhost:3000/recompensa_puntos/listarTodosProducto');
@@ -53,6 +54,15 @@ const CatalogoProductosSuma: React.FC = () => {
     };
 
     fetchProducts();
+  }, []);*/
+
+
+  useEffect(() => {
+    async function carga() {
+      const data = await getRecompensaPuntos();
+      setProducts(data);
+    }
+    carga();
   }, []);
 
   const handleAddProduct = (productId: string, puntosNecesarios: number) => {

@@ -5,6 +5,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
 import Banner from '../components/Banner/Banner';
+import baseApi from '../api/mainAxios.api';
 
 interface CartItem {
   id_recompensa: number;
@@ -23,15 +24,18 @@ const CarritoContent: React.FC = () => {
   const [codigo, setCodigo] = useState<string>('');
 
   useEffect(() => {
-    const dataString = searchParams.get('data');
-    if (dataString) {
-      const data = JSON.parse(dataString);
-      console.log('Datos recibidos:', data);
-      setCartItems(data.detalles || []);
-      setUserPoints(data.puntoscanjeado || 0);
-      setCodigo(data.codigo || '');
+    if (searchParams) {
+      const dataString = searchParams.get('data');
+      if (dataString) {
+        const data = JSON.parse(dataString);
+        console.log('Datos recibidos:', data);
+        setCartItems(data.detalles || []);
+        setUserPoints(data.puntoscanjeado || 0);
+        setCodigo(data.codigo || '');
+      }
     }
   }, [searchParams]);
+
 
   const handleCheckout = async () => {
     const dataToSend = {
@@ -40,16 +44,18 @@ const CarritoContent: React.FC = () => {
       codigo: codigo,
       detalles: cartItems,
     };
-
+  
     try {
-      const response = await fetch('http://localhost:3000/redencion/cliente/crear', {
-        method: 'POST',
+      console.log('Sending data:', dataToSend); // Debugging: Log the data being sent
+      const response = await baseApi.post('redencion/cliente/crear', dataToSend, {
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataToSend)
+        }
       });
-      if (response.ok) {
+  
+      console.log('Response:', response); // Debugging: Log the response
+  
+      if (response.status === 200 || response.status === 201) { // Check the status code
         alert('Redención exitosa!');
         router.push('/historial'); // Puedes redirigir a una página de éxito
       } else {
@@ -60,6 +66,8 @@ const CarritoContent: React.FC = () => {
       alert('Error en la redención');
     }
   };
+  
+  
 
   return (
     <div className="min-h-screen bg-gray-50">

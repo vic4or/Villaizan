@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
 import Banner from '../components/Banner/Banner';
+import baseApi from '../api/mainAxios.api';
 
 interface ViProducto {
   nombre: string;
@@ -39,9 +40,9 @@ const HistorialFalta: React.FC = () => {
   useEffect(() => {
     const fetchPointsHistory = async () => {
       try {
-        const response = await fetch('http://localhost:3000/redencion/cliente/listarPorCanjear/us-256de824');
-        const data: CanjeItem[] = await response.json();
-
+        const response = await baseApi.get('redencion/cliente/listarPorCanjear/us-256de824');
+        const data: CanjeItem[] = response.data;
+  
         const canjeEntries = data.map(item => ({
           date: new Date(item.fechageneracion).toLocaleDateString(),
           type: 'Canje',
@@ -49,15 +50,16 @@ const HistorialFalta: React.FC = () => {
           id: item.id,
           detalles: item.vi_detalleredencion
         }));
-
+  
         setPointsHistory(canjeEntries);
       } catch (error) {
         console.error("Error fetching points history:", error);
       }
     };
-
+  
     fetchPointsHistory();
   }, []);
+  
 
   const handleViewDetail = (entry: PointEntry) => {
     router.push(`/detallefalta?type=${entry.type}&date=${entry.date}&detalles=${encodeURIComponent(JSON.stringify(entry.detalles))}`);
