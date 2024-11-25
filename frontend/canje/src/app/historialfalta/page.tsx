@@ -1,16 +1,35 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+//import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
+import Banner from '../components/Banner/Banner';
+
+interface ViProducto {
+  nombre: string;
+}
+
+interface DetalleRedencion {
+  vi_producto: ViProducto;
+  puntosredencion: number;
+  cantidad: number;
+  subtotalpuntosredencion: number;
+}
+
+interface CanjeItem {
+  id: string;
+  fechageneracion: string;
+  puntoscanjeado: number;
+  vi_detalleredencion: DetalleRedencion[];
+}
 
 interface PointEntry {
   date: string;
   type: string;
   pointsRedeemed: number;
   id: string;
-  detalles: any;
+  detalles: DetalleRedencion[];
 }
 
 const HistorialFalta: React.FC = () => {
@@ -21,9 +40,9 @@ const HistorialFalta: React.FC = () => {
     const fetchPointsHistory = async () => {
       try {
         const response = await fetch('http://localhost:3000/redencion/cliente/listarPorCanjear/us-256de824');
-        const data = await response.json();
+        const data: CanjeItem[] = await response.json();
 
-        const canjeEntries = data.map((item: any) => ({
+        const canjeEntries = data.map(item => ({
           date: new Date(item.fechageneracion).toLocaleDateString(),
           type: 'Canje',
           pointsRedeemed: item.puntoscanjeado,
@@ -48,19 +67,7 @@ const HistorialFalta: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
       {/* Logo */}
-      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
-        <Image
-          src="/images/bannerFlujoCompra.png"
-          alt="Villaizan Logo"
-          width={1920}
-          height={1080}
-          style={{
-            width: '100%',
-            height: 'auto',
-          }}
-          priority
-        />
-      </div>
+      <Banner></Banner>
       
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6 text-black">PuntosVillaizan - Canjes Pendientes</h1>
@@ -143,3 +150,4 @@ const HistorialFalta: React.FC = () => {
 };
 
 export default HistorialFalta;
+

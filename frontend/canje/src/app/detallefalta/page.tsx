@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
+//import Image from 'next/image';
 import NavMenu from '../components/NavMenu/NavMenu';
+import Banner from '../components/Banner/Banner';
 
 interface ProductDetail {
   nombre: string;
@@ -12,7 +13,18 @@ interface ProductDetail {
   subtotal: number;
 }
 
-const DetalleFalta: React.FC = () => {
+interface ViProducto {
+  nombre: string;
+}
+
+interface DetalleItem {
+  vi_producto: ViProducto;
+  puntosredencion: number;
+  cantidad: number;
+  subtotalpuntosredencion: number;
+}
+
+const DetalleFaltaContent: React.FC = () => {
   const searchParams = useSearchParams();
   const [productDetails, setProductDetails] = useState<ProductDetail[]>([]);
   const [transactionType, setTransactionType] = useState<string>('');
@@ -27,8 +39,8 @@ const DetalleFalta: React.FC = () => {
       setTransactionType(type);
       setTransactionDate(date);
 
-      const detalles = JSON.parse(decodeURIComponent(detallesString)) as any[];
-      const mappedDetails = detalles.map((item: any) => ({
+      const detalles = JSON.parse(decodeURIComponent(detallesString)) as DetalleItem[];
+      const mappedDetails = detalles.map((item) => ({
         nombre: item.vi_producto.nombre,
         puntos: item.puntosredencion,
         cantidad: item.cantidad,
@@ -43,19 +55,7 @@ const DetalleFalta: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
       {/* Logo */}
-      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
-        <Image
-          src="/images/bannerFlujoCompra.png"
-          alt="Villaizan Logo"
-          width={1920}
-          height={1080}
-          style={{
-            width: '100%',
-            height: 'auto',
-          }}
-          priority
-        />
-      </div>
+      <Banner></Banner>
 
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6 text-black">Historial de {transactionType}</h1>
@@ -119,4 +119,14 @@ const DetalleFalta: React.FC = () => {
   );
 };
 
+const DetalleFalta: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <DetalleFaltaContent />
+    </Suspense>
+  );
+};
+
 export default DetalleFalta;
+
+
