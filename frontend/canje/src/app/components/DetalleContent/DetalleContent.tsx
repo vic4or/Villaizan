@@ -32,25 +32,28 @@ const DetalleContent: React.FC = () => {
   const [transactionDate, setTransactionDate] = useState<string>('');
 
   useEffect(() => {
-    const type = searchParams.get('type');
-    const date = searchParams.get('date');
-    const detallesString = searchParams.get('detalles');
-
-    if (type && date && detallesString) {
-      setTransactionType(type);
-      setTransactionDate(date);
-
-      const detalles = JSON.parse(detallesString) as DetalleItem[];
-      const mappedDetails = detalles.map((item) => ({
-        nombre: item.vi_producto.nombre,
-        puntos: type === 'Compra' ? item.puntosporunidad! : item.puntosredencion!,
-        cantidad: item.cantidad,
-        subtotal: type === 'Compra' ? item.subtotalpuntos! : item.subtotalpuntosredencion!,
-      }));
-
-      setProductDetails(mappedDetails);
+    if (searchParams) {
+      const type = searchParams.get('type');
+      const date = searchParams.get('date');
+      const detallesString = searchParams.get('detalles');
+  
+      if (type && date && detallesString) {
+        setTransactionType(type);
+        setTransactionDate(date);
+  
+        const detalles = JSON.parse(detallesString) as DetalleItem[];
+        const mappedDetails = detalles.map((item) => ({
+          nombre: item.vi_producto.nombre,
+          puntos: type === 'Compra' ? item.puntosporunidad! : item.puntosredencion!,
+          cantidad: item.cantidad,
+          subtotal: type === 'Compra' ? item.subtotalpuntos! : item.subtotalpuntosredencion!,
+        }));
+  
+        setProductDetails(mappedDetails);
+      }
     }
   }, [searchParams]);
+  
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
 import Banner from '../components/Banner/Banner';
+import baseApi from '../api/mainAxios.api';
 
 interface ViProducto {
   nombre: string;
@@ -56,16 +57,16 @@ const HistorialPuntos: React.FC = () => {
     const fetchPointsHistory = async () => {
       try {
         const [compraResponse, canjeResponse] = await Promise.all([
-          fetch('http://localhost:3000/puntosacumulados/cliente/listarTodos/us-256de824'),
-          fetch('http://localhost:3000/redencion/cliente/listarCanjeados/us-256de824')
+          baseApi.get('puntosacumulados/cliente/listarTodos/us-256de824'),
+          baseApi.get('redencion/cliente/listarCanjeados/us-256de824')
         ]);
-
-        const compraData: CompraItem[] = await compraResponse.json();
-        const canjeData: CanjeItem[] = await canjeResponse.json();
-
+  
+        const compraData: CompraItem[] = compraResponse.data;
+        const canjeData: CanjeItem[] = canjeResponse.data;
+  
         const pointsEarned = compraData.reduce((acc, item) => acc + item.cantidadpuntosganados, 0);
         setAccumulatedPoints(pointsEarned);
-
+  
         const compraEntries = compraData.map(item => ({
           date: new Date(item.fechatransaccion).toLocaleDateString(),
           type: 'Compra',
@@ -74,7 +75,7 @@ const HistorialPuntos: React.FC = () => {
           id: item.id,
           detalles: item.vi_detallepuntosacumulados
         }));
-
+  
         const canjeEntries = canjeData.map(item => ({
           date: new Date(item.fecharedencion).toLocaleDateString(),
           type: 'Canje',
@@ -83,15 +84,16 @@ const HistorialPuntos: React.FC = () => {
           id: item.id,
           detalles: item.vi_detalleredencion
         }));
-
+  
         setPointsHistory([...compraEntries, ...canjeEntries]);
       } catch (error) {
         console.error("Error fetching points history:", error);
       }
     };
-
+  
     fetchPointsHistory();
   }, []);
+  
 
   const handleViewDetail = (entry: PointEntry) => {
     // Pasar detalles a la página de detalle usando el estado o parámetros de la URL
