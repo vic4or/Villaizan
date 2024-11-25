@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
-import Link from 'next/link';
+import Banner from '../components/Banner/Banner';
 
 interface Product {
   id_recompensa: number;
@@ -118,19 +118,7 @@ const CatalogoProductosSuma: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
       {/* Logo */}
-      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
-        <Image
-          src="/images/bannerFlujoCompra.png"
-          alt="Villaizan Logo"
-          width={1920}
-          height={1080}
-          style={{
-            width: '100%',
-            height: 'auto',
-          }}
-          priority
-        />
-      </div>
+      <Banner/>
 
       {/* Search and Filter */}
       <div className="container mx-auto px-4 flex justify-between items-center mb-8">
@@ -141,7 +129,7 @@ const CatalogoProductosSuma: React.FC = () => {
           onClick={handleCanjear}  // Use the handleCanjear function here to navigate
           className="px-8 py-2 bg-red-600 text-white rounded"
         >
-          Canje
+          Ver Productos
         </button>
         <div className="relative">
           <input
@@ -167,7 +155,7 @@ const CatalogoProductosSuma: React.FC = () => {
 
       {/* User Points */}
       <div className="container mx-auto px-4 mb-8">
-        <h2 className="text-2xl font-semibold text-black">Puntos disponibles: {userPoints}</h2>
+        <h2 className="text-2xl font-semibold text-black">Tienes {userPoints} puntos</h2>
       </div>
 
       {/* Products Grid */}
@@ -188,9 +176,9 @@ const CatalogoProductosSuma: React.FC = () => {
                   onError={(e) => (e.currentTarget.src = '/images/defaultImage.png')} // Cargar una imagen predeterminada en caso de error
                 />
                 <h3 className="mt-4 text-lg font-semibold text-black">{product.vi_producto.nombre}</h3>
-                <p className="mt-2 text-black">{product.vi_producto.descripcion}</p>
+                {/*<p className="mt-2 text-black">{product.vi_producto.descripcion}</p>*/}
                 <div className="mt-4 flex justify-between items-center">
-                  <span className="text-lg font-bold text-black">Puntos: {product.puntosnecesarios}</span>
+                  <span className="text-lg text-black">Canjealo por <strong>{product.puntosnecesarios}</strong> puntos</span>
                 </div>
                 <div className="mt-4 flex items-center space-x-4">
                   <button

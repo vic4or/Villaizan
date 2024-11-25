@@ -1,9 +1,10 @@
 "use client";
 
-import Image from 'next/image';
-import React, { useState, useEffect } from 'react';
+//import Image from 'next/image';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
+import Banner from '../components/Banner/Banner';
 
 interface CartItem {
   id_recompensa: number;
@@ -14,7 +15,7 @@ interface CartItem {
   nombre: string;
 }
 
-const Carrito: React.FC = () => {
+const CarritoContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -60,37 +61,19 @@ const Carrito: React.FC = () => {
     }
   };
 
-  const handleCanjear = () => {
-    router.push('/historial');
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
-      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
-        <Image
-          src="/images/bannerFlujoCompra.png"
-          alt="Villaizan Logo"
-          width={1920}
-          height={1080}
-          style={{
-            width: '100%',
-            height: 'auto',
-          }}
-          priority
-        />
-      </div>
+      <Banner></Banner>
       
-      <div className="container mx-auto px-4 py-8 flex">
-        <div className="w-3/4">
-          <h1 className="text-3xl font-bold mb-6 text-black">Carrito de Compras</h1>
-          
-          <div className="bg-white p-4 rounded-lg shadow mb-6">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-wrap gap-6">
+          <div className="w-full md:w-[70%] p-6 bg-white rounded-lg shadow mb-6">
             <div className="grid grid-cols-4 font-bold border-b pb-2 mb-4">
-              <span className="text-center">Producto</span>
-              <span className="text-center">Puntos</span>
-              <span className="text-center">Cantidad</span>
-              <span className="text-center">Subtotal</span>
+              <span className="text-center text-black">Producto</span>
+              <span className="text-center text-black">Puntos por unidad</span>
+              <span className="text-center text-black">Cantidad</span>
+              <span className="text-center text-black">Subtotal de puntos</span>
             </div>
             {cartItems.map((item) => (
               <div key={item.id_producto} className="grid grid-cols-4 items-center mb-4 text-black">
@@ -101,23 +84,19 @@ const Carrito: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
-        
-        <div className="w-1/4 ml-6 bg-white p-4 rounded-lg shadow self-start">
-          <div className="flex justify-between mb-2 text-lg text-black">
-            <span>Puntos canjeados:</span>
-            <span>{userPoints}</span>
+
+          <div className="w-full md:w-[25%] p-6 bg-white rounded-lg shadow self-start">
+            <div className="flex justify-between font-bold text-xl mb-4 text-black">
+              <span>Total Puntos:</span>
+              <span>{userPoints}</span>
+            </div>
+            <button 
+              onClick={handleCheckout} 
+              className="w-full px-4 py-2 bg-red-600 text-white text-lg font-bold rounded hover:bg-red-700 transition-colors"
+            >
+              Canjear
+            </button>
           </div>
-          <div className="flex justify-between font-bold text-xl mb-4 text-black">
-            <span>Total Puntos:</span>
-            <span>{userPoints}</span>
-          </div>
-          <button 
-            onClick={handleCheckout} 
-            className="w-full px-4 py-2 bg-red-600 text-white text-lg font-bold rounded"
-          >
-            Canjear
-          </button>
         </div>
       </div>
 
@@ -155,7 +134,18 @@ const Carrito: React.FC = () => {
   );
 };
 
+const Carrito: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <CarritoContent />
+    </Suspense>
+  );
+};
+
 export default Carrito;
+
+
+
 
 
 

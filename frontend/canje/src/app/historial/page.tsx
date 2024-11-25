@@ -1,9 +1,42 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+//import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
+import Banner from '../components/Banner/Banner';
+
+interface ViProducto {
+  nombre: string;
+}
+
+interface DetallePuntosAcumulados {
+  vi_producto: ViProducto;
+  puntosporunidad: number;
+  cantidad: number;
+  subtotalpuntos: number;
+}
+
+interface DetalleRedencion {
+  vi_producto: ViProducto;
+  puntosredencion: number;
+  cantidad: number;
+  subtotalpuntosredencion: number;
+}
+
+interface CompraItem {
+  id: string;
+  fechatransaccion: string;
+  cantidadpuntosganados: number;
+  vi_detallepuntosacumulados: DetallePuntosAcumulados[];
+}
+
+interface CanjeItem {
+  id: string;
+  fecharedencion: string;
+  puntoscanjeado: number;
+  vi_detalleredencion: DetalleRedencion[];
+}
 
 interface PointEntry {
   date: string;
@@ -11,7 +44,7 @@ interface PointEntry {
   pointsEarned?: number | null;
   pointsRedeemed?: number | null;
   id: string;
-  detalles: any; // agregar la propiedad para los detalles
+  detalles: DetallePuntosAcumulados[] | DetalleRedencion[]; // detalles puede ser de cualquier tipo
 }
 
 const HistorialPuntos: React.FC = () => {
@@ -27,28 +60,28 @@ const HistorialPuntos: React.FC = () => {
           fetch('http://localhost:3000/redencion/cliente/listarCanjeados/us-256de824')
         ]);
 
-        const compraData = await compraResponse.json();
-        const canjeData = await canjeResponse.json();
+        const compraData: CompraItem[] = await compraResponse.json();
+        const canjeData: CanjeItem[] = await canjeResponse.json();
 
-        const pointsEarned = compraData.reduce((acc: number, item: any) => acc + item.cantidadpuntosganados, 0);
+        const pointsEarned = compraData.reduce((acc, item) => acc + item.cantidadpuntosganados, 0);
         setAccumulatedPoints(pointsEarned);
 
-        const compraEntries = compraData.map((item: any) => ({
+        const compraEntries = compraData.map(item => ({
           date: new Date(item.fechatransaccion).toLocaleDateString(),
           type: 'Compra',
           pointsEarned: item.cantidadpuntosganados,
           pointsRedeemed: null,
           id: item.id,
-          detalles: item.vi_detallepuntosacumulados // pasar los detalles
+          detalles: item.vi_detallepuntosacumulados
         }));
 
-        const canjeEntries = canjeData.map((item: any) => ({
+        const canjeEntries = canjeData.map(item => ({
           date: new Date(item.fecharedencion).toLocaleDateString(),
           type: 'Canje',
           pointsEarned: null,
           pointsRedeemed: item.puntoscanjeado,
           id: item.id,
-          detalles: item.vi_detalleredencion // pasar los detalles
+          detalles: item.vi_detalleredencion
         }));
 
         setPointsHistory([...compraEntries, ...canjeEntries]);
@@ -69,19 +102,7 @@ const HistorialPuntos: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
       {/* Logo */}
-      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
-        <Image
-          src="/images/bannerFlujoCompra.png"
-          alt="Villaizan Logo"
-          width={1920}
-          height={1080}
-          style={{
-            width: '100%',
-            height: 'auto',
-          }}
-          priority
-        />
-      </div>
+      <Banner></Banner>
       
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6 text-black">PuntosVillaizan</h1>
@@ -169,6 +190,7 @@ const HistorialPuntos: React.FC = () => {
 };
 
 export default HistorialPuntos;
+
 
 
 
