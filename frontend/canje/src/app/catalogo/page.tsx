@@ -252,11 +252,11 @@ const CatalogoProductosSuma: React.FC = () => {
               <li>La cantidad seleccionada de cada helado se mostrará entre los botones (+) y (-).</li>
             </ol>
             <p className="mb-4 text-black">
-              Una vez hayas seleccionado todas tus recompensas, haz clic en el botón "Ver Productos" para revisar tu carrito.
+              Una vez hayas seleccionado todas tus recompensas, haz clic en el botón &quot;Ver Productos&quot; para revisar tu carrito.
             </p>
             <h3 className="text-xl font-semibold mb-2 text-black">Carrito de Recompensas</h3>
             <p className="mb-4 text-black">
-              En el carrito, verás las recompensas seleccionadas con su precio por unidad, cantidad y subtotal. Si deseas canjear con esas recompensas escogidas, haz clic en el botón "Canjear".
+              En el carrito, verás las recompensas seleccionadas con su precio por unidad, cantidad y subtotal. Si deseas canjear con esas recompensas escogidas, haz clic en el botón &quot;Canjear&quot;.
             </p>
           </div>
         </div>
