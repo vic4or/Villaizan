@@ -21,12 +21,16 @@ interface DetalleRedencion {
 interface CanjeItem {
   id: string;
   fechageneracion: string;
+  fechaexpiracion: string;
+  codigo: string;
   puntoscanjeado: number;
   vi_detalleredencion: DetalleRedencion[];
 }
 
 interface PointEntry {
   date: string;
+  dateExp: string;
+  code: string;
   type: string;
   pointsRedeemed: number;
   id: string;
@@ -45,6 +49,8 @@ const HistorialFalta: React.FC = () => {
   
         const canjeEntries = data.map(item => ({
           date: new Date(item.fechageneracion).toLocaleDateString(),
+          dateExp: new Date(item.fechaexpiracion).toLocaleDateString(),
+          code: item.codigo,
           type: 'Canje',
           pointsRedeemed: item.puntoscanjeado,
           id: item.id,
@@ -78,7 +84,9 @@ const HistorialFalta: React.FC = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b bg-red-600 text-white">
+              <th className="py-2">Código</th>
                 <th className="py-2">Fecha Generación</th>
+                <th className="py-2">Fecha Expiración</th>
                 <th className="py-2">Tipo</th>
                 <th className="py-2">Puntos Canjeados</th>
                 <th className="py-2"></th>
@@ -87,7 +95,9 @@ const HistorialFalta: React.FC = () => {
             <tbody className="text-black">
               {pointsHistory.map((entry, index) => (
                 <tr key={index} className="border-b">
+                  <td className="py-2">{entry.code}</td>
                   <td className="py-2">{entry.date}</td>
+                  <td className="py-2">{entry.dateExp}</td>
                   <td className="py-2">{entry.type}</td>
                   <td className="py-2">{entry.pointsRedeemed}</td>
                   <td className="py-2">

@@ -41,21 +41,9 @@ const CatalogoProductosSuma: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [userPoints, setUserPoints] = useState<number>(200); // Puntos iniciales del usuario
   const [selectedProducts, setSelectedProducts] = useState<{ [key: string]: number }>({}); // Productos seleccionados
-
-  /*useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/recompensa_puntos/listarTodosProducto');
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-
-    fetchProducts();
-  }, []);*/
-
+  const [searchTerm, setSearchTerm] = useState<string>(''); // Estado para el término de búsqueda
+  const [currentPage, setCurrentPage] = useState<number>(1); // Estado para la página actual
+  const [showInstructions, setShowInstructions] = useState<boolean>(false); // Estado para mostrar las instrucciones
 
   useEffect(() => {
     async function carga() {
@@ -97,7 +85,7 @@ const CatalogoProductosSuma: React.FC = () => {
           puntosredencion: product.puntosnecesarios,
           cantidad: quantity,
           subtotalpuntosredencion: product.puntosnecesarios * quantity,
-          //nombre: product.vi_producto.nombre,
+          nombre: product.vi_producto.nombre,
         };
       }
       return null;
@@ -120,9 +108,21 @@ const CatalogoProductosSuma: React.FC = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    // Puedes agregar lógica para filtrar productos aquí
-    return products;
-  }, [products]);
+    // Filtrar productos basados en el término de búsqueda
+    return products.filter(product => 
+      product.vi_producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [products, searchTerm]);
+
+  // Calcular el número de páginas basado en el número de productos
+  const totalPages = Math.ceil(filteredProducts.length / 8);
+
+  // Obtener los productos para la página actual
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * 8;
+    const endIndex = startIndex + 8;
+    return filteredProducts.slice(startIndex, endIndex);
+  }, [filteredProducts, currentPage]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -132,8 +132,11 @@ const CatalogoProductosSuma: React.FC = () => {
 
       {/* Search and Filter */}
       <div className="container mx-auto px-4 flex justify-between items-center mb-8">
-        <button className="flex items-center space-x-2 px-4 py-2 bg-white rounded shadow">
-          <span className="text-black">Filtrar por categoría</span>
+        <button
+          className="flex items-center space-x-2 px-4 py-2 bg-white rounded shadow"
+          onClick={() => setShowInstructions(true)} // Mostrar las instrucciones al hacer clic
+        >
+          <span className="text-black">Instrucciones</span>
         </button>
         <button
           onClick={handleCanjear}  // Use the handleCanjear function here to navigate
@@ -146,6 +149,8 @@ const CatalogoProductosSuma: React.FC = () => {
             type="text"
             placeholder="Buscar tu helado"
             className="pl-10 pr-4 py-2 border rounded-lg text-black"
+            value={searchTerm} // Asignar el valor del término de búsqueda al input
+            onChange={(e) => setSearchTerm(e.target.value)} // Actualizar el término de búsqueda al escribir
           />
           <svg
             className="w-5 h-5 absolute left-3 top-2.5 text-gray-400"
@@ -171,7 +176,7 @@ const CatalogoProductosSuma: React.FC = () => {
       {/* Products Grid */}
       <div className="container mx-auto px-4 mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
+          {paginatedProducts.map((product) => (
             <div
               key={product.id_recompensa}
               className="bg-white rounded-lg shadow-md overflow-hidden relative"
@@ -213,11 +218,49 @@ const CatalogoProductosSuma: React.FC = () => {
 
       {/* Pagination */}
       <div className="container mx-auto px-4 flex justify-center space-x-2 mb-8">
-        <button className="px-4 py-2 bg-red-600 text-white rounded">1</button>
-        <button className="px-4 py-2 bg-gray-200 rounded">2</button>
-        <button className="px-4 py-2 bg-gray-200 rounded">3</button>
-        <button className="px-4 py-2 bg-gray-200 rounded">Next</button>
+      {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index}
+            className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-red-600 text-white' : 'bg-gray-200'} rounded`}
+            onClick={() => setCurrentPage(index + 1)}
+          >
+            {index + 1}
+          </button>
+        ))}
       </div>
+
+      {/* Pop-up de Instrucciones */}
+      {showInstructions && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded shadow-lg max-w-md">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Instrucciones</h2>
+              <button
+                onClick={() => setShowInstructions(false)}
+                className="text-black text-3xl"
+              >
+                &times;
+              </button>
+            </div>
+            <p className="mb-4 text-black">
+              Tienes un total de {userPoints} puntos disponibles. Para seleccionar una recompensa:
+            </p>
+            <ol className="list-decimal list-inside mb-4 text-black">
+              <li>Busca el helado que deseas canjear usando el campo de búsqueda o navegando por la lista.</li>
+              <li>Cada helado muestra la cantidad de puntos necesarios para canjearlo.</li>
+              <li>Para añadir un helado a tu selección, haz clic en el botón verde (+). Si deseas quitarlo, haz clic en el botón rojo (-).</li>
+              <li>La cantidad seleccionada de cada helado se mostrará entre los botones (+) y (-).</li>
+            </ol>
+            <p className="mb-4 text-black">
+              Una vez hayas seleccionado todas tus recompensas, haz clic en el botón "Ver Productos" para revisar tu carrito.
+            </p>
+            <h3 className="text-xl font-semibold mb-2 text-black">Carrito de Recompensas</h3>
+            <p className="mb-4 text-black">
+              En el carrito, verás las recompensas seleccionadas con su precio por unidad, cantidad y subtotal. Si deseas canjear con esas recompensas escogidas, haz clic en el botón "Canjear".
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="bg-white py-8">
@@ -252,9 +295,3 @@ const CatalogoProductosSuma: React.FC = () => {
 };
 
 export default CatalogoProductosSuma;
-
-
-
-
-
-
