@@ -4,8 +4,7 @@ import Image from 'next/image';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
-//import Banner from '../components/Banner/Banner';
-import {getRecompensaPuntos} from '../api/recompensaPuntos.api';
+import { getRecompensaPuntos } from '../api/recompensaPuntos.api';
 
 interface Product {
   id_recompensa: number;
@@ -127,9 +126,8 @@ const CatalogoProductosSuma: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
-      {/* Logo */}
-      {/*<Banner/>*/}
-
+      
+      {/* Espacio en blanco */}
       <div className="py-8"></div>
 
       {/* Search and Filter */}
@@ -199,14 +197,14 @@ const CatalogoProductosSuma: React.FC = () => {
                 </div>
                 <div className="mt-4 flex items-center space-x-4">
                   <button
-                    className="px-4 py-2 bg-red-500 text-white rounded"
+                    className="px-4 py-2 bg-gray-300 text-white rounded" // Color gris tenue para el botón "-"
                     onClick={() => handleRemoveProduct(product.vi_producto.id, product.puntosnecesarios)}
                   >
                     -
                   </button>
                   <span className="text-lg text-black">{selectedProducts[product.vi_producto.id] || 0}</span>
                   <button
-                    className="px-4 py-2 bg-green-500 text-white rounded"
+                    className="px-4 py-2 bg-gray-300 text-white rounded" // Color gris tenue para el botón "+"
                     onClick={() => handleAddProduct(product.vi_producto.id, product.puntosnecesarios)}
                   >
                     +
@@ -223,7 +221,7 @@ const CatalogoProductosSuma: React.FC = () => {
       {[...Array(totalPages)].map((_, index) => (
           <button
             key={index}
-            className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-red-600 text-white' : 'bg-gray-200'} rounded`}
+            className={`px-4 py-2 ${currentPage === index + 1 ? 'bg-red-600 text-white' : 'bg-gray-200 text-black'} rounded`}
             onClick={() => setCurrentPage(index + 1)}
           >
             {index + 1}
@@ -263,35 +261,7 @@ const CatalogoProductosSuma: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Footer */}
-      {/*<footer className="bg-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div>
-              <h4 className="font-bold mb-4 text-black">Helados Villaizan</h4>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-black">Links</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Carro</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Catálogo</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Acerca</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Contacto</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-black">Ayuda</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">FAQs</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Soporte</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Política de Privacidad</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Términos</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>*/}
+      <div className="py-8"></div>
     </div>
   );
 };
