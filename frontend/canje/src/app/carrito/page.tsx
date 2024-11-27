@@ -4,7 +4,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
-import Banner from '../components/Banner/Banner';
+//import Banner from '../components/Banner/Banner';
 import baseApi from '../api/mainAxios.api';
 
 interface CartItem {
@@ -72,7 +72,8 @@ const CarritoContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
-      <Banner></Banner>
+      {/*<Banner></Banner>*/}
+      <div className="py-8"></div>
       
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-wrap gap-6">
@@ -108,7 +109,7 @@ const CarritoContent: React.FC = () => {
         </div>
       </div>
 
-      <footer className="bg-white py-8">
+      {/*<footer className="bg-white py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
@@ -137,7 +138,7 @@ const CarritoContent: React.FC = () => {
             <p>2023 Helados Villaizan. All rights reserved</p>
           </div>
         </div>
-      </footer>
+      </footer>*/}
     </div>
   );
 };

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
-import Banner from '../components/Banner/Banner';
+//import Banner from '../components/Banner/Banner';
 import {getRecompensaPuntos} from '../api/recompensaPuntos.api';
 
 interface Product {
@@ -128,7 +128,9 @@ const CatalogoProductosSuma: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
       {/* Logo */}
-      <Banner/>
+      {/*<Banner/>*/}
+
+      <div className="py-8"></div>
 
       {/* Search and Filter */}
       <div className="container mx-auto px-4 flex justify-between items-center mb-8">
@@ -263,7 +265,7 @@ const CatalogoProductosSuma: React.FC = () => {
       )}
 
       {/* Footer */}
-      <footer className="bg-white py-8">
+      {/*<footer className="bg-white py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
@@ -289,7 +291,7 @@ const CatalogoProductosSuma: React.FC = () => {
             </div>
           </div>
         </div>
-      </footer>
+      </footer>*/}
     </div>
   );
 };
