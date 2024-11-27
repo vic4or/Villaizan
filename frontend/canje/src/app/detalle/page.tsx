@@ -5,7 +5,7 @@ import React from 'react';
 import NavMenu from '../components/NavMenu/NavMenu';
 import SuspenseWrapper from '../components/SuspenseWrapper/SuspenseWrapper'; 
 import DetalleContent from '../components/DetalleContent/DetalleContent'; // Importa el nuevo componente
-import Banner from '../components/Banner/Banner';
+//import Banner from '../components/Banner/Banner';
 
 const Detalle: React.FC = () => {
   return (
@@ -13,11 +13,12 @@ const Detalle: React.FC = () => {
       <div className="min-h-screen bg-gray-50">
         <NavMenu />
         {/* Logo */}
-        <Banner></Banner>
+        {/*<Banner></Banner>*/}
+        <div className="py-8"></div>
 
         <DetalleContent /> {/* Usamos el nuevo componente aquí */}
 
-        <footer className="bg-white py-8">
+        {/*<footer className="bg-white py-8">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div>
@@ -46,7 +47,7 @@ const Detalle: React.FC = () => {
               <p>2023 Helados Villaizan. All rights reserved</p>
             </div>
           </div>
-        </footer>
+        </footer>*/}
       </div>
     </SuspenseWrapper>
   );

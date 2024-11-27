@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 //import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
-import Banner from '../components/Banner/Banner';
+//import Banner from '../components/Banner/Banner';
 import baseApi from '../api/mainAxios.api';
 
 interface ViProducto {
@@ -104,7 +104,8 @@ const HistorialPuntos: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <NavMenu />
       {/* Logo */}
-      <Banner></Banner>
+      {/*<Banner></Banner>*/}
+      <div className="py-8"></div>
       
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6 text-black">PuntosVillaizan</h1>
@@ -157,7 +158,7 @@ const HistorialPuntos: React.FC = () => {
         </div>
       </div>
 
-      <footer className="bg-white py-8">
+      {/*<footer className="bg-white py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
@@ -186,7 +187,7 @@ const HistorialPuntos: React.FC = () => {
             <p>2023 Helados Villaizan. All rights reserved</p>
           </div>
         </div>
-      </footer>
+      </footer>*/}
     </div>
   );
 };
