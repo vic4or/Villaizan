@@ -2,63 +2,48 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Button, Alert, Modal } from 'react-bootstrap';
 
-const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
+const NuevaRecompensa = ({ show, handleClose }) => {
   const [productos, setProductos] = useState([]);
   const [recompensas, setRecompensas] = useState([]);
   const [id_producto, setid_producto] = useState('');
   const [nombreProducto, setNombreProducto] = useState('');
   const [puntosnecesarios, setpuntosnecesarios] = useState('');
-  const [error, setError] = useState('');
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredProductos, setFilteredProductos] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [error, setError] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false); // Modal de confirmación
+
+    // Función para obtener productos y recompensas
+    const fetchProductosYRecompensas = async () => {
+      try {
+        const productosResponse = await axios.get('http://localhost:3000/productos/listarTodos');
+        const recompensasResponse = await axios.get('http://localhost:3000/recompensa_puntos/listarTodos');
+        
+        setProductos(productosResponse.data);
+        setRecompensas(recompensasResponse.data);
+      } catch (err) {
+        console.error('Error al obtener los datos:', err);
+        setError('Hubo un error al cargar los productos y recompensas.');
+      }
+    };
   
-
-  // Obtener productos y recompensas al cargar el componente
-  const fetchProductosYRecompensas = async () => {
-    try {
-      const productosResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
-      const recompensasResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/recompensa_puntos/listarTodos`);
-      
-      setProductos(productosResponse.data);
-      setRecompensas(recompensasResponse.data);
-    } catch (err) {
-      console.error('Error al obtener los datos:', err);
-      setError('Hubo un error al cargar los productos y recompensas.');
-    }
-  };
-
-  useEffect(() => {
-    if (show) {
+    // Llamar a fetchProductosYRecompensas al montar el componente
+    useEffect(() => {
       fetchProductosYRecompensas();
-    }
-  }, [show]);
-  
-  useEffect(() => {
-    if (searchTerm) {
-      const filtered = productos.filter(producto =>
-        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredProductos(filtered);
-    } else {
-      setFilteredProductos(productos);
-    }
-  }, [searchTerm, productos]);
-  
-  
+    }, []);
+
   // Función para limpiar el formulario
   const resetForm = () => {
     setid_producto('');
     setNombreProducto('');
     setpuntosnecesarios('');
     setError('');
+    setSearchTerm('');
   };
 
   // Cerrar el modal y resetear el formulario
   const handleModalClose = () => {
     resetForm();
-    handleClose();
+    handleClose(); // Cierra el modal principal
   };
 
   // Manejar el submit del formulario
@@ -76,12 +61,15 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
       return;
     }
 
+    await fetchProductosYRecompensas();
+
     // Verificar si el producto ya tiene asignada una recompensa activa
     const recompensaExistente = recompensas.find(
-      (recompensa) => recompensa.id_producto === id_producto && recompensa.estado === true
+      (recompensa) => recompensa.id_producto === id_producto && recompensa.estaactivo === true
     );
 
     if (recompensaExistente) {
+      fetchProductosYRecompensas();
       setError(`El producto seleccionado ya tiene asignada una cantidad de puntos (${recompensaExistente.puntosnecesarios}).`);
       return;
     }
@@ -92,17 +80,12 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
     };
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/recompensa_puntos/registrar`, data);
-      console.log(response);
+      const response = await axios.post('http://localhost:3000/recompensa_puntos/registrar', data);
+      console.log(response); // Verifica el status de la respuesta
       if (response.status === 201) {
-        const nuevaRecompensa = response.data; // Obtener la recompensa registrada de la respuesta
-        setRecompensas([...recompensas, nuevaRecompensa]); // Agregar al estado de recompensas
-        setShowConfirmation(true);
+        await fetchProductosYRecompensas(); // Actualizar productos y recompensas después de agregar
+        setShowConfirmation(true); // Muestra el modal de confirmación
         setError('');
-
-        onRecompensaAdded();
-
-        resetForm();
       }
     } catch (err) {
       console.error('Error al registrar recompensas:', err);
@@ -110,29 +93,37 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
     }
   };
 
-  // Manejar la selección de un producto
-  const handleProductoSelect = (e) => {
-    const selectedProducto = productos.find((producto) => producto.nombre === e.target.value);
-    if (selectedProducto) {
-      setid_producto(selectedProducto.id);
-      setNombreProducto(selectedProducto.nombre);
+  // Manejar cambio de búsqueda
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleProductoSelect = (productoNombre) => {
+    fetchProductosYRecompensas();
+    const producto = productos.find(
+      (prod) => prod.nombre.toLowerCase() === productoNombre.toLowerCase()
+    );
+    if (producto) {
+      setid_producto(producto.id);
+      setNombreProducto(producto.nombre);
+    } else {
+      setid_producto('');
+      setNombreProducto('');
     }
   };
 
+
+  // Filtrar los productos según el término de búsqueda
+  const filteredProductos = productos.filter(producto =>
+    producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Cerrar ambos modales al cerrar el de confirmación
   const handleConfirmationClose = () => {
-    setShowConfirmation(false);
-    handleModalClose();
+    setShowConfirmation(false); // Cierra el modal de confirmación
+    handleModalClose(); // Cierra el modal principal y limpia el formulario
   };
 
-  const dropdownStyle = {
-    maxHeight: '200px',
-    overflowY: 'auto',
-    position: 'absolute',
-    zIndex: 1000,
-    width: '100%',
-  };
-  
 
   return (
     <>
@@ -146,38 +137,34 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
           {error && <Alert variant="danger">{error}</Alert>}
 
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Producto</Form.Label>
-              <Form.Control
+          <Form.Group className="mb-3">
+            <Form.Label>Producto</Form.Label>
+            <Form.Control
                 type="text"
                 placeholder="Buscar producto..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onClick={() => setShowDropdown(true)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  handleProductoSelect(e.target.value); // Aquí llamamos a handleProductoSelect
+                }}
+                list="productOptions"
+                autoComplete="off"
               />
-              {showDropdown && (
-                <ul className="list-group mt-2" style={dropdownStyle}>
-                  {filteredProductos.length > 0 ? (
-                    filteredProductos.map((producto) => (
-                      <li
-                        key={producto.id}
-                        className="list-group-item list-group-item-action"
-                        onClick={() => {
-                          setid_producto(producto.id);
-                          setNombreProducto(producto.nombre);
-                          setSearchTerm('');
-                          setShowDropdown(false);
-                        }}
-                      >
-                        {producto.nombre}
-                      </li>
-                    ))
-                  ) : (
-                    <li className="list-group-item">No se encontraron productos.</li>
-                  )}
-                </ul>
-              )}
-            </Form.Group>
+
+            <datalist id="productOptions">
+                {productos
+                    .filter((producto) =>
+                        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map((producto) => (
+                        <option
+                            key={producto.id}
+                            value={producto.nombre}
+                            onClick={() => handleProductoSelect(producto.nombre)}
+                        />
+                    ))}
+            </datalist>
+        </Form.Group>
 
 
             <Form.Group className="mb-3">
@@ -206,7 +193,7 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
           <Modal.Title>Confirmación</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Se han asignado los puntos necesarios correctamente.</p>
+          <p>Se han asignado {puntosnecesarios} puntos necesarios al producto {nombreProducto} correctamente.</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="success" onClick={handleConfirmationClose}>
