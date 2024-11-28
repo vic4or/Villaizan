@@ -1,7 +1,4 @@
-//import CatalogoProductosSuma from '@/app/pages/catalogoProductosSuma';
-//import Carrito from '@/components/Carrito/Carrito';
-//import HistorialPuntos from '@/components/HistorialPuntos/HistorialPuntos';
-
+/* eslint-disable */
 "use client";
 
 import React,{useState,useRef,useEffect} from "react";
@@ -17,10 +14,12 @@ const Page: React.FC = () => {
 useEffect(() => {
     if(status !== "loading" && !hasRunOnceAuth.current) {
       hasRunOnceAuth.current = true;
-      if (session?.user?.id) {
+      //@ts-ignore
+      if (session?.user?.db_info.id) {
         console.log("Is isAuthenticated",isAuthenticated)
         setIsAuthenticated(true);
-        setUserId(session.user.id);
+        //@ts-ignore
+        setUserId(session.user.db_info.id);
         console.log("UserId",userId)
       } else {
         console.log("Not isAuthenticated")
@@ -32,6 +31,7 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Renderiza el catálogo aquí */}
+      
       <CatalogoProductosSuma />
     </div>
   );
