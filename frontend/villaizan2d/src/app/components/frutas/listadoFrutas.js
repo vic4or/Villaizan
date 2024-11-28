@@ -177,9 +177,9 @@ export default function ListadoFrutas() {
                     <tr>
                         <th style={{ width: "21%" , textAlign: "left" }}>Id Fruta</th>
                         <th style={{ width: "15%" , textAlign: "left"}}>Nombre</th>
-                        <th style={{ width: "15%" , textAlign: "left"}}>Descripción</th>
+                        <th style={{ width: "15%" , textAlign: "left"}}>Historia</th>
                         <th style={{ width: "15%" , textAlign: "left"}}>Productos</th>
-                        <th style={{ width: "10%" , textAlign: "center" }}>Usuario</th>
+                        <th style={{ width: "10%" , textAlign: "center" }}>Usuario Actualización</th>
                         <th style={{ width: "8%" , textAlign: "center" }}>Fecha Actualización</th>
                         <th style={{ width: "8%" , textAlign: "center" }}>Hora Actualización</th>
                         <th style={{ width: "8%" , textAlign: "center" }}>Acciones</th>
@@ -199,7 +199,7 @@ export default function ListadoFrutas() {
                             <td style={{ textAlign: "left" }}>{item.nombre}</td>
                             <td style={{ textAlign: "left" }}>{truncateText(item.descripcion, 30)}</td>
                             <td style={{ textAlign: "left" }}>{truncateText(productosRelacionados, 30)}</td> {/* Truncar también productos */}
-                            <td style={{ textAlign: "center" }}>-</td>
+                            <td style={{ textAlign: "center" }}>admin</td>
                             <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
                             <td style={{ textAlign: "center" }}>{horaFormateada}</td>
                             <td className="text-center">

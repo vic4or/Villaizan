@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Menu from "./components/menu/menu.js"; // Importar el componente de menú
+import Menu from "./components/menu/menu.js"; 
 
 const Icon = ({ name }) => {
   const icons = {
@@ -11,7 +11,8 @@ const Icon = ({ name }) => {
     bell: "🔔",
     image: "🖼️",
     tag: "🏷️",
-    apple: "🍎", // Icono para "Gestión de Frutas"
+    apple: "🍎", 
+    usuario: "👥",
   };
   return (
     <span className="icon" style={{ fontSize: '3rem', lineHeight: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
@@ -53,6 +54,13 @@ export default function Home() {
               </div>
               <div className="grid">
                 {/* Tarjetas de opciones */}
+               {/*  <div className="card" onClick={() => window.location.href='/pages/usuario/lista'}>  
+                  <div className="icon-container">
+                    <Icon name="usuario" />
+                  </div>
+                  <h3>Gestión de Usuarios</h3>
+                  <p>Administra los usuarios del sistema</p>
+                </div> */}
                 <div className="card" onClick={() => window.location.href='/pages/recompensas/lista'}>  
                   <div className="icon-container">
                     <Icon name="gift" />

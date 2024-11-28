@@ -29,16 +29,67 @@ export default function ListadoPromociones() {
     const fetchPromociones = async () => {
       try {
         const response = await axios.get("http://localhost:3000/promocion/listarTodos");
-        //const descuentosActivos = response.data.filter((promo) => promo.estado === "Activo"); // Filtrar promociones activas
-        setPromociones(response.data);
-        console.log(response.data);
+  
+        // Ordenar promociones por fecha de inicio, de más reciente a más antigua
+        const sortedPromociones = response.data.sort((a, b) => 
+          new Date(b.actualizadoen) - new Date(a.actualizadoen)
+        );
+  
+        setPromociones(sortedPromociones);
+        console.log(sortedPromociones);
       } catch (error) {
         console.error("Error al obtener las promociones:", error);
       }
     };
-    
+  
     fetchPromociones();
   }, []);
+
+  useEffect(() => {
+    const fetchAndUpdatePromotions = async () => {
+      try {
+        // Obtener las promociones
+        const response = await axios.get("http://localhost:3000/productos/listarTodos");
+        const promotions = response.data;
+  
+        // Obtener la fecha actual en formato "yyyy-MM-dd"
+        const today = new Date();
+        const todayFormatted = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  
+        // Filtrar las promociones que tienen fechaFin menor a la fecha actual
+        const expiredPromotions = promotions.filter(
+          (promo) => promo.fechaFin && promo.fechaFin < todayFormatted
+        );
+  
+        // Actualizar cada promoción expirada a inactiva
+        await Promise.all(
+          expiredPromotions.map(async (promo) => {
+            await axios.delete(`http://localhost:3000/descuento/eliminar/${promo.id}`);
+          })
+        );
+  
+        // Refrescar las promociones después de actualizar
+        const updatedResponse = await axios.get("http://localhost:3000/productos/listarTodos");
+        setAvailableProducts(updatedResponse.data.map((product) => ({
+          id: product.id,
+          nombre: product.nombre,
+        })));
+  
+        console.log("Promociones expiradas actualizadas a inactivas:", expiredPromotions);
+      } catch (error) {
+        console.error("Error al actualizar promociones expiradas:", error);
+      }
+    };
+  
+    fetchAndUpdatePromotions();
+  }, []);
+  
+  const truncateText = (text, maxLength) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  };
 
   // Función para eliminar una promoción
   const handleDelete = async (id) => {
@@ -111,6 +162,13 @@ export default function ListadoPromociones() {
     return `${day}/${month}/${year}`;
   };  
 
+  const formatFechaHora = (fechaString) => {
+    const fecha = new Date(fechaString);
+    const fechaFormateada = fecha.toLocaleDateString();
+    const horaFormateada = fecha.toLocaleTimeString();
+    return { fechaFormateada, horaFormateada };
+};
+
   return (
     <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
       {/* Breadcrumb y Filtro de Activos/Inactivos */}
@@ -173,23 +231,35 @@ export default function ListadoPromociones() {
       <Table hover>
         <thead>
           <tr>
-            <th>Nombre</th>
-            {/*<th>Tipo</th>*/}
-            <th>Descripción</th>
-            <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>
-            <th>Descuento</th>
-            <th className="text-center">Opciones</th>
+            <th style={{ textAlign: "left" }}>Id Promoción</th>
+            <th style={{ textAlign: "left" }}>Nombre</th>
+            <th style={{ textAlign: "left" }}>Descripción</th>
+            <th style={{ textAlign: "center" }}>Fecha Inicio</th>
+            <th style={{ textAlign: "center" }}>Fecha Fin</th>
+            <th style={{ textAlign: "center" }}>Descuento (%)</th>
+            <th style={{ textAlign: "center" }}>Límite Stock</th>
+            <th style={{ width: "10%" , textAlign: "center" }}>Usuario Actualización</th>
+            <th style={{ textAlign: "center" }}>Fecha Actualización</th>
+            <th style={{ textAlign: "center" }}>Hora Actualización</th>
+            <th className="text-center">Acciones</th>
+            <th style={{ textAlign: "center" }}>Estado</th>
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((item) => (
+          {currentItems.map((item) => {
+            const { fechaFormateada, horaFormateada } = formatFechaHora(item.actualizadoen);
+            return (
             <tr key={item.id}>
-              <td>{item.titulo}</td>
-              <td>{item.descripcion}</td>
-              <td>{formatDate(item.fechainicio)}</td>
-              <td>{formatDate(item.fechafin)}</td>
-              <td>{item.porcentajedescuento}</td>
+              <td style={{ textAlign: "left" }}>{item.id}</td>
+              <td style={{ textAlign: "left" }}>{item.titulo}</td>
+              <td style={{ textAlign: "left" }}>{truncateText(item.descripcion, 10)}</td>
+              <td style={{ textAlign: "center" }}>{formatDate(item.fechainicio)}</td>
+              <td style={{ textAlign: "center" }}>{formatDate(item.fechafin)}</td>
+              <td style={{ textAlign: "center" }}>{item.porcentajedescuento}</td>
+              <td style={{ textAlign: "center" }}>{item.limitestock}</td>
+              <td style={{ textAlign: "center" }}>{item.usuarioactualizacion}</td>
+              <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
+              <td style={{ textAlign: "center" }}>{horaFormateada}</td>
               <td className="text-center">
                 {/* Botones de Edición y Eliminación */}
                 <Link href={`/pages/promociones/editar/?id=${item.id}`} key={item.id}>
@@ -197,16 +267,20 @@ export default function ListadoPromociones() {
                     <FaEdit /> 
                   </Button>
                 </Link>
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  <FaTrashAlt /> 
-                </Button>
+              </td>
+              <td className="text-center">
+                  <Button 
+                      variant={item.estaactivo ? "success" : "danger"} 
+                      size="sm"
+                      onClick={() => handleDelete(item.id)}
+                  >
+                      {item.estaactivo ? "Activo" : "Inactivo"}
+                  </Button>
               </td>
             </tr>
-          ))}
+            );
+                
+          })}
         </tbody>
       </Table>
 

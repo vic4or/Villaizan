@@ -128,85 +128,107 @@ export default function FormularioPromocion() {
     }
   };
 
-  // Modificación de la función handleSubmit
-const handleSubmit = async (event) => {
-  event.preventDefault();
-
-  let valid = true;
-  let message = "";
-
-  if (!initialValues.nombre || !initialValues.tipo || !initialValues.descuento || !initialValues.fechaInicio || !initialValues.fechaFin || !initialValues.descripcion) {
-    valid = false;
-    message = "Todos los campos obligatorios deben ser completados.";
-  }
-
-  if (initialValues.tipo === "Paquete" && selectedProducts.length < 2) {
-    valid = false;
-    message = "Para el tipo \"Paquete\", debe seleccionar al menos dos productos.";
-  }
-
-  if (initialValues.descuento < 1 || initialValues.descuento > 100) {
-    valid = false;
-    message = "El descuento debe estar entre 1 y 100.";
-  }
-
-  if (parseInt(initialValues.limiteStock, 10) < 10) {
-    valid = false;
-    message = "El stock debe ser al menos 10.";
-  }
-
-  const today = new Date().toISOString().split("T")[0];
-  if (new Date(initialValues.fechaInicio) < new Date(today)) {
-    valid = false;
-    message = "La fecha de inicio no puede ser anterior a hoy.";
-  } else if (new Date(initialValues.fechaFin) < new Date(today)) {
-    valid = false;
-    message = "La fecha de fin no puede ser anterior a hoy.";
-  } else if (new Date(initialValues.fechaFin) < new Date(initialValues.fechaInicio)) {
-    valid = false;
-    message = "La fecha de fin no puede ser menor a la fecha de inicio.";
-  }
-
-  if (selectedProducts.length === 0) {
-    valid = false;
-    message = "Debe seleccionar al menos un producto.";
-  }
-
-  if (valid) {
-    const payload = {
-      titulo: initialValues.nombre,
-      descripcion: initialValues.descripcion,
-      fechaInicio: initialValues.fechaInicio,
-      fechaFin: initialValues.fechaFin,
-      limiteStock: parseInt(initialValues.limiteStock, 10),
-      porcentajeDescuento: parseFloat(initialValues.descuento),
-      vi_productoIds: selectedProducts.map((product) => product.id),
-    };
-
-    try {
-      console.log("Datos de la promoción:", payload);
-      
-      if (isEditMode) {
-        // Llamar a la función de actualización si está en modo edición
-        await updateDiscount();
-      } else {
-        // Llamar a la API de registro si no está en modo edición
-        const response = await axios.post("http://localhost:3000/descuento/registrar", payload);
-        setShowConfirmation(true);
-        setFormError(false);
-        setErrorMessage("");
-        console.log("Descuento registrado:", response.data);
-      }
-    } catch (error) {
-      console.error("Error al procesar la solicitud:", error);
-      setFormError(true);
-      setErrorMessage("Error al procesar la solicitud. Por favor, intenta nuevamente.");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+  
+    let valid = true;
+    let message = "";
+  
+    // Obtener la fecha actual ajustada a la zona horaria local
+    const todayFormatted = getTodayDate();
+  
+    // Verifica las fechas del formulario
+    const fechaInicio = initialValues.fechaInicio;
+    const fechaFin = initialValues.fechaFin;
+  
+    console.log("Fecha de hoy:", todayFormatted);
+    console.log("Fecha de inicio:", fechaInicio);
+    console.log("Fecha de fin:", fechaFin);
+  
+    // Validaciones
+    if (!initialValues.nombre || !initialValues.tipo || !initialValues.descuento || !fechaInicio || !fechaFin || !initialValues.descripcion) {
+      valid = false;
+      message = "Todos los campos obligatorios deben ser completados.";
     }
-  } else {
-    setFormError(true);
-    setErrorMessage(message);
-  }
-};
+  
+    if (initialValues.tipo === "Paquete" && selectedProducts.length < 2) {
+      valid = false;
+      message = "Para el tipo \"Paquete\", debe seleccionar al menos dos productos.";
+    }
+  
+    if (initialValues.descuento < 1 || initialValues.descuento > 100) {
+      valid = false;
+      message = "El descuento debe estar entre 1 y 100.";
+    }
+  
+    if (parseInt(initialValues.limiteStock, 10) < 10) {
+      valid = false;
+      message = "El stock debe ser al menos 10.";
+    }
+  
+    // Comparaciones de fechas como cadenas "yyyy-MM-dd"
+    if (fechaInicio < todayFormatted) {
+      valid = false;
+      message = "La fecha de inicio no puede ser anterior a hoy.";
+    } else if (fechaFin < todayFormatted) {
+      valid = false;
+      message = "La fecha de fin no puede ser anterior a hoy.";
+    } else if (fechaFin < fechaInicio) {
+      valid = false;
+      message = "La fecha de fin no puede ser menor a la fecha de inicio.";
+    }
+  
+    if (selectedProducts.length === 0) {
+      valid = false;
+      message = "Debe seleccionar al menos un producto.";
+    }
+  
+    if (valid) {
+      const payload = {
+        titulo: initialValues.nombre,
+        descripcion: initialValues.descripcion,
+        fechaInicio: fechaInicio,
+        fechaFin: fechaFin,
+        limiteStock: parseInt(initialValues.limiteStock, 10),
+        porcentajeDescuento: parseFloat(initialValues.descuento),
+        vi_productoIds: selectedProducts.map((product) => product.id),
+      };
+  
+      try {
+        console.log("Datos de la promoción:", payload);
+        
+        if (isEditMode) {
+          // Llamar a la función de actualización si está en modo edición
+          await updateDiscount();
+        } else {
+          // Llamar a la API de registro si no está en modo edición
+          const response = await axios.post("http://localhost:3000/descuento/registrar", payload);
+          setShowConfirmation(true);
+          setFormError(false);
+          setErrorMessage("");
+          console.log("Descuento registrado:", response.data);
+        }
+      } catch (error) {
+        console.error("Error al procesar la solicitud:", error);
+        setFormError(true);
+        setErrorMessage("Error al procesar la solicitud. Por favor, intenta nuevamente.");
+      }
+    } else {
+      setFormError(true);
+      setErrorMessage(message);
+    }
+  };
+  
+  
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
+  
   const handleProductSearch = (event) => {
     setSearchProduct(event.target.value);
   };
@@ -316,9 +338,22 @@ const handleSubmit = async (event) => {
                     placeholder="Límite de stock"
                     className="form-control-custom"
                     value={initialValues.limiteStock}
-                    onChange={(e) => setInitialValues({ ...initialValues, limiteStock: e.target.value })}
+                    onChange={(e) => {
+                      // Permitir solo números enteros positivos
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value)) {
+                        setInitialValues({ ...initialValues, limiteStock: value });
+                      }
+                    }}
+                    onKeyPress={(e) => {
+                      // Evitar ingreso de puntos, comas o caracteres inválidos
+                      if (e.key === '.' || e.key === ',' || e.key === '-') {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                 </Form.Group>
+
 
                 {/* Fechas */}
                 <Form.Group className="mb-3">
