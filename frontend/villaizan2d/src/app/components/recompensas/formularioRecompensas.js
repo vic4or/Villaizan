@@ -18,8 +18,8 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
   // Obtener productos y recompensas al cargar el componente
   const fetchProductosYRecompensas = async () => {
     try {
-      const productosResponse = await axios.get('http://localhost:3000/productos/listarTodos');
-      const recompensasResponse = await axios.get('http://localhost:3000/recompensa_puntos/listarTodos');
+      const productosResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
+      const recompensasResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/recompensa_puntos/listarTodos`);
       
       setProductos(productosResponse.data);
       setRecompensas(recompensasResponse.data);
@@ -92,7 +92,7 @@ const NuevaRecompensa = ({ show, handleClose , onRecompensaAdded  }) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:3000/recompensa_puntos/registrar', data);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/recompensa_puntos/registrar`, data);
       console.log(response);
       if (response.status === 201) {
         const nuevaRecompensa = response.data; // Obtener la recompensa registrada de la respuesta

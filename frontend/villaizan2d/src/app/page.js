@@ -61,42 +61,42 @@ export default function Home() {
                   <h3>Gestión de Usuarios</h3>
                   <p>Administra los usuarios del sistema</p>
                 </div> */}
-                <div className="card" onClick={() => window.location.href='/pages/recompensas/lista'}>  
+                <div className="card" onClick={() => window.location.href='/recompensas/lista'}>  
                   <div className="icon-container">
                     <Icon name="gift" />
                   </div>
                   <h3>Gestión de Recompensas</h3>
                   <p>Administra los puntos de recompensa de los clientes</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/puntos/lista'}>  
+                <div className="card" onClick={() => window.location.href='/puntos/lista'}>  
                   <div className="icon-container">
                     <Icon name="card" />
                   </div>
                   <h3>Gestión de Puntos</h3>
                   <p>Administra los puntos asignados por la compra de cada producto</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/canjes/lista'}>  
+                <div className="card" onClick={() => window.location.href='/canjes/lista'}>  
                   <div className="icon-container">
                     <Icon name="percent" />
                   </div>
                   <h3>Gestión de Canjes</h3>
                   <p>Administra los códigos generados por los clientes para canjear recompensas</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/multimedia/lista'}>  
+                <div className="card" onClick={() => window.location.href='/multimedia/lista'}>  
                   <div className="icon-container">
                     <Icon name="image" />
                   </div>
                   <h3>Gestión de Multimedia</h3>
                   <p>Crea, modifica y gestiona contenido multimedia como imágenes y videos de frutas y helados</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/promociones/lista'}>  
+                <div className="card" onClick={() => window.location.href='/promociones/lista'}>  
                   <div className="icon-container">
                     <Icon name="tag" />
                   </div>
                   <h3>Gestión de Promociones</h3>
                   <p>Administra ofertas y promociones para los clientes</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/frutas/lista'}>
+                <div className="card" onClick={() => window.location.href='/frutas/lista'}>
                   <div className="icon-container">
                     <Icon name="apple" />
                   </div>

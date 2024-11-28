@@ -32,7 +32,7 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/productos/listarTodos");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
         setProductos(response.data);
       } catch (err) {
         console.error("Error al obtener los productos:", err);
@@ -42,7 +42,7 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
 
     const fetchFrutasActivas = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/fruta/listarTodos");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/listarTodos`);
         const frutas = response.data.filter((fruta) => fruta.estaactivo); 
         setFrutasActivas(frutas);
       } catch (err) {
@@ -69,7 +69,7 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
     if (isEditMode && frutaId) {
       const fetchFrutaById = async () => {
         try {
-          const response = await axios.patch(`http://localhost:3000/fruta/editar/${frutaId}`, {
+          const response = await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/editar/${frutaId}`, {
             nombre: "",
             descripcion: "",
             productosParaAgregar: [],
@@ -126,9 +126,9 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
       };
 
       if (isEditMode) {
-        await axios.patch(`http://localhost:3000/fruta/editar/${frutaId}`, payload);
+        await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/editar/${frutaId}`, payload);
       } else {
-        await axios.post("http://localhost:3000/fruta/registrar", payload);
+        await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/registrar`, payload);
       }
 
       setShowConfirmation(true);
@@ -138,7 +138,7 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
 
       setTimeout(() => {
         setShowConfirmation(false);
-        router.push("/pages/frutas/lista");
+        router.push("/frutas/lista");
       }, 3000);
     } catch (error) {
       console.error("Error al guardar la fruta:", error);
@@ -185,7 +185,7 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
 
   const handleClose = () => {
     setShowConfirmation(false);
-    router.push("/pages/frutas/lista");
+    router.push("/frutas/lista");
   };
 
   const [filteredProductos, setFilteredProductos] = useState([]); 

@@ -43,7 +43,7 @@ export default function FormularioPromocion() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/productos/listarTodos");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
         setAvailableProducts(response.data.map((product) => ({
           id: product.id,
           nombre: product.nombre,
@@ -66,7 +66,7 @@ export default function FormularioPromocion() {
 
   const fetchPromotionById = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:3000/descuento/listarUno/${id}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/descuento/listarUno/${id}`);
       return response.data; // Retorna los datos de la promoción obtenidos de la API
     } catch (error) {
       console.error("Error al obtener la promoción: ", error);
@@ -116,7 +116,7 @@ export default function FormularioPromocion() {
     try {
       console.log("Actualizando el descuento con datos:", payload);
       // Llamar a la API de edición usando el método PATCH y pasando el id del descuento
-      const response = await axios.patch(`http://localhost:3000/descuento/editar/${id}`, payload);
+      const response = await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/descuento/editar/${id}`, payload);
       setShowConfirmation(true);
       setFormError(false);
       setErrorMessage("");
@@ -202,7 +202,7 @@ export default function FormularioPromocion() {
           await updateDiscount();
         } else {
           // Llamar a la API de registro si no está en modo edición
-          const response = await axios.post("http://localhost:3000/descuento/registrar", payload);
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/descuento/registrar`, payload);
           setShowConfirmation(true);
           setFormError(false);
           setErrorMessage("");
@@ -248,7 +248,7 @@ export default function FormularioPromocion() {
 
   const handleClose = () => {
     setShowConfirmation(false);
-    router.push("/pages/promociones/lista");
+    router.push("/promociones/lista");
   };
 
   return (

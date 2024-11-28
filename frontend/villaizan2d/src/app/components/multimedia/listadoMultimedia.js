@@ -18,7 +18,7 @@ export default function ListadoMultimedia() {
 
     useEffect(() => {
         // Cargar multimedia desde la API
-        axios.get("http://localhost:3000/contenidoeducativo/listarTodos")
+        axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/contenidoeducativo/listarTodos`)
             .then((response) => {
                 setMultimedia(response.data);
             })
@@ -27,7 +27,7 @@ export default function ListadoMultimedia() {
             });
 
         // Cargar frutas desde la API
-        axios.get("http://localhost:3000/fruta/listarTodos")
+        axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/listarTodos`)
             .then((response) => {
                 setFrutas(response.data);
             })
@@ -59,18 +59,18 @@ export default function ListadoMultimedia() {
     const totalPages = Math.ceil(filteredMultimedia.length / itemsPerPage);
 
     const handleEdit = (id) => {
-        router.push(`/pages/multimedia/editar/?id=${id}`);
+        router.push(`/multimedia/editar/?id=${id}`);
     };
 
     const handleAddNew = () => {
-        router.push("/pages/multimedia/nuevo");
+        router.push("/multimedia/nuevo");
     };
 
     // Función para inactivar multimedia
     const handleDelete = (id) => {
         const confirmDelete = window.confirm("¿Estás seguro de que deseas inactivar este contenido?");
         if (confirmDelete) {
-            axios.put(`http://localhost:3000/contenidoeducativo/inactivar/${id}`)
+            axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/contenidoeducativo/inactivar/${id}`)
                 .then((response) => {
                     console.log("Contenido inactivado exitosamente:", response.data);
                     // Actualizar la lista de multimedia
@@ -202,7 +202,7 @@ export default function ListadoMultimedia() {
 
                         return (
                             <tr key={item.id}>
-                                <td style={{ textAlign: "left" }}>{item.id.slice(0, 6)}...</td> {/* Truncar ID */}
+                                <td style={{ textAlign: "left" }}>{item.id}</td>
                                 <td style={{ textAlign: "left" }}>{getNombreFruta(item.id_fruta)}</td>
                                 <td style={{ textAlign: "left" }}>{item.titulo}</td>
                                 <td style={{ textAlign: "center" }}>{item.tipocontenido}</td>
@@ -224,7 +224,7 @@ export default function ListadoMultimedia() {
                                 <td style={{ textAlign: "center" }}>{horaFormateada}</td>
                                 <td style={{ textAlign: "center" }}>admin</td>
                                 <td className="text-center">
-                                    <Link href={`/pages/multimedia/editar?id=${item.id}`} key={item.id}>
+                                    <Link href={`/multimedia/editar?id=${item.id}`} key={item.id}>
                                         <Button variant="outline-primary" size="sm" className="me-2">
                                             <FaEdit />
                                         </Button>

@@ -22,7 +22,7 @@ export default function ListadoFrutas() {
     useEffect(() => {
         const fetchFrutas = async () => {
             try {
-                const frutasResponse = await axios.get("http://localhost:3000/fruta/listarTodos");
+                const frutasResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/listarTodos`);
                 setFrutas(frutasResponse.data);
             } catch (error) {
                 console.error("Error al obtener los datos:", error);
@@ -69,7 +69,7 @@ export default function ListadoFrutas() {
 
     const fetchFrutas = async () => {
         try {
-            const frutasResponse = await axios.get("http://localhost:3000/fruta/listarTodos");
+            const frutasResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/listarTodos`);
             setFrutas(frutasResponse.data);
         } catch (error) {
             console.error("Error al obtener los datos:", error);
@@ -85,7 +85,7 @@ export default function ListadoFrutas() {
         if (!selectedFruta) return;
 
         try {
-            await axios.patch(`http://localhost:3000/fruta/inactivar/${selectedFruta}`);
+            await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/inactivar/${selectedFruta}`);
             const updatedFrutas = frutas.map((item) =>
                 item.id === selectedFruta ? { ...item, estaactivo: false } : item
             );
@@ -167,7 +167,7 @@ export default function ListadoFrutas() {
             <Row className="mb-4">
                 <Col md={8}></Col>
                 <Col md={4} className="d-flex justify-content-end align-items-start">
-                    <Button variant="danger" className="me-2" onClick={() => router.push("/pages/frutas/nuevo")}>+ Agregar</Button>
+                    <Button variant="danger" className="me-2" onClick={() => router.push("/frutas/nuevo")}>+ Agregar</Button>
                     <Button variant="outline-danger" onClick={handleExport}>Exportar</Button>
                 </Col>
             </Row>
@@ -203,7 +203,7 @@ export default function ListadoFrutas() {
                             <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
                             <td style={{ textAlign: "center" }}>{horaFormateada}</td>
                             <td className="text-center">
-                                <Button variant="outline-primary" size="sm" onClick={() => router.push(`/pages/frutas/editar?id=${item.id}`)}>
+                                <Button variant="outline-primary" size="sm" onClick={() => router.push(`/frutas/editar?id=${item.id}`)}>
                                     <FaEdit />
                                 </Button>
                             </td>

@@ -15,7 +15,7 @@ export default function ListadoCanje() {
 
     useEffect(() => {
         const fetchRedenciones = async () => {
-            const response = await axios.get("http://localhost:3000/redencion/admin/listarTodos");
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/redencion/admin/listarTodos`);
             console.log("Redenciones obtenidas:", response.data);
             setRedenciones(response.data);
         };
@@ -29,7 +29,7 @@ export default function ListadoCanje() {
 
     const fetchRedenciones = async () => {
         try {
-            const response = await axios.get("http://localhost:3000/redencion/admin/listarTodos");
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/redencion/admin/listarTodos`);
             console.log("Redenciones actualizadas:", response.data);
             setRedenciones(response.data);
         } catch (error) {
@@ -41,7 +41,7 @@ export default function ListadoCanje() {
         try {
             console.log("ID seleccionado para canjear:", selectedRedencion.id); // Verificar ID
             const response = await axios.patch(
-                `http://localhost:3000/redencion/admin/validar/${selectedRedencion.id}`
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/redencion/admin/validar/${selectedRedencion.id}`
             );
             alert("El código ha sido canjeado exitosamente.");
             setRedenciones((prevRedenciones) =>

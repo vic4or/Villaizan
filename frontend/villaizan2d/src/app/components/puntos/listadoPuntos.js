@@ -26,8 +26,8 @@ export default function ListadoPuntos() {
     useEffect(() => {
         const fetchPuntosYProductos = async () => {
             try {
-                const puntosResponse = await axios.get("http://localhost:3000/puntos_producto/listarTodos");
-                const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
+                const puntosResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/listarTodos`);
+                const productosResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
 
                 setPuntos(puntosResponse.data); // Asumimos que la respuesta es el array de puntos
                 setProductos(productosResponse.data); // Lista de productos
@@ -92,7 +92,7 @@ export default function ListadoPuntos() {
             }
 
             // Hacemos la llamada a la API para editar
-            await axios.put("http://localhost:3000/puntos_producto/editar", {
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/editar`, {
                 idPuntosProducto: selectedProduct.id_puntosproducto,
                 idProducto: selectedProduct.id_producto,
                 nuevaCantidad: nuevaCantidad
@@ -117,7 +117,7 @@ export default function ListadoPuntos() {
     const handleDelete = async (idPuntosProducto) => {
         console.log("ID a inactivar:", idPuntosProducto); // Verificar el ID en la consola
         try {
-            await axios.put(`http://localhost:3000/puntos_producto/inactivar/${idPuntosProducto}`);
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/inactivar/${idPuntosProducto}`);
             // Actualizar la lista de puntos para reflejar el cambio de estado
             const updatedPuntos = puntos.map((item) =>
                 item.id_puntosproducto === idPuntosProducto

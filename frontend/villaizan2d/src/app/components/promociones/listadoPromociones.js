@@ -28,7 +28,7 @@ export default function ListadoPromociones() {
   useEffect(() => {
     const fetchPromociones = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/promocion/listarTodos");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/promocion/listarTodos`);
   
         // Ordenar promociones por fecha de inicio, de más reciente a más antigua
         const sortedPromociones = response.data.sort((a, b) => 
@@ -49,7 +49,7 @@ export default function ListadoPromociones() {
     const fetchAndUpdatePromotions = async () => {
       try {
         // Obtener las promociones
-        const response = await axios.get("http://localhost:3000/productos/listarTodos");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
         const promotions = response.data;
   
         // Obtener la fecha actual en formato "yyyy-MM-dd"
@@ -64,12 +64,12 @@ export default function ListadoPromociones() {
         // Actualizar cada promoción expirada a inactiva
         await Promise.all(
           expiredPromotions.map(async (promo) => {
-            await axios.delete(`http://localhost:3000/descuento/eliminar/${promo.id}`);
+            await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/descuento/eliminar/${promo.id}`);
           })
         );
   
         // Refrescar las promociones después de actualizar
-        const updatedResponse = await axios.get("http://localhost:3000/productos/listarTodos");
+        const updatedResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
         setAvailableProducts(updatedResponse.data.map((product) => ({
           id: product.id,
           nombre: product.nombre,
@@ -97,7 +97,7 @@ export default function ListadoPromociones() {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/descuento/eliminar/${id}`);
+      await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/descuento/eliminar/${id}`);
       // Actualizar la lista de promociones después de la eliminación
       setPromociones(promociones.filter((promo) => promo.id !== id));
       alert("Promoción eliminada exitosamente.");
@@ -124,11 +124,11 @@ export default function ListadoPromociones() {
   const totalPages = Math.ceil(filteredPromociones.length / itemsPerPage);
 
   const handleEdit = (id) => {
-    router.push(`/pages/promociones/editar/?id=${id}`);
+    router.push(`/promociones/editar/?id=${id}`);
   };
 
   const handleAddNew = () => {
-    router.push("/pages/promociones/nuevo");
+    router.push("/promociones/nuevo");
   };
 
   // Función para exportar datos a CSV
@@ -262,7 +262,7 @@ export default function ListadoPromociones() {
               <td style={{ textAlign: "center" }}>{horaFormateada}</td>
               <td className="text-center">
                 {/* Botones de Edición y Eliminación */}
-                <Link href={`/pages/promociones/editar/?id=${item.id}`} key={item.id}>
+                <Link href={`/promociones/editar/?id=${item.id}`} key={item.id}>
                   <Button variant="outline-primary" size="sm" className="me-2">
                     <FaEdit /> 
                   </Button>

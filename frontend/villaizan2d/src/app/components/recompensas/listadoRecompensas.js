@@ -28,8 +28,8 @@ export default function ListadoRecompensas() {
     // Función para cargar recompensas y productos desde el backend
     const fetchRecompensasYProductos = async () => {
         try {
-            const recompensasResponse = await axios.get("http://localhost:3000/recompensa_puntos/listarTodos");
-            const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
+            const recompensasResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/recompensa_puntos/listarTodos`);
+            const productosResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
 
             setRecompensas(recompensasResponse.data);
             setProductos(productosResponse.data);
@@ -103,7 +103,7 @@ export default function ListadoRecompensas() {
                 return;
             }
     
-            await axios.put("http://localhost:3000/recompensa_puntos/editar", {
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/recompensa_puntos/editar`, {
                 id_recompensa: selectedRecompensa.id_recompensa,
                 id_producto: selectedRecompensa.id_producto,
                 puntosNecesarios: newAmountValue
@@ -138,7 +138,7 @@ export default function ListadoRecompensas() {
         try {
             // Solo inactivar si la recompensa seleccionada está actualmente activa
             if (selectedRecompensa && selectedRecompensa.estaactivo) {
-                await axios.put(`http://localhost:3000/recompensa_puntos/inactivar/${parseInt(selectedRecompensa.id_recompensa)}`);
+                await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/recompensa_puntos/inactivar/${parseInt(selectedRecompensa.id_recompensa)}`);
                 const updatedRecompensas = recompensas.map((item) =>
                     item.id_recompensa === selectedRecompensa.id_recompensa
                     ? { ...item, estaactivo: false }
