@@ -69,18 +69,14 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
     if (isEditMode && frutaId) {
       const fetchFrutaById = async () => {
         try {
-          const response = await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/editar/${frutaId}`, {
-            nombre: "",
-            descripcion: "",
-            productosParaAgregar: [],
-            productosParaQuitar: []
-          });
+          const response = await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/editar/${frutaId}`);
+          console.log("Datos de la fruta recibidos:", response.data);
           const fruta = response.data;
   
           setInitialValues({
             nombre: fruta.nombre,
             descripcion: fruta.descripcion,
-            productos: fruta.vi_producto_fruta,
+            productos: fruta.vi_producto_fruta || [],
           });
           setSelectedProducts(fruta.vi_producto_fruta || []);
         } catch (error) {
@@ -91,51 +87,42 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
       fetchFrutaById();
     }
   }, [isEditMode, frutaId]);
-
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     if (!initialValues.nombre || !initialValues.descripcion) {
       setFormError(true);
       setErrorMessage("Todos los campos deben ser completados.");
       return;
     }
-
-    if (!hasChanges) {
-      alert("No se han realizado cambios.");
-      return;
-    }
-
-    // Validar duplicado de nombre (normalizando texto)
-    const nombreNormalizado = initialValues.nombre.trim().toLowerCase();
-    const nombreDuplicado = frutasActivas.some(
-      (fruta) => fruta.nombre.trim().toLowerCase() === nombreNormalizado
-    );
-    if (nombreDuplicado) {
-      setFormError(true);
-      setErrorMessage("Ya existe una fruta activa con este nombre.");
-      return;
-    }
-
+  
+    const cleanProductos = productosParaAgregar.filter((id) => id); // Filtra valores inválidos
+  
+    const payload = {
+      nombre: initialValues.nombre,
+      descripcion: initialValues.descripcion,
+      productos: cleanProductos, // Usar "productos" para registrar
+    };
+  
     try {
-      const payload = {
-        nombre: initialValues.nombre,
-        descripcion: initialValues.descripcion,
-        productosParaAgregar,
-        productosParaQuitar,
-      };
-
       if (isEditMode) {
-        await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/editar/${frutaId}`, payload);
+        // Modo edición
+        await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/editar/${frutaId}`, {
+          ...payload,
+          productosParaAgregar: cleanProductos,
+          productosParaQuitar, // Incluye la lista para quitar (si aplica)
+        });
       } else {
+        // Registro
         await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/registrar`, payload);
       }
-
+  
       setShowConfirmation(true);
       setFormError(false);
       setErrorMessage("");
-      setHasChanges(false); // Resetear cambios después de guardar
-
+      setHasChanges(false);
+  
       setTimeout(() => {
         setShowConfirmation(false);
         router.push("/frutas/lista");
@@ -146,7 +133,9 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
       setErrorMessage("Error al guardar la fruta. Inténtalo de nuevo.");
     }
   };
-
+  
+  
+  
   const handleProductSearch = (event) => {
     setSearchProduct(event.target.value);
   };
@@ -155,12 +144,17 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
     if (product && !selectedProducts.some((p) => p.id === product.id)) {
       setSelectedProducts([...selectedProducts, product]);
       setProductosParaAgregar([...productosParaAgregar, product.id]);
-
-      setProductosParaQuitar(productosParaQuitar.filter((id) => id !== product.id));
+  
+      // Verifica y elimina si por error se añadió a productosParaQuitar
+      setProductosParaQuitar((prevProductosParaQuitar) =>
+        prevProductosParaQuitar.filter((id) => id !== product.id)
+      );
+  
       setSearchProduct("");
       setHasChanges(true); 
     }
   };
+  
 
   const handleRemoveProduct = (product) => {
     setSelectedProducts((prevSelectedProducts) => 
