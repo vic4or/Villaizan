@@ -222,7 +222,7 @@ export default function ListadoMultimedia() {
                                 </td>
                                 <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
                                 <td style={{ textAlign: "center" }}>{horaFormateada}</td>
-                                <td style={{ textAlign: "center" }}>-</td>
+                                <td style={{ textAlign: "center" }}>admin</td>
                                 <td className="text-center">
                                     <Link href={`/pages/multimedia/editar?id=${item.id}`} key={item.id}>
                                         <Button variant="outline-primary" size="sm" className="me-2">

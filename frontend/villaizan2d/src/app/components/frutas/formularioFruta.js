@@ -103,12 +103,6 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
       return;
     }
 
-    if (selectedProducts.length === 0) {
-      setFormError(true);
-      setErrorMessage("Debes añadir al menos un producto.");
-      return;
-    }
-
     if (!hasChanges) {
       alert("No se han realizado cambios.");
       return;
@@ -263,7 +257,7 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>Descripción</Form.Label>
+                  <Form.Label>Historia</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}

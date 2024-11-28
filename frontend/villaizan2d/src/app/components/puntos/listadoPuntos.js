@@ -210,7 +210,7 @@ export default function ListadoPuntos() {
                         <th style={{ width: "23%", textAlign: "left" }}>Id Producto</th>
                         <th style={{ width: "18%", textAlign: "left" }}>Nombre Producto</th>
                         <th style={{ width: "10%", textAlign: "center" }}>Cantidad Puntos</th>
-                        <th style={{ width: "15%", textAlign: "center" }}>Usuario</th>
+                        <th style={{ width: "15%", textAlign: "center" }}>Usuario Actualización</th>
                         <th style={{ width: "12%", textAlign: "center" }}>Fecha Actualización</th>
                         <th style={{ width: "12%", textAlign: "center" }}>Hora Actualización</th>
                         <th style={{ width: "10%", textAlign: "center" }}>Acciones</th> 
@@ -226,7 +226,7 @@ export default function ListadoPuntos() {
                                 <td style={{ textAlign: "left" }}> {producto ? producto.id : "Producto no encontrado"}</td>
                                 <td style={{ textAlign: "left" }}>{producto ? producto.nombre : "Producto no encontrado"}</td>
                                 <td style={{ textAlign: "center" }}>{item.cantidadpuntos}</td>
-                                <td style={{ textAlign: "center" }}>-</td>
+                                <td style={{ textAlign: "center" }}>admin</td>
                                 <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
                                 <td style={{ textAlign: "center" }}>{horaFormateada}</td>
                                 <td className="text-center">
