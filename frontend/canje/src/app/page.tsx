@@ -12,8 +12,8 @@ const Page: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
 
 useEffect(() => {
-    if(status !== "loading" && !hasRunOnceAuth.current) {
-      hasRunOnceAuth.current = true;
+  console.log("Session",session)
+    if(status !== "loading") {
       //@ts-ignore
       if (session?.user?.db_info.id) {
         console.log("Is isAuthenticated",isAuthenticated)
@@ -28,6 +28,11 @@ useEffect(() => {
       }
     }
   }, [session, status]);
+useEffect(()=>{
+  if(userId){
+    console.log("UsuarioId: ",userId)
+  }
+},[userId])
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Renderiza el catálogo aquí */}
