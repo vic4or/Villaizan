@@ -175,7 +175,7 @@ export default function ListadoFrutas() {
             <Table hover>
                 <thead>
                     <tr>
-                        <th style={{ width: "21%" , textAlign: "left" }}>Id Fruta</th>
+                        <th style={{ width: "10%" , textAlign: "left" }}>Id Fruta</th>
                         <th style={{ width: "15%" , textAlign: "left"}}>Nombre</th>
                         <th style={{ width: "15%" , textAlign: "left"}}>Historia</th>
                         <th style={{ width: "15%" , textAlign: "left"}}>Productos</th>
