@@ -65,8 +65,6 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
     }
   }, [searchProduct, productos]);
   
-  
-
   useEffect(() => {
     if (isEditMode && frutaId) {
       const fetchFrutaById = async () => {
@@ -288,11 +286,11 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
                   {showDropdown && (
                     <div style={dropdownStyle}>
                       {filteredProductos.length > 0 ? (
-                        filteredProductos.map((producto) => (
+                        filteredProductos.map((product) => (
                           <div
-                            key={producto.id}
+                            key={product.id}
                             onClick={() => {
-                              handleAddProduct(producto); // Lógica para agregar el producto
+                              handleAddProduct(product); // Lógica para agregar el producto
                               setShowDropdown(false); // Oculta el dropdown después de seleccionar
                               setSearchProduct(""); // Limpia el término de búsqueda
                             }}
@@ -303,7 +301,7 @@ export default function FormularioFruta({ isEditMode, frutaId }) {
                               borderBottom: "1px solid #ddd",
                             }}
                           >
-                            {producto.nombre}
+                            {product.nombre}
                           </div>
                         ))
                       ) : (
