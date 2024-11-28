@@ -1,11 +1,31 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect,useState,useRef } from "react";
 import { useSession } from "next-auth/react"; // Importa useSession
 //import CatalogoProductosSuma from "@/app/catalogo/page"; // Asegúrate de que la ruta sea correcta
 
 const Page: React.FC = () => {
   // Usa los hooks incondicionalmente
-  const { data: session } = useSession(); // Obtén la sesión de autenticación
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { data: session, status } = useSession();
+  const hasRunOnceAuth = useRef(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+useEffect(() => {
+    if(status !== "loading" && !hasRunOnceAuth.current) {
+      hasRunOnceAuth.current = true;
+      if (session?.user?.id) {
+        console.log("Is isAuthenticated",isAuthenticated)
+        setIsAuthenticated(true);
+        setUserId(session.user.id);
+        console.log("UserId",userId)
+      } else {
+        console.log("Not isAuthenticated")
+        setIsAuthenticated(false);
+        setUserId(null);
+      }
+    }
+  }, [session, status]);
 
   useEffect(() => {
     if (session) {
