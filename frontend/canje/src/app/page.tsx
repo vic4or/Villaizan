@@ -31,6 +31,11 @@ const Page: React.FC = () => {
   useEffect(() => {
     if (userId) {
       console.log("UsuarioId: ", userId);
+      // Convertir el objeto JSON a una cadena
+      const userJSON = JSON.stringify(session?.user);
+
+      // Guardar el objeto como una cadena en LocalStorage
+      localStorage.setItem('user', userJSON);
     }
   }, [userId]);
 

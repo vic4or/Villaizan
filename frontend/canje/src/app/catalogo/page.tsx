@@ -5,6 +5,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import NavMenu from '../components/NavMenu/NavMenu';
 import { getRecompensaPuntos } from '../api/recompensaPuntos.api';
+//import { useSession } from "next-auth/react";
 
 interface Product {
   id_recompensa: number;
@@ -43,11 +44,28 @@ const CatalogoProductosSuma: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>(''); // Estado para el término de búsqueda
   const [currentPage, setCurrentPage] = useState<number>(1); // Estado para la página actual
   const [showInstructions, setShowInstructions] = useState<boolean>(false); // Estado para mostrar las instrucciones
+  // Obtener el objeto guardado desde LocalStorage
+  const [user,setUser] = useState(null);
+
+  useEffect(() => {
+    // Verificar si estamos en el cliente (browser)
+    if (typeof window !== 'undefined') {
+      const usuarioGuardado = localStorage.getItem('user');
+      if (usuarioGuardado) {
+        const usuarioParsed = JSON.parse(usuarioGuardado);
+        setUser(usuarioParsed);
+        console.log("usuario:",user)
+        console.log("usuarioParsed:",usuarioParsed)
+      } else {
+        console.log('No se encontró el usuario en LocalStorage');
+      }
+    }
+  }, []);
 
   useEffect(() => {
     async function carga() {
-      const data = await getRecompensaPuntos();
-      setProducts(data);
+      const datos = await getRecompensaPuntos();
+      setProducts(datos);
     }
     carga();
   }, []);
@@ -91,7 +109,7 @@ const CatalogoProductosSuma: React.FC = () => {
     }).filter(item => item !== null);
 
     const dataToSend = {
-      id_usuario: "us-256de824",
+      id_usuario: 'us-256de824',
       puntoscanjeado: selectedProductsData.reduce((sum, product) => sum + (product ? product.subtotalpuntosredencion : 0), 0),
       codigo: generateRandomCode(),
       detalles: selectedProductsData,
