@@ -35,7 +35,6 @@ export class ContenidoEducativoService {
     
     return this.prisma.vi_contenidoeducativo.create({
       data: {
-        id: crypto.randomUUID(), 
         titulo: data.titulo,
         contenidoinformacion: data.tipocontenido === 'Información' ? data.contenidoinformacion : null,
         tipocontenido: data.tipocontenido,
@@ -53,7 +52,7 @@ export class ContenidoEducativoService {
 
   // Editar un contenido educativo existente
   async updateContenidoEducativo(
-    id: string,
+    id: number,
     data: {
       titulo?: string;
       contenidoinformacion?: string;
@@ -105,13 +104,13 @@ export class ContenidoEducativoService {
     );
   }
 
-  async getContenidoEducativoById(id: string): Promise<vi_contenidoeducativo> {
+  async getContenidoEducativoById(id: number): Promise<vi_contenidoeducativo> {
     return this.prisma.vi_contenidoeducativo.findUnique({
       where: { id: id },
     });
   }
 
-  async inactivateContenidoEducativo(id: string): Promise<vi_contenidoeducativo> {
+  async inactivateContenidoEducativo(id: number): Promise<vi_contenidoeducativo> {
     return this.prisma.vi_contenidoeducativo.update({
       where: { id: id },
       data: {
