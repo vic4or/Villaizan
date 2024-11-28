@@ -33,12 +33,23 @@ export class FrutaService {
         });
     }
 
+    private async obtenerUltimoIdFruta(): Promise<number> {
+      const [ultimoRegistro]: any = await this.prisma.$queryRawUnsafe(`
+          SELECT CAST(id AS INTEGER) AS id
+          FROM vi_fruta
+          ORDER BY id DESC
+          LIMIT 1
+      `);
+
+      return ultimoRegistro?.id ?? 0;
+  }
+
     async createFruta(nombre: string, descripcion?: string, productos?: string[]): Promise<vi_fruta> {
-        const frutaId = randomUUID();
+        const frutaId = await this.obtenerUltimoIdFruta()+1;
 
         const fruta = await this.prisma.vi_fruta.create({
             data: {
-              id: frutaId,
+              id: frutaId.toString(),
               nombre: nombre,
               descripcion: descripcion ?? null ,
               urlimagen: "", //validar
@@ -49,7 +60,7 @@ export class FrutaService {
         if (productos && productos.length > 0) {
             const productosAgregarData = productos.map(productoId => ({
                 id_producto: productoId,
-                id_fruta: frutaId,
+                id_fruta: frutaId.toString(),
                 estaactivo: true,
                 creadoen: new Date(),
                 actualizadoen: new Date(),
@@ -62,7 +73,7 @@ export class FrutaService {
         }
 
         return await this.prisma.vi_fruta.findUnique({
-            where: { id: frutaId },
+            where: { id: frutaId.toString() },
             include: { vi_producto_fruta: true },
         });
 

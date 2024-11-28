@@ -17,7 +17,7 @@ import axios from "axios";
 export default function NuevaMultimedia() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const id = Number(searchParams.get("id"));
 
   const [frutas, setFrutas] = useState([]);
   const [titulo, setTitulo] = useState("");
@@ -33,7 +33,7 @@ export default function NuevaMultimedia() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/fruta/listarTodos")
+      .get(`${process.env.NEXT_PUBLIC_SERVER_URL}/fruta/listarTodos`)
       .then((response) => {
         setFrutas(response.data);
       })
@@ -44,7 +44,7 @@ export default function NuevaMultimedia() {
     if (id) {
       setIsEditing(true);
       axios
-        .get(`http://localhost:3000/contenidoeducativo/listarTodos`)
+        .get(`${process.env.NEXT_PUBLIC_SERVER_URL}/contenidoeducativo/listarTodos`)
         .then((response) => {
           const multimediaData = response.data.find((item) => item.id === id);
           if (multimediaData) {
@@ -116,9 +116,9 @@ export default function NuevaMultimedia() {
 
     try {
       if (isEditing) {
-        await axios.put(`http://localhost:3000/contenidoeducativo/editar/${id}`, payload);
+        await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/contenidoeducativo/editar/${id}`, payload);
       } else {
-        await axios.post("http://localhost:3000/contenidoeducativo/registrar", payload);
+        await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/contenidoeducativo/registrar`, payload);
       }
 
       setShowConfirmation(true);
@@ -127,7 +127,7 @@ export default function NuevaMultimedia() {
 
       setTimeout(() => {
         setShowConfirmation(false);
-        router.push("/pages/multimedia/lista");
+        router.push("/multimedia/lista");
       }, 3000);
     } catch (error) {
       console.error("Error al guardar el multimedia:", error);
@@ -188,7 +188,7 @@ export default function NuevaMultimedia() {
 
   return (
     <>
-      <Modal show={showConfirmation} onHide={() => router.push("/pages/multimedia/lista")}>
+      <Modal show={showConfirmation} onHide={() => router.push("/multimedia/lista")}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmación</Modal.Title>
         </Modal.Header>
@@ -196,7 +196,7 @@ export default function NuevaMultimedia() {
           El contenido multimedia se ha {isEditing ? "actualizado" : "guardado"} exitosamente.
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="success" onClick={() => router.push("/pages/multimedia/lista")}>
+          <Button variant="success" onClick={() => router.push("/multimedia/lista")}>
             Cerrar
           </Button>
         </Modal.Footer>
@@ -314,7 +314,7 @@ export default function NuevaMultimedia() {
             <Button
               variant="light"
               type="button"
-              onClick={() => router.push("/pages/multimedia/lista")}
+              onClick={() => router.push("/multimedia/lista")}
             >
               Cancelar
             </Button>

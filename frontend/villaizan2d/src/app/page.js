@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Menu from "./components/menu/menu.js"; // Importar el componente de menú
+import Menu from "./components/menu/menu.js"; 
 
 const Icon = ({ name }) => {
   const icons = {
@@ -11,7 +11,8 @@ const Icon = ({ name }) => {
     bell: "🔔",
     image: "🖼️",
     tag: "🏷️",
-    apple: "🍎", // Icono para "Gestión de Frutas"
+    apple: "🍎", 
+    usuario: "👥",
   };
   return (
     <span className="icon" style={{ fontSize: '3rem', lineHeight: '1', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
@@ -53,42 +54,49 @@ export default function Home() {
               </div>
               <div className="grid">
                 {/* Tarjetas de opciones */}
-                <div className="card" onClick={() => window.location.href='/pages/recompensas/lista'}>  
+               {/*  <div className="card" onClick={() => window.location.href='/pages/usuario/lista'}>  
+                  <div className="icon-container">
+                    <Icon name="usuario" />
+                  </div>
+                  <h3>Gestión de Usuarios</h3>
+                  <p>Administra los usuarios del sistema</p>
+                </div> */}
+                <div className="card" onClick={() => window.location.href='/recompensas/lista'}>  
                   <div className="icon-container">
                     <Icon name="gift" />
                   </div>
                   <h3>Gestión de Recompensas</h3>
                   <p>Administra los puntos de recompensa de los clientes</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/puntos/lista'}>  
+                <div className="card" onClick={() => window.location.href='/puntos/lista'}>  
                   <div className="icon-container">
                     <Icon name="card" />
                   </div>
                   <h3>Gestión de Puntos</h3>
                   <p>Administra los puntos asignados por la compra de cada producto</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/canjes/lista'}>  
+                <div className="card" onClick={() => window.location.href='/canjes/lista'}>  
                   <div className="icon-container">
                     <Icon name="percent" />
                   </div>
                   <h3>Gestión de Canjes</h3>
                   <p>Administra los códigos generados por los clientes para canjear recompensas</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/multimedia/lista'}>  
+                <div className="card" onClick={() => window.location.href='/multimedia/lista'}>  
                   <div className="icon-container">
                     <Icon name="image" />
                   </div>
                   <h3>Gestión de Multimedia</h3>
                   <p>Crea, modifica y gestiona contenido multimedia como imágenes y videos de frutas y helados</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/promociones/lista'}>  
+                <div className="card" onClick={() => window.location.href='/promociones/lista'}>  
                   <div className="icon-container">
                     <Icon name="tag" />
                   </div>
                   <h3>Gestión de Promociones</h3>
                   <p>Administra ofertas y promociones para los clientes</p>
                 </div>
-                <div className="card" onClick={() => window.location.href='/pages/frutas/lista'}>
+                <div className="card" onClick={() => window.location.href='/frutas/lista'}>
                   <div className="icon-container">
                     <Icon name="apple" />
                   </div>

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { ContenidoEducativoService } from './contenidoeducativo.service';
 
 @Controller('contenidoeducativo')
@@ -13,7 +13,7 @@ export class ContenidoEducativoController {
 
   // Obtener un contenido educativo por ID
   @Get('/listarUno/:id')
-  async getContenidoEducativoById(@Param('id') id: string) {
+  async getContenidoEducativoById(@Param('id', ParseIntPipe) id: number) {
     return this.contenidoeducativoService.getContenidoEducativoById(id);
   }
 
@@ -38,7 +38,7 @@ export class ContenidoEducativoController {
   // Editar un contenido educativo
   @Put('/editar/:id')
   async editarContenidoEducativo(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body('titulo') titulo: string,
     @Body('contenidoinformacion') contenidoinformacion: string,
     @Body('tipocontenido') tipocontenido: string,
@@ -56,7 +56,7 @@ export class ContenidoEducativoController {
 
   // Desactivar un contenido educativo
   @Put('/inactivar/:id')
-  async inactivarContenidoEducativo(@Param('id') id: string) {
+  async inactivarContenidoEducativo(@Param('id', ParseIntPipe) id: number) {
     return this.contenidoeducativoService.inactivateContenidoEducativo(id);
   }
 }

@@ -17,7 +17,7 @@ const NuevaPuntos = ({ show, handleClose }) => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/productos/listarTodos');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
         setProductos(response.data);
         setFilteredProductos(response.data);
       } catch (err) {
@@ -73,7 +73,7 @@ const NuevaPuntos = ({ show, handleClose }) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:3000/puntos_producto/registrar', data);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/registrar`, data);
       if (response.status === 200) {
         setShowConfirmation(true);
         setError('');

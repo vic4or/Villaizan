@@ -2127,7 +2127,6 @@ model vi_comentario {
 }
 
 model vi_contenidoeducativo {
-  id                   String    @id @db.VarChar(50)
   id_fruta             String?   @db.VarChar(50)
   titulo               String    @db.VarChar(200)
   contenidoinformacion String?
@@ -2140,6 +2139,7 @@ model vi_contenidoeducativo {
   actualizadoen        DateTime  @default(now()) @db.Timestamp(6)
   usuariocreacion      String    @db.VarChar(50)
   usuarioactualizacion String?   @db.VarChar(50)
+  id                   Int       @id @default(autoincrement())
   vi_fruta             vi_fruta? @relation(fields: [id_fruta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fruta")
 }
 
@@ -2250,6 +2250,7 @@ model vi_fruta {
   usuarioactualizacion  String?                 @db.VarChar(50)
   vi_contenidoeducativo vi_contenidoeducativo[]
   vi_producto_fruta     vi_producto_fruta[]
+  vi_villaparada        vi_villaparada[]
 }
 
 model vi_historialrepartidor {
@@ -2438,26 +2439,27 @@ model vi_ordenserie {
 }
 
 model vi_pago {
-  id                   String         @id @db.VarChar(50)
+  id                   String                 @id @db.VarChar(50)
   estransferencia      Boolean
-  montocobrado         Decimal        @db.Decimal(10, 2)
-  numerooperacion      String?        @db.VarChar(50)
-  urlevidencia         String?        @db.VarChar(200)
-  codigotransaccion    String?        @db.VarChar(100)
-  id_venta             String?        @db.VarChar(50)
-  id_metodopago        String?        @db.VarChar(50)
-  id_banco             String?        @db.VarChar(50)
-  estaactivo           Boolean        @default(true)
-  desactivadoen        DateTime?      @db.Timestamp(6)
-  creadoen             DateTime       @default(now()) @db.Timestamp(6)
-  actualizadoen        DateTime       @default(now()) @db.Timestamp(6)
-  usuariocreacion      String         @db.VarChar(50)
-  usuarioactualizacion String?        @db.VarChar(50)
-  id_pedido            String?        @db.VarChar(50)
-  vi_banco             vi_banco?      @relation(fields: [id_banco], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_banco")
-  vi_metodopago        vi_metodopago? @relation(fields: [id_metodopago], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_metodopago")
-  vi_pedido            vi_pedido?     @relation(fields: [id_pedido], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido")
-  vi_venta             vi_venta?      @relation(fields: [id_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_venta")
+  montocobrado         Decimal                @db.Decimal(10, 2)
+  numerooperacion      String?                @db.VarChar(50)
+  urlevidencia         String?                @db.VarChar(200)
+  codigotransaccion    String?                @db.VarChar(100)
+  id_venta             String?                @db.VarChar(50)
+  id_metodopago        String?                @db.VarChar(50)
+  id_banco             String?                @db.VarChar(50)
+  estaactivo           Boolean                @default(true)
+  desactivadoen        DateTime?              @db.Timestamp(6)
+  creadoen             DateTime               @default(now()) @db.Timestamp(6)
+  actualizadoen        DateTime               @default(now()) @db.Timestamp(6)
+  usuariocreacion      String                 @db.VarChar(50)
+  usuarioactualizacion String?                @db.VarChar(50)
+  id_pedido            String?                @db.VarChar(50)
+  vi_banco             vi_banco?              @relation(fields: [id_banco], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_banco")
+  vi_metodopago        vi_metodopago?         @relation(fields: [id_metodopago], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_metodopago")
+  vi_pedido            vi_pedido?             @relation(fields: [id_pedido], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido")
+  vi_venta             vi_venta?              @relation(fields: [id_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_venta")
+  vi_pedido_metodopago vi_pedido_metodopago[]
 }
 
 model vi_pedido {
@@ -2506,7 +2508,9 @@ model vi_pedido_metodopago {
   usuariocreacion      String         @default("admin") @db.VarChar(50)
   usuarioactualizacion String?        @db.VarChar(50)
   monto                Decimal?       @db.Decimal(10, 2)
+  id_pago              String?        @db.VarChar(50)
   vi_metodopago        vi_metodopago? @relation(fields: [id_metodopago], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_metodopago")
+  vi_pago              vi_pago?       @relation(fields: [id_pago], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pago")
   vi_pedido            vi_pedido?     @relation(fields: [id_pedido], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido")
 }
 
@@ -3064,6 +3068,19 @@ model vi_redencion {
   usuarioactualizacion String?               @db.VarChar(50)
   vi_detalleredencion  vi_detalleredencion[]
   vi_usuario           vi_usuario            @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario")
+}
+
+model vi_villaparada {
+  id                      Int      @id @default(autoincrement())
+  nombre                  String   @db.VarChar(255)
+  latitud                 Float
+  longitud                Float
+  nota                    String?
+  fechacreacion           DateTime @default(now()) @db.Timestamp(6)
+  fechaultimamodificacion DateTime @default(now()) @db.Timestamp(6)
+  estaactivo              Boolean? @default(true)
+  id_fruta                String   @db.VarChar(100)
+  vi_fruta                vi_fruta @relation(fields: [id_fruta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fruta")
 }
 
 enum PAYMENT_COLLECTION_STATUS_ENUM {

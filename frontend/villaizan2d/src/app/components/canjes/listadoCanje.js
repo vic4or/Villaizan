@@ -15,7 +15,7 @@ export default function ListadoCanje() {
 
     useEffect(() => {
         const fetchRedenciones = async () => {
-            const response = await axios.get("http://localhost:3000/redencion/admin/listarTodos");
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/redencion/admin/listarTodos`);
             console.log("Redenciones obtenidas:", response.data);
             setRedenciones(response.data);
         };
@@ -27,12 +27,21 @@ export default function ListadoCanje() {
         setShowModal(true);
     };
 
+    const fetchRedenciones = async () => {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/redencion/admin/listarTodos`);
+            console.log("Redenciones actualizadas:", response.data);
+            setRedenciones(response.data);
+        } catch (error) {
+            console.error("Error al obtener las redenciones:", error);
+        }
+    };
     
     const handleConfirmCanje = async () => {
         try {
             console.log("ID seleccionado para canjear:", selectedRedencion.id); // Verificar ID
             const response = await axios.patch(
-                `http://localhost:3000/redencion/admin/validar/${selectedRedencion.id}`
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/redencion/admin/validar/${selectedRedencion.id}`
             );
             alert("El código ha sido canjeado exitosamente.");
             setRedenciones((prevRedenciones) =>
@@ -42,6 +51,7 @@ export default function ListadoCanje() {
                         : item
                 )
             );
+            await fetchRedenciones(); 
         } catch (error) {
             console.error("Error al canjear el código:", error.response?.data || error.message);
             alert(`Error al canjear el código: ${error.response?.data?.message || "Error desconocido"}`);
@@ -52,15 +62,15 @@ export default function ListadoCanje() {
     };
     
     const filteredRedenciones = redenciones
-        .filter((item) => {
-            if (viewType === "canjeado") return item.estado.toLowerCase() === "canjeado";
-            if (viewType === "porCanjear") return item.estado.toLowerCase() === "por canjear";
-            if (viewType === "vencido") return item.estado.toLowerCase() === "vencido"; 
-            return true; // Mostrar todos
-        })
-        .filter((item) =>
-            item.codigo.toLowerCase().includes(searchTerm.toLowerCase()) // Filtrar por código
-        );
+    .filter((item) => {
+        if (viewType === "canjeado") return item.estado.toLowerCase() === "canjeado";
+        if (viewType === "porCanjear") return item.estado.toLowerCase() === "por canjear";
+        if (viewType === "vencido") return item.estado.toLowerCase() === "vencido";
+        return true; // Mostrar todos
+    })
+    .filter((item) =>
+        item.codigo.toLowerCase().includes(searchTerm.toLowerCase()) // Filtrar por código
+    );
 
     // Paginación
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -132,12 +142,12 @@ export default function ListadoCanje() {
             <Table hover>
                 <thead>
                     <tr>
-                        <th style={{ textAlign: "left" }}>Código Canje</th>
                         <th style={{ textAlign: "center" }}>ID Cliente</th>
                         <th style={{ textAlign: "center" }}>Puntos Canjeados</th>
                         <th style={{ textAlign: "center" }}>Fecha Generación</th>
                         <th style={{ textAlign: "center" }}>Fecha Redención</th>
                         <th style={{ textAlign: "center" }}>Fecha Vencimiento</th>
+                        <th style={{ textAlign: "center" }}>Usuario Canjeador</th>
                         <th style={{ textAlign: "left" }}>Productos</th>
                         <th style={{ textAlign: "center" }}>Estado</th>
                     </tr>
@@ -145,12 +155,18 @@ export default function ListadoCanje() {
                 <tbody>
                     {currentItems.map((item) => (
                         <tr key={item.id}>
-                            <td style={{ textAlign: "left" }}>{item.codigo}</td>
-                            <td style={{ textAlign: "center" }}>{item.vi_usuario.vi_persona.numerodocumento}</td>
+                            <td style={{ textAlign: "center" }}>
+                                {item.vi_usuario.vi_persona.numerodocumento}
+                            </td>
                             <td style={{ textAlign: "center" }}>{item.puntoscanjeado}</td>
                             <td style={{ textAlign: "center" }}>{formatFecha(item.fechageneracion)}</td>
-                            <td style={{ textAlign: "center" }}>{item.fecharedencion ? formatFecha(item.fecharedencion) : "-"}</td>
+                            <td style={{ textAlign: "center" }}>
+                                {item.fecharedencion ? formatFecha(item.fecharedencion) : "-"}
+                            </td>
                             <td style={{ textAlign: "center" }}>{formatFecha(item.fechaexpiracion)}</td>
+                            <td style={{ textAlign: "center" }}>
+                                {item.estado.toLowerCase() === "canjeado" ? "admin" : "-"}
+                            </td>
                             <td style={{ textAlign: "left" }}>
                                 {item.vi_detalleredencion.map((detalle) => (
                                     <div key={detalle.id}>{detalle.vi_producto.nombre}</div>
@@ -183,6 +199,7 @@ export default function ListadoCanje() {
                     ))}
                 </tbody>
             </Table>
+
 
             <Pagination>
                 <Pagination.Prev

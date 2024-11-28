@@ -51,7 +51,7 @@ export class RedencionService {
                 },
             });
     
-            const idUsuario = redencion.id_usuario;
+            /* const idUsuario = redencion.id_usuario;
             const puntosCanjeados = redencion.puntoscanjeado;
     
             await prisma.vi_usuario.update({
@@ -63,7 +63,7 @@ export class RedencionService {
                     actualizadoen: new Date(),
                     usuarioactualizacion: "admin", // TODO: Cambiar por usuario logueado
                 },
-            });
+            }); */
     
             return redencion;
         });
@@ -141,6 +141,21 @@ export class RedencionService {
               },
             });
           }
+
+            // Actualizamos los puntos del usuario luego de que este genere un canje
+            const idUsuario = redencion.id_usuario;
+            const puntosCanjeados = redencion.puntoscanjeado;
+    
+            await prisma.vi_usuario.update({
+                where: { id: idUsuario },
+                data: {
+                    puntosacumulados: {
+                        decrement: puntosCanjeados, // Resta los puntos canjeado
+                    },
+                    actualizadoen: new Date(),
+                    usuarioactualizacion: "admin", // TODO: Cambiar por usuario logueado
+                },
+            });
     
           return redencion; // Retorna la redención creada
         });

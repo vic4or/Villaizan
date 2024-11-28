@@ -26,8 +26,8 @@ export default function ListadoPuntos() {
     useEffect(() => {
         const fetchPuntosYProductos = async () => {
             try {
-                const puntosResponse = await axios.get("http://localhost:3000/puntos_producto/listarTodos");
-                const productosResponse = await axios.get("http://localhost:3000/productos/listarTodos");
+                const puntosResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/listarTodos`);
+                const productosResponse = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/productos/listarTodos`);
 
                 setPuntos(puntosResponse.data); // Asumimos que la respuesta es el array de puntos
                 setProductos(productosResponse.data); // Lista de productos
@@ -92,7 +92,7 @@ export default function ListadoPuntos() {
             }
 
             // Hacemos la llamada a la API para editar
-            await axios.put("http://localhost:3000/puntos_producto/editar", {
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/editar`, {
                 idPuntosProducto: selectedProduct.id_puntosproducto,
                 idProducto: selectedProduct.id_producto,
                 nuevaCantidad: nuevaCantidad
@@ -117,7 +117,7 @@ export default function ListadoPuntos() {
     const handleDelete = async (idPuntosProducto) => {
         console.log("ID a inactivar:", idPuntosProducto); // Verificar el ID en la consola
         try {
-            await axios.put(`http://localhost:3000/puntos_producto/inactivar/${idPuntosProducto}`);
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/inactivar/${idPuntosProducto}`);
             // Actualizar la lista de puntos para reflejar el cambio de estado
             const updatedPuntos = puntos.map((item) =>
                 item.id_puntosproducto === idPuntosProducto
@@ -210,7 +210,7 @@ export default function ListadoPuntos() {
                         <th style={{ width: "23%", textAlign: "left" }}>Id Producto</th>
                         <th style={{ width: "18%", textAlign: "left" }}>Nombre Producto</th>
                         <th style={{ width: "10%", textAlign: "center" }}>Cantidad Puntos</th>
-                        <th style={{ width: "15%", textAlign: "center" }}>Usuario</th>
+                        <th style={{ width: "15%", textAlign: "center" }}>Usuario Actualización</th>
                         <th style={{ width: "12%", textAlign: "center" }}>Fecha Actualización</th>
                         <th style={{ width: "12%", textAlign: "center" }}>Hora Actualización</th>
                         <th style={{ width: "10%", textAlign: "center" }}>Acciones</th> 
@@ -226,7 +226,7 @@ export default function ListadoPuntos() {
                                 <td style={{ textAlign: "left" }}> {producto ? producto.id : "Producto no encontrado"}</td>
                                 <td style={{ textAlign: "left" }}>{producto ? producto.nombre : "Producto no encontrado"}</td>
                                 <td style={{ textAlign: "center" }}>{item.cantidadpuntos}</td>
-                                <td style={{ textAlign: "center" }}>-</td>
+                                <td style={{ textAlign: "center" }}>admin</td>
                                 <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
                                 <td style={{ textAlign: "center" }}>{horaFormateada}</td>
                                 <td className="text-center">
