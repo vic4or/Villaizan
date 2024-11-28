@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react"; // Importa useSession
-import CatalogoProductosSuma from "@/app/catalogo/page"; // Asegúrate de que la ruta sea correcta
+//import CatalogoProductosSuma from "@/app/catalogo/page"; // Asegúrate de que la ruta sea correcta
 
 const Page: React.FC = () => {
   // Usa los hooks incondicionalmente
@@ -30,7 +30,7 @@ const Page: React.FC = () => {
         Bienvenido, {session.user?.name}
       </p>
       {/* Renderiza el catálogo solo si el usuario está autenticado */}
-      <CatalogoProductosSuma />
+      {/*<CatalogoProductosSuma />*/}
     </div>
   );
 };
