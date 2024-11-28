@@ -2886,6 +2886,7 @@ model vi_usuario {
   vi_redencion                                           vi_redencion[]
   vi_persona                                             vi_persona?                          @relation(fields: [id_persona], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_persona")
   vi_rol                                                 vi_rol                               @relation(fields: [id_rol], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rol")
+  vi_villaparada_x_usuario                               vi_villaparada_x_usuario[]
 }
 
 model vi_venta {
@@ -3071,16 +3072,31 @@ model vi_redencion {
 }
 
 model vi_villaparada {
-  id                      Int      @id @default(autoincrement())
-  nombre                  String   @db.VarChar(255)
-  latitud                 Float
-  longitud                Float
-  nota                    String?
-  fechacreacion           DateTime @default(now()) @db.Timestamp(6)
-  fechaultimamodificacion DateTime @default(now()) @db.Timestamp(6)
-  estaactivo              Boolean? @default(true)
-  id_fruta                String   @db.VarChar(100)
-  vi_fruta                vi_fruta @relation(fields: [id_fruta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fruta")
+  id                       Int                        @id @default(autoincrement())
+  nombre                   String                     @db.VarChar(255)
+  latitud                  Float
+  longitud                 Float
+  nota                     String?
+  direccion                String                     @db.VarChar(512)
+  fechacreacion            DateTime                   @default(now()) @db.Timestamp(6)
+  fechaultimamodificacion  DateTime                   @default(now()) @db.Timestamp(6)
+  estaactivo               Boolean?                   @default(true)
+  id_fruta                 String                     @db.VarChar(255)
+  vi_fruta                 vi_fruta                   @relation(fields: [id_fruta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_fruta")
+  vi_villaparada_x_usuario vi_villaparada_x_usuario[]
+}
+
+model vi_villaparada_x_usuario {
+  id             Int            @id @default(autoincrement())
+  cantitadpuntos Int
+  latitud        Float
+  longitud       Float
+  fechacreacion  DateTime       @default(now()) @db.Timestamp(6)
+  estaactivo     Boolean?       @default(true)
+  id_usuario     String         @db.VarChar(255)
+  id_villaparada Int
+  vi_usuario     vi_usuario     @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario")
+  vi_villaparada vi_villaparada @relation(fields: [id_villaparada], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_villaparada")
 }
 
 enum PAYMENT_COLLECTION_STATUS_ENUM {
