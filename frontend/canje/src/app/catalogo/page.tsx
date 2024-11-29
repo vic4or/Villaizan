@@ -203,7 +203,7 @@ const CatalogoProductosSuma: React.FC = () => {
             <h2 className="text-2xl font-semibold text-black">Tienes {userPoints} puntos</h2>
           </div>
 
-          {/* Products Grid */}
+   {/* Products Grid */}
 <div className="container mx-auto px-4 mb-8">
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
     {paginatedProducts.map((product) => (
@@ -261,7 +261,7 @@ const CatalogoProductosSuma: React.FC = () => {
 {/* Pop-up de Instrucciones */}
 {showInstructions && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
+    <div className="bg-white rounded-lg shadow-lg max-w-lg w-full">
       <div className="bg-red-600 text-white p-4 rounded-t-lg">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">Instrucciones</h2>
@@ -277,14 +277,14 @@ const CatalogoProductosSuma: React.FC = () => {
         <p className="mb-4 text-black">
           Tienes un total de {userPoints} puntos disponibles. Para seleccionar una recompensa:
         </p>
-        <ol className="list-decimal list-inside mb-4 text-black space-y-2">
+        <ol className="list-decimal list-inside mb-4 text-black space-y-4">
           <li className="text-lg">
-            Busca el helado que deseas canjear usando el campo de búsqueda o navegando por la lista 
-            <span className="text-sm block mt-1">(Cada helado muestra la cantidad de puntos necesarios para canjearlo)</span>.
+            Busca el helado que deseas canjear usando el campo de búsqueda o navegando por la lista.
+            <span className="text-sm block mt-1 text-gray-700">(Cada helado muestra la cantidad de puntos necesarios para canjearlo)</span>
           </li>
           <li className="text-lg">
-            Para añadir un helado a tu selección, haz clic en el botón verde (+). Si deseas quitarlo, haz clic en el botón rojo (-) 
-            <span className="text-sm block mt-1">(La cantidad seleccionada de cada helado se mostrará entre los botones (+) y (-))</span>.
+            Para añadir un helado a tu selección, haz clic en el botón verde (+). Si deseas quitarlo, haz clic en el botón rojo (-).
+            <span className="text-sm block mt-1 text-gray-700">(La cantidad seleccionada de cada helado se mostrará entre los botones (+) y (-))</span>
           </li>
           <li className="text-lg">
             Una vez hayas seleccionado todas tus recompensas, haz clic en el botón "Ver Productos" para revisar tu carrito.
