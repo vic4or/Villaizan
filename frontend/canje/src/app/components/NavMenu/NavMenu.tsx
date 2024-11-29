@@ -19,12 +19,32 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
     <header className="bg-red-600 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex space-x-4">
-          <a onClick={() => handleNavigation('/catalogo')} className="hover:text-gray-200 cursor-pointer">Catalogo</a>
-          <a onClick={() => handleNavigation(`/historial?user=${encodeURIComponent(JSON.stringify(usuario))}`)} className="hover:text-gray-200 cursor-pointer">HistorialPuntos</a>
-          <a onClick={() => handleNavigation(`/historialfalta?user=${encodeURIComponent(JSON.stringify(usuario))}`)} className="hover:text-gray-200 cursor-pointer">HistorialPuntosPorCanjear</a>
+          <a 
+            onClick={() => handleNavigation('/catalogo')}
+            className="hover:text-gray-200 cursor-pointer text-white font-semibold"
+            style={{ fontFamily: 'Arial, sans-serif' }}
+          >
+            Catálogo
+          </a>
+          <a 
+            onClick={() => handleNavigation(`/historial?user=${encodeURIComponent(JSON.stringify(usuario))}`)}
+            className="hover:text-gray-200 cursor-pointer text-white font-semibold"
+            style={{ fontFamily: 'Arial, sans-serif' }}
+          >
+            Historial Puntos
+          </a>
+          <a 
+            onClick={() => handleNavigation(`/historialfalta?user=${encodeURIComponent(JSON.stringify(usuario))}`)}
+            className="hover:text-gray-200 cursor-pointer text-white font-semibold"
+            style={{ fontFamily: 'Arial, sans-serif' }}
+          >
+            Historial Puntos Por Canjear
+          </a>
         </div>
         <div>
-          <span className="text-black">Hola, {usuario.name}!</span>
+          <span className="text-white font-semibold" style={{ fontFamily: 'Arial, sans-serif' }}>
+            Hola, {usuario.name}!
+          </span>
         </div>
       </div>
     </header>
@@ -32,4 +52,5 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
 };
 
 export default NavMenu;
+
 
