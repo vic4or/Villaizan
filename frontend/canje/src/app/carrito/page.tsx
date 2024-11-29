@@ -70,7 +70,7 @@ const CarritoContent: React.FC = () => {
   
       if (response.status === 200 || response.status === 201) { // Check the status code
         alert('Redención exitosa!');
-        router.push('/historial'); // Puedes redirigir a una página de éxito
+        router.push('/historialfalta'); // Puedes redirigir a una página de éxito
       } else {
         alert('Error en la redención');
       }
