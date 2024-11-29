@@ -23,9 +23,9 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
           <Image 
             src="/images/logo2.png" 
             alt="Logo" 
-            width={50} 
-            height={50}
-            className="cursor-pointer h-12" // Ajusta la altura de la imagen
+            width={60} 
+            height={60}
+            className="cursor-pointer" // Ajusta la altura y ancho de la imagen
             onClick={() => handleNavigation('/')}
           />
         </div>
@@ -63,6 +63,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
 };
 
 export default NavMenu;
+
 
 
 
