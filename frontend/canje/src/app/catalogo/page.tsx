@@ -262,7 +262,7 @@ const CatalogoProductosSuma: React.FC = () => {
 {showInstructions && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
     <div className="bg-white rounded-lg shadow-lg max-w-lg w-full">
-      <div className="bg-red-800 text-white p-4 rounded-t-lg">
+      <div className="bg-red-600 text-white p-4 rounded-t-lg">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">Instrucciones</h2>
           <button
