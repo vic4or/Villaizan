@@ -53,7 +53,7 @@ const HistorialPuntosContent: React.FC = () => {
   const searchParams = useSearchParams();
 
   const user = JSON.parse(searchParams.get('user') || '{}');
-
+    console.log("Usuario en historial:",user)
   useEffect(() => {
     const fetchPointsHistory = async () => {
       try {
@@ -61,7 +61,7 @@ const HistorialPuntosContent: React.FC = () => {
           baseApi.get(`puntosacumulados/cliente/listarTodos/${user.id}`),
           baseApi.get(`redencion/cliente/listarCanjeados/${user.id}`)
         ]);
-
+        console.log("Id del usuario:",user.id)
         const compraData: CompraItem[] = compraResponse.data;
         const canjeData: CanjeItem[] = canjeResponse.data;
 

@@ -20,7 +20,6 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex space-x-4">
           <a onClick={() => handleNavigation('/catalogo')} className="hover:text-gray-200 cursor-pointer">Catalogo</a>
-          <a onClick={() => handleNavigation('/carrito')} className="hover:text-gray-200 cursor-pointer">Carrito</a>
           <a onClick={() => handleNavigation(`/historial?user=${encodeURIComponent(JSON.stringify(usuario))}`)} className="hover:text-gray-200 cursor-pointer">HistorialPuntos</a>
           <a onClick={() => handleNavigation('/historialfalta')} className="hover:text-gray-200 cursor-pointer">HistorialPuntosPorCanjear</a>
         </div>
