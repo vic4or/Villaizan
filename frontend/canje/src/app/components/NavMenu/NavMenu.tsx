@@ -21,7 +21,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
         <div className="flex space-x-4">
           <a onClick={() => handleNavigation('/catalogo')} className="hover:text-gray-200 cursor-pointer">Catalogo</a>
           <a onClick={() => handleNavigation(`/historial?user=${encodeURIComponent(JSON.stringify(usuario))}`)} className="hover:text-gray-200 cursor-pointer">HistorialPuntos</a>
-          <a onClick={() => handleNavigation('/historialfalta')} className="hover:text-gray-200 cursor-pointer">HistorialPuntosPorCanjear</a>
+          <a onClick={() => handleNavigation(`/historialfalta?user=${encodeURIComponent(JSON.stringify(usuario))}`)} className="hover:text-gray-200 cursor-pointer">HistorialPuntosPorCanjear</a>
         </div>
         <div>
           <span className="text-black">Hola, {usuario.name}!</span>
