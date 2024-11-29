@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 //import Image from 'next/image';
-//import NavMenu from '../components/NavMenu/NavMenu';
+import NavMenu from '../components/NavMenu/NavMenu';
 //import Banner from '../components/Banner/Banner';
 
 interface ProductDetail {
@@ -29,7 +29,7 @@ const DetalleFaltaContent: React.FC = () => {
   const [productDetails, setProductDetails] = useState<ProductDetail[]>([]);
   const [transactionType, setTransactionType] = useState<string>('');
   const [transactionDate, setTransactionDate] = useState<string>('');
-  //const user = JSON.parse(searchParams.get('user') || '{}');
+  const user = JSON.parse(searchParams.get('user') || '{}');
   
   useEffect(() => {
     if (searchParams) {
@@ -57,7 +57,7 @@ const DetalleFaltaContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/*<NavMenu />*/}
+      <NavMenu usuario={user}/>
       {/* Logo */}
       {/*<Banner></Banner>*/}
       <div className="py-8"></div>
@@ -90,7 +90,7 @@ const DetalleFaltaContent: React.FC = () => {
         </div>
       </div>
 
-      {/*<footer className="bg-white py-8">
+      <footer className="bg-white py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
@@ -99,19 +99,15 @@ const DetalleFaltaContent: React.FC = () => {
             <div>
               <h4 className="font-bold mb-4 text-black">Links</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Carro</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Catálogo</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Acerca</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Contacto</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Inicio</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Ecommerce</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">LandingPage</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4 text-black">Ayuda</h4>
+              <h4 className="font-bold mb-4 text-black">Dirección</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Opciones de Pago</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Returns</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Privacy Policies</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Libro de Reclamaciones</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Canjea tus productos aquí: TARAPOTO: Calle Las Dunas cdra 3 Altura de cdra 23 de Av. Alfonso Ugarte Tarapoto</a></li>
               </ul>
             </div>
           </div>
@@ -119,7 +115,7 @@ const DetalleFaltaContent: React.FC = () => {
             <p>2023 Helados Villaizan. All rights reserved</p>
           </div>
         </div>
-      </footer>*/}
+      </footer>
     </div>
   );
 };

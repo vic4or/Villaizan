@@ -144,6 +144,32 @@ const HistorialPuntosContent: React.FC = () => {
               </table>
             </div>
           </div>
+          <footer className="bg-white py-8">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div>
+              <h4 className="font-bold mb-4 text-black">Helados Villaizan</h4>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4 text-black">Links</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Inicio</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Ecommerce</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">LandingPage</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4 text-black">Dirección</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Canjea tus productos aquí: TARAPOTO: Calle Las Dunas cdra 3 Altura de cdra 23 de Av. Alfonso Ugarte Tarapoto</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 text-center text-gray-600 text-black">
+            <p>2023 Helados Villaizan. All rights reserved</p>
+          </div>
+        </div>
+      </footer>
         </>
       ) : (
         <p>Loading...</p>
