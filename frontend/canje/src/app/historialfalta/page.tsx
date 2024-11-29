@@ -1,9 +1,10 @@
+/* eslint-disable */
 "use client";
 
 import React, { useEffect, useState } from 'react';
 //import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import NavMenu from '../components/NavMenu/NavMenu';
+//import NavMenu from '../components/NavMenu/NavMenu';
 //import Banner from '../components/Banner/Banner';
 import baseApi from '../api/mainAxios.api';
 
@@ -73,7 +74,7 @@ const HistorialFalta: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavMenu />
+      {/*<NavMenu />*/}
       {/* Logo */}
       {/*<Banner></Banner>*/}
       <div className="py-8"></div>

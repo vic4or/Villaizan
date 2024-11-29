@@ -2,7 +2,7 @@
 
 import React from 'react';
 //import Image from 'next/image';
-import NavMenu from '../components/NavMenu/NavMenu';
+//import NavMenu from '../components/NavMenu/NavMenu';
 import SuspenseWrapper from '../components/SuspenseWrapper/SuspenseWrapper'; 
 import DetalleContent from '../components/DetalleContent/DetalleContent'; // Importa el nuevo componente
 //import Banner from '../components/Banner/Banner';
@@ -11,7 +11,6 @@ const Detalle: React.FC = () => {
   return (
     <SuspenseWrapper>
       <div className="min-h-screen bg-gray-50">
-        <NavMenu />
         {/* Logo */}
         {/*<Banner></Banner>*/}
         <div className="py-8"></div>

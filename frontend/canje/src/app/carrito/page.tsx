@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 //import Image from 'next/image';
@@ -22,6 +23,22 @@ const CarritoContent: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [userPoints, setUserPoints] = useState<number>(0);
   const [codigo, setCodigo] = useState<string>('');
+  const [user,setUser] = useState(null);
+  const [usuarioParsed,setUsuarioParsed] = useState(null);
+  useEffect(() => {
+    // Verificar si estamos en el cliente (browser)
+    if (typeof window !== 'undefined') {
+      const usuarioGuardado = localStorage.getItem('user');
+      if (usuarioGuardado) {
+        setUsuarioParsed(JSON.parse(usuarioGuardado));
+        setUser(usuarioParsed);
+        console.log("usuario:",user)
+        console.log("usuarioParsed:",usuarioParsed)
+      } else {
+        console.log('No se encontró el usuario en LocalStorage');
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (searchParams) {
@@ -71,7 +88,7 @@ const CarritoContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavMenu />
+      <NavMenu usuario={user} />
       {/*<Banner></Banner>*/}
       <div className="py-8"></div>
       

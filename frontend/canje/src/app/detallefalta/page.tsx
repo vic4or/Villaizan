@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 //import Image from 'next/image';
-import NavMenu from '../components/NavMenu/NavMenu';
+//import NavMenu from '../components/NavMenu/NavMenu';
 //import Banner from '../components/Banner/Banner';
 
 interface ProductDetail {
@@ -56,7 +56,7 @@ const DetalleFaltaContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavMenu />
+      {/*<NavMenu />*/}
       {/* Logo */}
       {/*<Banner></Banner>*/}
       <div className="py-8"></div>
