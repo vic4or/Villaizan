@@ -17,7 +17,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
   };
 
   return (
-    <header className="bg-red-600 text-white p-4">
+    <header className="bg-red-600 text-white p-4" style={{ backgroundColor: '#BD181E' }}>
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <Image 
@@ -25,7 +25,7 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
             alt="Logo" 
             width={50} 
             height={50}
-            className="cursor-pointer"
+            className="cursor-pointer h-12" // Ajusta la altura de la imagen
             onClick={() => handleNavigation('/')}
           />
         </div>
@@ -33,27 +33,27 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
           <a 
             onClick={() => handleNavigation('/catalogo')}
             className="hover:text-gray-200 cursor-pointer"
-            style={{ color: '#BD181E', fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}
+            style={{ color: '#FFFFFF', fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}
           >
             Catálogo
           </a>
           <a 
             onClick={() => handleNavigation(`/historial?user=${encodeURIComponent(JSON.stringify(usuario))}`)}
             className="hover:text-gray-200 cursor-pointer"
-            style={{ color: '#BD181E', fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}
+            style={{ color: '#FFFFFF', fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}
           >
             Historial Puntos
           </a>
           <a 
             onClick={() => handleNavigation(`/historialfalta?user=${encodeURIComponent(JSON.stringify(usuario))}`)}
             className="hover:text-gray-200 cursor-pointer"
-            style={{ color: '#BD181E', fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}
+            style={{ color: '#FFFFFF', fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}
           >
             Historial Puntos Por Canjear
           </a>
         </div>
         <div>
-          <span className="font-semibold" style={{ color: '#BD181E', fontFamily: 'Arial, sans-serif' }}>
+          <span className="font-semibold" style={{ color: '#FFFFFF', fontFamily: 'Arial, sans-serif' }}>
             Hola, {usuario.name}!
           </span>
         </div>
@@ -63,6 +63,8 @@ const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
 };
 
 export default NavMenu;
+
+
 
 
 
