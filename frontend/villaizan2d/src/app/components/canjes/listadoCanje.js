@@ -87,6 +87,13 @@ export default function ListadoCanje() {
         });
     };
 
+    const formatFechaHora = (fechaString) => {
+        const fecha = new Date(fechaString);
+        const fechaFormateada = fecha.toLocaleDateString();
+        const horaFormateada = fecha.toLocaleTimeString();
+        return { fechaFormateada, horaFormateada };
+    };
+
     return (
         <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
             <Row className="mb-4">
@@ -145,15 +152,18 @@ export default function ListadoCanje() {
                         <th style={{ textAlign: "center" }}>ID Cliente</th>
                         <th style={{ textAlign: "center" }}>Puntos Canjeados</th>
                         <th style={{ textAlign: "center" }}>Fecha Generación</th>
-                        <th style={{ textAlign: "center" }}>Fecha Redención</th>
                         <th style={{ textAlign: "center" }}>Fecha Vencimiento</th>
+                        <th style={{ textAlign: "center" }}>Fecha Redención</th>
+                        <th style={{ textAlign: "center" }}>Hora Redención</th>
                         <th style={{ textAlign: "center" }}>Usuario Canjeador</th>
                         <th style={{ textAlign: "left" }}>Productos</th>
                         <th style={{ textAlign: "center" }}>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentItems.map((item) => (
+                     {currentItems.map((item) => {
+                        const { fechaFormateada, horaFormateada } = formatFechaHora(item.actualizadoen);
+                        return (
                         <tr key={item.id}>
                             <td style={{ textAlign: "center" }}>
                                 {item.vi_usuario.vi_persona.numerodocumento}
@@ -161,9 +171,10 @@ export default function ListadoCanje() {
                             <td style={{ textAlign: "center" }}>{item.puntoscanjeado}</td>
                             <td style={{ textAlign: "center" }}>{formatFecha(item.fechageneracion)}</td>
                             <td style={{ textAlign: "center" }}>
-                                {item.fecharedencion ? formatFecha(item.fecharedencion) : "-"}
+                                {item.fecharedencion ? formatFecha(item.fechaexpiracion) : "-"}
                             </td>
-                            <td style={{ textAlign: "center" }}>{formatFecha(item.fechaexpiracion)}</td>
+                            <td style={{ textAlign: "center" }}>{fechaFormateada}</td>
+                            <td style={{ textAlign: "center" }}>{horaFormateada}</td>
                             <td style={{ textAlign: "center" }}>
                                 {item.estado.toLowerCase() === "canjeado" ? "admin" : "-"}
                             </td>
@@ -196,7 +207,8 @@ export default function ListadoCanje() {
                                 )}
                             </td>
                         </tr>
-                    ))}
+                    );
+                })}
                 </tbody>
             </Table>
 
