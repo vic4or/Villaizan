@@ -50,7 +50,7 @@ const HistorialFaltaPuntosContent: React.FC = () => {
       try {
         const response = await baseApi.get(`redencion/cliente/listarPorCanjear/${user.id}`);
         const data: CanjeItem[] = response.data;
-  
+        console.log("Datos",data)
         const canjeEntries = data.map(item => ({
           date: new Date(item.fechageneracion).toLocaleDateString(),
           dateExp: new Date(item.fechaexpiracion).toLocaleDateString(),
