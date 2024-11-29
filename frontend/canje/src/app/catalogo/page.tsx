@@ -39,7 +39,7 @@ const generateRandomCode = () => {
 const CatalogoProductosSuma: React.FC = () => {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
-  const [userPoints, setUserPoints] = useState<number>(200); // Puntos iniciales del usuario
+  const [userPoints, setUserPoints] = useState<number>(0); // Puntos iniciales del usuario
   const [selectedProducts, setSelectedProducts] = useState<{ [key: string]: number }>({}); // Productos seleccionados
   const [searchTerm, setSearchTerm] = useState<string>(''); // Estado para el término de búsqueda
   const [currentPage, setCurrentPage] = useState<number>(1); // Estado para la página actual
@@ -47,6 +47,7 @@ const CatalogoProductosSuma: React.FC = () => {
   // Obtener el objeto guardado desde LocalStorage
   const [user, setUser] = useState(null);
   const [codigo, setCodigo] = useState(null);
+
 
   useEffect(() => {
     // Verificar si estamos en el cliente (browser)
@@ -58,6 +59,7 @@ const CatalogoProductosSuma: React.FC = () => {
         console.log("usuario:", user);
         console.log("usuarioParsed:", usuarioParsed);
         setCodigo(usuarioParsed.id);
+        setUserPoints(usuarioParsed.db_info.puntosacumulados);
       } else {
         console.log('No se encontró el usuario en LocalStorage');
       }
