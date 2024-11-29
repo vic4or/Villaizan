@@ -149,7 +149,7 @@ export default function ListadoCanje() {
             <Table hover>
                 <thead>
                     <tr>
-                        <th style={{ textAlign: "center" }}>ID Cliente</th>
+                        <th style={{ textAlign: "center" }}>DNI Cliente</th>
                         <th style={{ textAlign: "center" }}>Puntos Canjeados</th>
                         <th style={{ textAlign: "center" }}>Fecha Generación</th>
                         <th style={{ textAlign: "center" }}>Fecha Vencimiento</th>
