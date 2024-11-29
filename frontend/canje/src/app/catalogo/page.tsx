@@ -267,19 +267,15 @@ const CatalogoProductosSuma: React.FC = () => {
             <div>
               <h4 className="font-bold mb-4 text-black">Links</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Carro</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Catálogo</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Acerca</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Contacto</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Inicio</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Ecommerce</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">LandingPage</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4 text-black">Ayuda</h4>
+              <h4 className="font-bold mb-4 text-black">Dirección</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Opciones de Pago</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Returns</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Privacy Policies</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Libro de Reclamaciones</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Canjea tus productos aquí: TARAPOTO: Calle Las Dunas cdra 3 Altura de cdra 23 de Av. Alfonso Ugarte Tarapoto</a></li>
               </ul>
             </div>
           </div>
