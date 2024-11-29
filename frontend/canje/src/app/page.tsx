@@ -3,7 +3,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import CatalogoProductosSuma from "@/app/catalogo/page"; // Asegúrate de que la ruta sea correcta
+import CatalogoProductosSuma from "@/app/catalogo/page";
+import { ClipLoader } from "react-spinners"; // Importar el componente de carga
 
 const Page: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -40,18 +41,29 @@ const Page: React.FC = () => {
   }, [userId]);
 
   if (!isAuthenticated) {
-    return <p>Redirigiendo...</p>; // Mostrar un mensaje temporal mientras redirige
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <ClipLoader size={50} color={"#123abc"} loading={true} />
+        <p>Redirigiendo...</p>
+      </div>
+    ); // Mostrar una animación de carga mientras redirige
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Renderiza el catálogo aquí */}
-      {userId ? <CatalogoProductosSuma /> : <p>Cargando...</p>}
+      {userId ? <CatalogoProductosSuma /> : (
+        <div className="flex justify-center items-center min-h-screen bg-gray-50">
+          <ClipLoader size={50} color={"#123abc"} loading={true} />
+          <p>Cargando...</p>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Page;
+
 
 
 
