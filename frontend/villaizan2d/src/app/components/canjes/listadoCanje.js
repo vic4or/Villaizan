@@ -254,7 +254,7 @@ export default function ListadoCanje() {
                             </p>
                             <ul>
                                 {selectedRedencion.vi_detalleredencion.map((detalle) => (
-                                    <li key={detalle.id}>{detalle.vi_producto.nombre}</li>
+                                    <li key={detalle.id}>{detalle.cantidad} {detalle.vi_producto.nombre}</li>
                                 ))}
                             </ul>
                         </>
