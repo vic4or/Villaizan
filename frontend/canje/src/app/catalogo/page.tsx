@@ -280,11 +280,11 @@ const CatalogoProductosSuma: React.FC = () => {
         <ol className="list-decimal list-inside mb-4 text-black space-y-4">
           <li className="text-lg">
             Busca el helado que deseas canjear usando el campo de búsqueda o navegando por la lista.
-            <span className="text-sm block mt-1 text-gray-700">(Cada helado muestra la cantidad de puntos necesarios para canjearlo)</span>
+            {/*<span className="text-sm block mt-1 text-gray-700">(Cada helado muestra la cantidad de puntos necesarios para canjearlo)</span>*/}
           </li>
           <li className="text-lg">
             Para añadir un helado a tu selección, haz clic en el botón verde (+). Si deseas quitarlo, haz clic en el botón rojo (-).
-            <span className="text-sm block mt-1 text-gray-700">(La cantidad seleccionada de cada helado se mostrará entre los botones (+) y (-))</span>
+            {/*<span className="text-sm block mt-1 text-gray-700">(La cantidad seleccionada de cada helado se mostrará entre los botones (+) y (-))</span>*/}
           </li>
           <li className="text-lg">
             Una vez hayas seleccionado todas tus recompensas, haz clic en el botón "Ver Productos" para revisar tu carrito.
