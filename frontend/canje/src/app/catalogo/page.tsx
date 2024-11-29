@@ -291,8 +291,8 @@ const CatalogoProductosSuma: React.FC = () => {
           </li>
         </ol>
         <h3 className="text-xl font-semibold mb-2 text-black">Carrito de Recompensas</h3>
-        <p className="mb-4 text-black">
-          En el carrito, verás las recompensas seleccionadas con su precio por unidad, cantidad y subtotal. Si deseas canjear con esas recompensas escogidas, haz clic en el botón "Canjear".
+        <p className="list-decimal list-inside mb-4 text-black space-y-4 text-lg">
+          4. En el carrito, verás las recompensas seleccionadas con su precio por unidad, cantidad y subtotal. Si deseas canjear con esas recompensas escogidas, haz clic en el botón "Canjear".
         </p>
       </div>
     </div>
