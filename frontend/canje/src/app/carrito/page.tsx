@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 //import Image from 'next/image';
@@ -17,28 +16,20 @@ interface CartItem {
   nombre: string;
 }
 
+interface User {
+  id: string;
+  db_info: {
+    puntosacumulados: number;
+  };
+}
+
 const CarritoContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [userPoints, setUserPoints] = useState<number>(0);
   const [codigo, setCodigo] = useState<string>('');
-  const [user,setUser] = useState(null);
-  const [usuarioParsed,setUsuarioParsed] = useState(null);
-  useEffect(() => {
-    // Verificar si estamos en el cliente (browser)
-    if (typeof window !== 'undefined') {
-      const usuarioGuardado = localStorage.getItem('user');
-      if (usuarioGuardado) {
-        setUsuarioParsed(JSON.parse(usuarioGuardado));
-        setUser(usuarioParsed);
-        console.log("usuario:",user)
-        console.log("usuarioParsed:",usuarioParsed)
-      } else {
-        console.log('No se encontró el usuario en LocalStorage');
-      }
-    }
-  }, []);
+  const [user, setUser] = useState<User | null>(null); // Definimos el tipo User para user
 
   useEffect(() => {
     if (searchParams) {
@@ -49,14 +40,14 @@ const CarritoContent: React.FC = () => {
         setCartItems(data.detalles || []);
         setUserPoints(data.puntoscanjeado || 0);
         setCodigo(data.codigo || '');
+        setUser(data.user || null); // Asignamos el user recibido
       }
     }
   }, [searchParams]);
 
-
   const handleCheckout = async () => {
     const dataToSend = {
-      id_usuario: 'us-256de824',
+      id_usuario: user?.id || 'us-256de824', // Usamos el ID del user si está disponible
       puntoscanjeado: userPoints,
       codigo: codigo,
       detalles: cartItems,
@@ -84,12 +75,9 @@ const CarritoContent: React.FC = () => {
     }
   };
   
-  
-
   return (
     <div className="min-h-screen bg-gray-50">
       <NavMenu usuario={user} />
-      {/*<Banner></Banner>*/}
       <div className="py-8"></div>
       
       <div className="container mx-auto px-4 py-8">
@@ -125,37 +113,6 @@ const CarritoContent: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/*<footer className="bg-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div>
-              <h4 className="font-bold mb-4 text-black">Helados Villaizan</h4>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-black">Links</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Carro</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Catálogo</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Acerca</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Contacto</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4 text-black">Ayuda</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Opciones de Pago</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Returns</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Privacy Policies</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Libro de Reclamaciones</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 text-center text-gray-600 text-black">
-            <p>2023 Helados Villaizan. All rights reserved</p>
-          </div>
-        </div>
-      </footer>*/}
     </div>
   );
 };
@@ -169,6 +126,8 @@ const Carrito: React.FC = () => {
 };
 
 export default Carrito;
+
+
 
 
 
