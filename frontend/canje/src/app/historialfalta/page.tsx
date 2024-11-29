@@ -13,3 +13,4 @@ const HistorialFaltaPuntos: React.FC = () => {
 
 export default HistorialFaltaPuntos;
 
+
