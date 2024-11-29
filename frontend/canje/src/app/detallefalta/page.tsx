@@ -100,19 +100,17 @@ const DetalleFaltaContent: React.FC = () => {
               <h4 className="font-bold mb-4 text-black">Links</h4>
               <ul className="space-y-2">
                 <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Inicio</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Ecommerce</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">LandingPage</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-4 text-black">Dirección</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Canjea tus productos aquí: TARAPOTO: Calle Las Dunas cdra 3 Altura de cdra 23 de Av. Alfonso Ugarte Tarapoto</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-gray-900 text-black">Canjea tus productos aquí: <strong>Tarapoto</strong>: Calle Las Dunas cdra 3 Altura de cdra 23 de Av. Alfonso Ugarte Tarapoto</a></li>
               </ul>
             </div>
           </div>
           <div className="mt-8 text-center text-gray-600 text-black">
-            <p>2023 Helados Villaizan. All rights reserved</p>
+            <p>2024 Helados Villaizan. All rights reserved</p>
           </div>
         </div>
       </footer>
