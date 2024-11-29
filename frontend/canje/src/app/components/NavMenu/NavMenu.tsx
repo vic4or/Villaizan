@@ -1,11 +1,31 @@
+/* eslint-disable */
 "use client";
 
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import { useRouter } from 'next/navigation'; // Cambiado a 'next/navigation'
 
-const NavMenu: React.FC = () => {
-  const router = useRouter();
+interface NavMenuProps {
+  usuario: any; // O el tipo adecuado para el usuario
+}
 
+const NavMenu: React.FC<NavMenuProps> = ({ usuario }) => {
+  const router = useRouter();
+  const [user,setUser] = useState(null);
+  const [usuarioParsed,setUsuarioParsed] = useState(null);
+  useEffect(() => {
+    // Verificar si estamos en el cliente (browser)
+    if (typeof window !== 'undefined') {
+      const usuarioGuardado = localStorage.getItem('user');
+      if (usuarioGuardado) {
+        setUsuarioParsed(JSON.parse(usuarioGuardado));
+        setUser(usuarioParsed);
+        console.log("usuario:",user)
+        console.log("usuarioParsed:",usuarioParsed)
+      } else {
+        console.log('No se encontró el usuario en LocalStorage');
+      }
+    }
+  }, []);
   const handleNavigation = (path: string) => {
     router.push(path);
   };
@@ -20,7 +40,7 @@ const NavMenu: React.FC = () => {
           <a onClick={() => handleNavigation('/historialfalta')} className="hover:text-gray-200 cursor-pointer">HistorialPuntosPorCanjear</a>
         </div>
         <div>
-          <span className="text-black">Hola, Usuario!</span>
+          <span className="text-black">Hola, {usuario.name}!</span>
         </div>
       </div>
     </header>
