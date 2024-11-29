@@ -48,7 +48,6 @@ const CatalogoProductosSuma: React.FC = () => {
   const [user, setUser] = useState(null);
   const [codigo, setCodigo] = useState(null);
 
-
   useEffect(() => {
     // Verificar si estamos en el cliente (browser)
     if (typeof window !== 'undefined') {
@@ -117,6 +116,7 @@ const CatalogoProductosSuma: React.FC = () => {
       puntoscanjeado: selectedProductsData.reduce((sum, product) => sum + (product ? product.subtotalpuntosredencion : 0), 0),
       codigo: generateRandomCode(),
       detalles: selectedProductsData,
+      user: user // Pasar el objeto user completo
     };
 
     // Convertimos los datos a una cadena de consulta (query string)
@@ -124,7 +124,7 @@ const CatalogoProductosSuma: React.FC = () => {
       data: JSON.stringify(dataToSend)
     }).toString();
 
-    // Navegar a la página de carrito con los productos y los puntos en la URL
+    // Navegar a la página de carrito con los productos, los puntos y el usuario en la URL
     router.push(`/carrito?${queryString}`);
   };
 
