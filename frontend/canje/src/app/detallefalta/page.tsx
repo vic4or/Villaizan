@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 //import Image from 'next/image';
-import NavMenu from '../components/NavMenu/NavMenu';
+//import NavMenu from '../components/NavMenu/NavMenu';
 //import Banner from '../components/Banner/Banner';
 
 interface ProductDetail {
@@ -29,8 +29,8 @@ const DetalleFaltaContent: React.FC = () => {
   const [productDetails, setProductDetails] = useState<ProductDetail[]>([]);
   const [transactionType, setTransactionType] = useState<string>('');
   const [transactionDate, setTransactionDate] = useState<string>('');
-  const user = JSON.parse(searchParams.get('user') || '{}');
-
+  //const user = JSON.parse(searchParams.get('user') || '{}');
+  
   useEffect(() => {
     if (searchParams) {
       const type = searchParams.get('type');
@@ -57,7 +57,7 @@ const DetalleFaltaContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavMenu usuario={user} />
+      {/*<NavMenu />*/}
       {/* Logo */}
       {/*<Banner></Banner>*/}
       <div className="py-8"></div>
