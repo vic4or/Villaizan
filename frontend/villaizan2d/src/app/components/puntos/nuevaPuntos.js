@@ -67,9 +67,28 @@ const NuevaPuntos = ({ show, handleClose }) => {
       return;
     }
 
+    // Verificar si el producto ya tiene puntos activos
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/listarTodos`);
+      const puntosAsignados = response.data;
+
+      const puntosActivos = puntosAsignados.find(
+        (punto) => punto.id_producto === idProducto && punto.estaactivo === true
+      );
+
+      if (puntosActivos) {
+        setError(`El producto "${nombreProducto}" ya tiene puntos asignados.`);
+        return;
+      }
+    } catch (err) {
+      console.error('Error al verificar puntos existentes:', err);
+      setError('Hubo un error al verificar los puntos existentes.');
+      return;
+    }
+
     const data = {
       idProducto: idProducto,
-      cantidadPuntos: parseInt(cantidadPuntos)
+      cantidadPuntos: parseInt(cantidadPuntos),
     };
 
     try {
@@ -85,16 +104,11 @@ const NuevaPuntos = ({ show, handleClose }) => {
     }
   };
 
-  // Manejar el clic en el campo de Producto
-  const handleProductoClick = () => {
-    setShowDropdown(true);
-  };
-
   // Manejar la selección de producto
   const handleProductoSelect = (producto) => {
     setIdProducto(producto.id);
     setNombreProducto(producto.nombre);
-    setSearchTerm('');
+    setSearchTerm(producto.nombre); // Mantiene el texto del producto seleccionado en el campo de búsqueda
     setShowDropdown(false);
   };
 
@@ -124,14 +138,17 @@ const NuevaPuntos = ({ show, handleClose }) => {
             {error && <Alert variant="danger">{error}</Alert>}
             
             <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3">
+              <Form.Group className="mb-3" style={{ position: 'relative' }}>
                 <Form.Label>Producto</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Buscar producto..."
-                  value={nombreProducto}
-                  onClick={handleProductoClick}
-                  readOnly
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setShowDropdown(true);
+                  }}
+                  onFocus={() => setShowDropdown(true)}
                 />
                 {showDropdown && (
                   <ul className="list-group mt-2" style={dropdownStyle}>

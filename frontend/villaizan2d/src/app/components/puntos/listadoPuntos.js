@@ -21,6 +21,9 @@ export default function ListadoPuntos() {
     const [showModal, setShowModal] = useState(false);
     const [showNuevoModal, setShowNuevoModal] = useState(false); // Estado para mostrar el modal de nueva puntos
     const itemsPerPage = 10;
+    const [showConfirmModal, setShowConfirmModal] = useState(false); // Modal de confirmación
+    const [selectedDeleteId, setSelectedDeleteId] = useState(null); // ID del punto seleccionado para inactivar
+
 
     // Llamada a la API para listar todos los puntos
     useEffect(() => {
@@ -93,7 +96,7 @@ export default function ListadoPuntos() {
 
             // Hacemos la llamada a la API para editar
             await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/editar`, {
-                idPuntosProducto: selectedProduct.id_puntosproducto,
+                id_puntosproducto: selectedProduct.id_puntosproducto,
                 idProducto: selectedProduct.id_producto,
                 nuevaCantidad: nuevaCantidad
             });
@@ -113,23 +116,34 @@ export default function ListadoPuntos() {
         }
     };
 
-    // Manejar la eliminación (inactivación) de un punto
-    const handleDelete = async (idPuntosProducto) => {
-        console.log("ID a inactivar:", idPuntosProducto); // Verificar el ID en la consola
+    const handleDelete = (id_puntosproducto) => {
+        setSelectedDeleteId(id_puntosproducto); // Guardar el ID del punto a inactivar
+        setShowConfirmModal(true); // Mostrar el modal de confirmación
+    }
+    ;
+
+    const confirmDelete = async () => {
         try {
-            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/inactivar/${idPuntosProducto}`);
-            // Actualizar la lista de puntos para reflejar el cambio de estado
+            if (!selectedDeleteId) return; // Validar que haya un ID seleccionado
+    
+            await axios.put(`${process.env.NEXT_PUBLIC_SERVER_URL}/puntos_producto/inactivar/${selectedDeleteId}`);
+    
+            // Actualizar la lista de puntos
             const updatedPuntos = puntos.map((item) =>
-                item.id_puntosproducto === idPuntosProducto
-                ? { ...item, estado: false } // Cambiar el estado a inactivo
-                : item
+                item.id_puntosproducto === selectedDeleteId
+                    ? { ...item, estaactivo: false } // Cambiar el estado a inactivo
+                    : item
             );
             setPuntos(updatedPuntos);
+    
+            setShowConfirmModal(false); // Cerrar el modal
+            setSelectedDeleteId(null); // Limpiar el ID seleccionado
         } catch (error) {
             console.error("Error al inactivar el punto:", error);
             alert("Error al inactivar el punto. Inténtalo de nuevo.");
         }
     };
+    
 
     const handleExport = () => {
         const worksheetData = filteredPuntos.map((item) => {
@@ -149,7 +163,16 @@ export default function ListadoPuntos() {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Puntos");
         XLSX.writeFile(workbook, "puntos_export.xlsx");
     };      
+    const [showDropdown, setShowDropdown] = useState(false);
 
+    const dropdownStyle = {
+        maxHeight: '200px',
+        overflowY: 'auto',
+        position: 'absolute',
+        zIndex: 1000,
+        width: '100%',
+      };
+    
     return (
         <Container fluid style={{ marginLeft: "60px", maxWidth: "95%" }}>
             <Row className="mb-4">
@@ -186,13 +209,40 @@ export default function ListadoPuntos() {
 
             <Row className="mb-3">
                 <Col>
-                    <InputGroup>
-                        <FormControl
-                            placeholder="Buscar por producto..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </InputGroup>
+                <Form.Control
+                    type="text"
+                    placeholder="Buscar producto..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setShowDropdown(true); // Mostrar el dropdown mientras se escribe
+                    }}
+                    onFocus={() => setShowDropdown(true)} // Mostrar al enfocar
+                    />
+                    {showDropdown && (
+                        <ul className="list-group mt-2" style={dropdownStyle}>
+                            {productos
+                            .filter((producto) =>
+                                producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((producto) => (
+                                <li
+                                key={producto.id}
+                                className="list-group-item list-group-item-action"
+                                onClick={() => {
+                                    setid_producto(producto.id);
+                                    setNombreProducto(producto.nombre);
+                                    setSearchTerm(producto.nombre); // Mantener el producto seleccionado en el input
+                                    setShowDropdown(false); // Ocultar el dropdown
+                                }}
+                                >
+                                {producto.nombre}
+                                </li>
+                            ))}
+                        </ul>
+                        
+                        )}
+
                 </Col>
             </Row>
 
@@ -238,7 +288,7 @@ export default function ListadoPuntos() {
                                     <Button 
                                         variant={item.estaactivo ? "success" : "danger"} 
                                         size="sm" 
-                                        onClick={() => handleDelete(item)} 
+                                        onClick={() => handleDelete(item.id_puntosproducto)} 
                                     >
                                         {item.estaactivo ? "Activo" : "Inactivo"}
                                     </Button>
@@ -278,6 +328,23 @@ export default function ListadoPuntos() {
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>Cerrar</Button>
                     <Button variant="danger" onClick={handleSave}>Guardar</Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Inactivación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que deseas inactivar la asignación de puntos de este producto? Esta acción no se puede deshacer.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="danger" onClick={confirmDelete}>
+                        Inactivar
+                    </Button>
                 </Modal.Footer>
             </Modal>
 

@@ -147,6 +147,7 @@ export default function ListadoRecompensas() {
                 setRecompensas(updatedRecompensas);
                 setShowConfirmDeleteModal(false);
                 setShowDeleteSuccessModal(true);
+                await fetchRecompensasYProductos(); // Actualiza la lista tras inactivar
             }
         } catch (error) {
             console.error("Error al inactivar la recompensa:", error);
