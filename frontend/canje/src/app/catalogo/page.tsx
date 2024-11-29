@@ -204,45 +204,45 @@ const CatalogoProductosSuma: React.FC = () => {
           </div>
 
           {/* Products Grid */}
-          <div className="container mx-auto px-4 mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {paginatedProducts.map((product) => (
-                <div
-                  key={product.id_recompensa}
-                  className="bg-white rounded-lg shadow-md overflow-hidden relative"
-                >
-                  <div className="p-4">
-  <Image
-    src={product.vi_producto.urlimagen}
-    alt={product.vi_producto.nombre}
-    width={300}
-    height={300}
-    className="w-full h-48 object-cover rounded-lg"
-    onError={(e) => (e.currentTarget.src = '/images/defaultImage.png')} // Cargar una imagen predeterminada en caso de error
-  />
-  <h3 className="mt-4 text-lg font-semibold text-black">{product.vi_producto.nombre}</h3>
-  <div className="mt-4 flex justify-between items-center">
-    <span className="text-lg text-black">Canjealo por <strong>{product.puntosnecesarios}</strong> puntos</span>
+<div className="container mx-auto px-4 mb-8">
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {paginatedProducts.map((product) => (
+      <div
+        key={product.id_recompensa}
+        className="bg-white rounded-lg shadow-md overflow-hidden relative"
+      >
+        <div className="p-4">
+          <Image
+            src={product.vi_producto.urlimagen}
+            alt={product.vi_producto.nombre}
+            width={300}
+            height={300}
+            className="w-full h-48 object-cover rounded-lg"
+            onError={(e) => (e.currentTarget.src = '/images/defaultImage.png')} // Cargar una imagen predeterminada en caso de error
+          />
+          <h3 className="mt-4 text-lg font-semibold text-black">{product.vi_producto.nombre}</h3>
+          <div className="mt-4 flex justify-between items-center">
+            <span className="text-lg text-black">Canjealo por <strong>{product.puntosnecesarios}</strong> puntos</span>
+          </div>
+          <div className="mt-4 flex items-center space-x-4">
+            <button
+              className="px-4 py-2 bg-gray-300 text-white rounded" // Color gris tenue para el botón "-"
+              onClick={() => handleRemoveProduct(product.vi_producto.id, product.puntosnecesarios)}
+            >
+              -
+            </button>
+            <span className="text-lg text-black">{selectedProducts[product.vi_producto.id] || 0}</span>
+            <button
+              className="px-4 py-2 bg-gray-300 text-white rounded" // Color gris tenue para el botón "+"
+              onClick={() => handleAddProduct(product.vi_producto.id, product.puntosnecesarios)}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+    ))}
   </div>
-  <div className="mt-4 flex items-center space-x-4">
-    <button
-      className="px-4 py-2 bg-gray-300 text-white rounded" // Color gris tenue para el botón "-"
-      onClick={() => handleRemoveProduct(product.vi_producto.id, product.puntosnecesarios)}
-    >
-      -
-    </button>
-    <span className="text-lg text-black">{selectedProducts[product.vi_producto.id] || 0}</span>
-    <button
-      className="px-4 py-2 bg-gray-300 text-white rounded" // Color gris tenue para el botón "+"
-      onClick={() => handleAddProduct(product.vi_producto.id, product.puntosnecesarios)}
-    >
-      +
-    </button>
-  </div>
-</div>
-</div>
-))}
-</div>
 </div>
 
 {/* Pagination */}
@@ -261,36 +261,40 @@ const CatalogoProductosSuma: React.FC = () => {
 {/* Pop-up de Instrucciones */}
 {showInstructions && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white p-8 rounded shadow-lg max-w-md">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold mb-4 text-black">Instrucciones</h2>
-        <button
-          onClick={() => setShowInstructions(false)}
-          className="text-black text-3xl"
-        >
-          &times;
-        </button>
+    <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
+      <div className="bg-red-600 text-white p-4 rounded-t-lg">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">Instrucciones</h2>
+          <button
+            onClick={() => setShowInstructions(false)}
+            className="text-white text-3xl"
+          >
+            &times;
+          </button>
+        </div>
       </div>
-      <p className="mb-4 text-black">
-        Tienes un total de {userPoints} puntos disponibles. Para seleccionar una recompensa:
-      </p>
-      <ol className="list-decimal list-inside mb-4 text-black">
-        <li>
-          Busca el helado que deseas canjear usando el campo de búsqueda o navegando por la lista 
-          <span className="text-sm">(Cada helado muestra la cantidad de puntos necesarios para canjearlo)</span>.
-        </li>
-        <li>
-          Para añadir un helado a tu selección, haz clic en el botón verde (+). Si deseas quitarlo, haz clic en el botón rojo (-) 
-          <span className="text-sm">(La cantidad seleccionada de cada helado se mostrará entre los botones (+) y (-))</span>.
-        </li>
-        <li>
-          Una vez hayas seleccionado todas tus recompensas, haz clic en el botón "Ver Productos" para revisar tu carrito.
-        </li>
-      </ol>
-      <h3 className="text-xl font-semibold mb-2 text-black">Carrito de Recompensas</h3>
-      <p className="mb-4 text-black">
-        En el carrito, verás las recompensas seleccionadas con su precio por unidad, cantidad y subtotal. Si deseas canjear con esas recompensas escogidas, haz clic en el botón "Canjear".
-      </p>
+      <div className="p-6">
+        <p className="mb-4 text-black">
+          Tienes un total de {userPoints} puntos disponibles. Para seleccionar una recompensa:
+        </p>
+        <ol className="list-decimal list-inside mb-4 text-black space-y-2">
+          <li className="text-lg">
+            Busca el helado que deseas canjear usando el campo de búsqueda o navegando por la lista 
+            <span className="text-sm block mt-1">(Cada helado muestra la cantidad de puntos necesarios para canjearlo)</span>.
+          </li>
+          <li className="text-lg">
+            Para añadir un helado a tu selección, haz clic en el botón verde (+). Si deseas quitarlo, haz clic en el botón rojo (-) 
+            <span className="text-sm block mt-1">(La cantidad seleccionada de cada helado se mostrará entre los botones (+) y (-))</span>.
+          </li>
+          <li className="text-lg">
+            Una vez hayas seleccionado todas tus recompensas, haz clic en el botón "Ver Productos" para revisar tu carrito.
+          </li>
+        </ol>
+        <h3 className="text-xl font-semibold mb-2 text-black">Carrito de Recompensas</h3>
+        <p className="mb-4 text-black">
+          En el carrito, verás las recompensas seleccionadas con su precio por unidad, cantidad y subtotal. Si deseas canjear con esas recompensas escogidas, haz clic en el botón "Canjear".
+        </p>
+      </div>
     </div>
   </div>
 )}
