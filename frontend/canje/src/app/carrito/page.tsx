@@ -46,8 +46,13 @@ const CarritoContent: React.FC = () => {
   }, [searchParams]);
 
   const handleCheckout = async () => {
+    if (!user) {
+      alert('No se encontró el usuario');
+      return;
+    }
+
     const dataToSend = {
-      id_usuario: user?.id || 'us-256de824', // Usamos el ID del user si está disponible
+      id_usuario: user.id, // Usamos el ID del user
       puntoscanjeado: userPoints,
       codigo: codigo,
       detalles: cartItems,
@@ -77,7 +82,7 @@ const CarritoContent: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <NavMenu usuario={user} />
+      {user ? <NavMenu usuario={user} /> : <p>Loading...</p>}
       <div className="py-8"></div>
       
       <div className="container mx-auto px-4 py-8">
@@ -126,6 +131,7 @@ const Carrito: React.FC = () => {
 };
 
 export default Carrito;
+
 
 
 
