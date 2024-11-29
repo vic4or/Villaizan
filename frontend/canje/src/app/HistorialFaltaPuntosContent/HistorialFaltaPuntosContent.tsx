@@ -52,6 +52,7 @@ const HistorialFaltaPuntosContent: React.FC = () => {
         console.log("API Response:", response);
 
         const data: CanjeItem[] = response.data;
+        
         console.log("Data received:", data);
 
         const canjeEntries = data.map(item => ({
